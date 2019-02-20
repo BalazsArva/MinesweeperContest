@@ -5,7 +5,7 @@ namespace Minesweeper.GameServices.Contracts
 {
     public interface IGameService
     {
-        Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, CancellationToken cancellationToken);
+        Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken);
 
         Task JoinGameAsync(string gameId, string player2Id, string playerDisplayName, string entryToken, CancellationToken cancellationToken);
 
