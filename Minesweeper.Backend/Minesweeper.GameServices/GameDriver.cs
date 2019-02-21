@@ -147,18 +147,13 @@ namespace Minesweeper.GameServices
         {
             var table = game.GameTable;
 
-            if (row < 0 || row >= table.Rows)
-            {
-                return;
-            }
-
-            if (column < 0 || column >= table.Columns)
-            {
-                return;
-            }
-
+            var rowOverflown = row < 0 || row >= table.Rows;
+            var colOverflown = column < 0 || column >= table.Columns;
+            var isMined = table.FieldMatrix[row, column] == FieldTypes.Mined;
             // TODO: Use a faster structure to look up opened fields
-            if (game.Moves.Any(m => m.Row == row && m.Column == column))
+            var isMovedOn = game.Moves.Any(m => m.Row == row && m.Column == column);
+
+            if (rowOverflown || colOverflown || isMined || isMovedOn)
             {
                 return;
             }
@@ -169,6 +164,7 @@ namespace Minesweeper.GameServices
             {
                 for (var colOffset = -1; colOffset <= 1; ++colOffset)
                 {
+                    // The same field for which this recursion step was called for, skip.
                     if (rowOffset == 0 && colOffset == 0)
                     {
                         continue;
