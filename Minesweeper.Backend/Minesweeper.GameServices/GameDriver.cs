@@ -108,16 +108,17 @@ namespace Minesweeper.GameServices
             var neighboringMineCount = 0;
             for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
             {
+                var rowToCheck = row + rowOffset;
+
+                // Row out of range
+                if (rowToCheck < 0 || rowToCheck >= table.Rows)
+                {
+                    continue;
+                }
+
                 for (var colOffset = -1; colOffset <= 1; ++colOffset)
                 {
-                    var rowToCheck = row + rowOffset;
                     var colToCheck = column + colOffset;
-
-                    // Row out of range
-                    if (rowToCheck < 0 || rowToCheck >= table.Rows)
-                    {
-                        continue;
-                    }
 
                     // Column out of range
                     if (colToCheck < 0 || colToCheck >= table.Columns)

@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts;
-using Minesweeper.WebAPI.Contracts.Requests;
 
 namespace Minesweeper.WebAPI.Controllers
 {
@@ -20,9 +19,22 @@ namespace Minesweeper.WebAPI.Controllers
 
         [HttpGet]
         [Route("{gameId}", Name = RouteNames.Game)]
-        public async Task<IActionResult> Get([FromBody] NewGameRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        [Route("{gameId}/table")]
+        public async Task<IActionResult> GetGameTableTemp(string gameId, CancellationToken cancellationToken)
+        {
+            // TODO: This is only temp
+            var result = await _gameService.GetVisibleGameTableAsync(gameId, cancellationToken).ConfigureAwait(false);
+
+            return Ok(new
+            {
+                VisibleTable = result
+            });
         }
     }
 }

@@ -10,6 +10,10 @@ namespace Minesweeper.GameServices.GameModel
         public const int MinColumns = 10;
         public const int MaxColumns = 100;
 
+        protected GameTable()
+        {
+        }
+
         public GameTable(int rows, int columns)
         {
             if (rows < MinRows)
@@ -38,10 +42,10 @@ namespace Minesweeper.GameServices.GameModel
             FieldMatrix = new FieldTypes[rows, columns];
         }
 
-        public int Rows { get; }
+        public int Rows { get; set; }
 
-        public int Columns { get; }
+        public int Columns { get; set; }
 
-        public FieldTypes[,] FieldMatrix { get; }
+        public FieldTypes[,] FieldMatrix { get; set; }
     }
 }
