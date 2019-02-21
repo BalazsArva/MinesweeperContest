@@ -10,7 +10,6 @@ namespace Minesweeper.GameServices.Extensions
     {
         public static Task<Game> LoadGameAsync(this IAsyncDocumentSession session, string gameId, CancellationToken cancellationToken)
         {
-            var documentId = gameId;
             var id = session.Advanced.DocumentStore.GetPrefixedDocumentId<Game>(gameId);
 
             return session.LoadAsync<Game>(id, cancellationToken);

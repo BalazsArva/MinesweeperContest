@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Minesweeper.DataAccess.RavenDb.Extensions;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
 using Minesweeper.GameServices.Generators;
+using Minesweeper.GameServices.Providers;
 using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices
@@ -14,12 +16,14 @@ namespace Minesweeper.GameServices
         private readonly IDocumentStore _documentStore;
         private readonly IGameGenerator _gameGenerator;
         private readonly IGameDriver _gameDriver;
+        private readonly IGuidProvider _guidProvider;
 
-        public GameService(IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver)
+        public GameService(IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IGuidProvider guidProvider)
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _gameGenerator = gameGenerator ?? throw new ArgumentNullException(nameof(gameGenerator));
             _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
+            _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
         }
 
         public async Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
@@ -28,6 +32,7 @@ namespace Minesweeper.GameServices
             {
                 var game = _gameGenerator.GenerateGame(tableRows, tableColumns, mineCount);
 
+                game.Id = _documentStore.GetPrefixedDocumentId<Game>(_guidProvider.GenerateGuidString());
                 game.Player1 = new Player
                 {
                     PlayerId = hostPlayerId,
