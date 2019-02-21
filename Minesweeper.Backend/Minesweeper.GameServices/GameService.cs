@@ -61,6 +61,8 @@ namespace Minesweeper.GameServices
                 {
                     await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 }
+
+                return new MoveResult { MoveResultType = movementResult };
             }
         }
     }
