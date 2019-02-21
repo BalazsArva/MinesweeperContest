@@ -35,7 +35,18 @@ namespace Minesweeper.GameServices
                 return MoveResultType.CannotMoveThere;
             }
 
+            game.Status = GameStatus.InProgress;
+
             PerformMove(game, player, row, column);
+
+            var gameIsOver = GameIsOver(game);
+            if (gameIsOver)
+            {
+                game.Status = GameStatus.Finished;
+                game.Winner = DetermineWinner(game);
+
+                return MoveResultType.GameOver;
+            }
 
             return MoveResultType.Success;
         }
@@ -207,6 +218,30 @@ namespace Minesweeper.GameServices
             }
 
             return basePoints + bonus;
+        }
+
+        private bool GameIsOver(Game game)
+        {
+            var table = game.GameTable;
+
+            return game.Moves.Count == table.Rows * table.Columns;
+        }
+
+        private Players? DetermineWinner(Game game)
+        {
+            var player1Points = game.Player1.Points;
+            var player2Points = game.Player2.Points;
+
+            if (player1Points == player2Points)
+            {
+                return null;
+            }
+            else if (player1Points > player2Points)
+            {
+                return Players.Player1;
+            }
+
+            return Players.Player2;
         }
     }
 }

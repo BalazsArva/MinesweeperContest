@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Minesweeper.DataAccess.RavenDb\Minesweeper.DataAccess.RavenDb.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
 </Project>

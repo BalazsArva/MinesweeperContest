@@ -29,7 +29,8 @@ namespace Minesweeper.GameServices.Generators
                 EntryToken = _guidProvider.GenerateGuidString(),
                 UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime(),
                 GameTable = gameTable,
-                StarterPlayer = starterPlayer
+                StarterPlayer = starterPlayer,
+                Status = GameStatus.NotStarted
             };
         }
     }

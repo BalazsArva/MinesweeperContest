@@ -72,7 +72,7 @@ namespace Minesweeper.GameServices
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 var movementResult = _gameDriver.MakeMove(game, playerId, row, column);
-                if (movementResult == MoveResultType.Success)
+                if (movementResult == MoveResultType.Success || movementResult == MoveResultType.GameOver)
                 {
                     await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 }

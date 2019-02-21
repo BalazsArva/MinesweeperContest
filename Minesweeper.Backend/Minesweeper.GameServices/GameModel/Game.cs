@@ -15,9 +15,13 @@ namespace Minesweeper.GameServices.GameModel
 
         public Players StarterPlayer { get; set; }
 
+        public Players? Winner { get; set; }
+
         public Player Player1 { get; set; }
 
         public Player Player2 { get; set; }
+
+        public GameStatus Status { get; set; }
 
         public List<GameMove> Moves { get; set; } = new List<GameMove>();
     }

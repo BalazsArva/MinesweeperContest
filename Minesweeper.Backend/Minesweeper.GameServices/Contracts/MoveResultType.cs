@@ -4,6 +4,8 @@
     {
         Success,
 
+        GameOver,
+
         NotYourTurn,
 
         CannotMoveThere
