@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
 using Minesweeper.GameServices.Generators;
 using Raven.Client.Documents;
@@ -12,11 +13,13 @@ namespace Minesweeper.GameServices
     {
         private readonly IDocumentStore _documentStore;
         private readonly IGameGenerator _gameGenerator;
+        private readonly IGameDriver _gameDriver;
 
-        public GameService(IDocumentStore documentStore, IGameGenerator gameGenerator)
+        public GameService(IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver)
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _gameGenerator = gameGenerator ?? throw new ArgumentNullException(nameof(gameGenerator));
+            _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
         }
 
         public async Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
@@ -38,8 +41,7 @@ namespace Minesweeper.GameServices
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
-                // TODO: Create util method for document id prefix generation
-                var game = await session.LoadAsync<Game>("Games/" + gameId, cancellationToken).ConfigureAwait(false);
+                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 // TODO: Validate: Player2 is unset, entry token is valid, game not finished, etc.
                 game.Player2 = new Player(player2Id, playerDisplayName);
@@ -50,7 +52,16 @@ namespace Minesweeper.GameServices
 
         public async Task<MoveResult> MakeMoveAsync(string gameId, string playerId, int row, int column, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using (var session = _documentStore.OpenAsyncSession())
+            {
+                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
+
+                var movementResult = _gameDriver.MakeMove(game, playerId, row, column);
+                if (movementResult == MoveResultType.Success)
+                {
+                    await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                }
+            }
         }
     }
 }

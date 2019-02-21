@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Minesweeper.GameServices.GameModel
 {
@@ -17,5 +18,7 @@ namespace Minesweeper.GameServices.GameModel
         public Player Player1 { get; set; }
 
         public Player Player2 { get; set; }
+
+        public List<GameMove> Moves { get; set; } = new List<GameMove>();
     }
 }
