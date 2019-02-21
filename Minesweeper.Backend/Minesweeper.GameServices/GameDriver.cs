@@ -40,7 +40,7 @@ namespace Minesweeper.GameServices
 
             PerformMove(game, openedFieldLookup, player, row, column);
 
-            var gameIsOver = GameIsOver(game);
+            var gameIsOver = IsGameOver(game);
             if (gameIsOver)
             {
                 game.Status = GameStatus.Finished;
@@ -54,8 +54,12 @@ namespace Minesweeper.GameServices
 
         private bool CheckPlayerCanMove(Game game, Players player)
         {
-            var isFirstMove = game.Moves.Count == 0;
+            if (game.Status == GameStatus.Finished)
+            {
+                return false;
+            }
 
+            var isFirstMove = game.Moves.Count == 0;
             if (isFirstMove)
             {
                 return game.StarterPlayer == player;
@@ -217,7 +221,7 @@ namespace Minesweeper.GameServices
             return basePoints + bonus;
         }
 
-        private bool GameIsOver(Game game)
+        private bool IsGameOver(Game game)
         {
             var table = game.GameTable;
 
