@@ -34,7 +34,7 @@ namespace Minesweeper.GameServices.Generators
 
             foreach (var minedField in minedFields)
             {
-                gameTable[minedField.Row, minedField.Column] = FieldTypes.Mined;
+                gameTable.FieldMatrix[minedField.Row, minedField.Column] = FieldTypes.Mined;
             }
 
             return gameTable;

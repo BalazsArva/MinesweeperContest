@@ -28,7 +28,12 @@ namespace Minesweeper.GameServices
             {
                 var game = _gameGenerator.GenerateGame(tableRows, tableColumns, mineCount);
 
-                game.Player1 = new Player(hostPlayerId, hostPlayerDisplayName);
+                game.Player1 = new Player
+                {
+                    PlayerId = hostPlayerId,
+                    DisplayName = hostPlayerDisplayName,
+                    Points = 0
+                };
 
                 await session.StoreAsync(game, cancellationToken).ConfigureAwait(false);
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -44,7 +49,12 @@ namespace Minesweeper.GameServices
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 // TODO: Validate: Player2 is unset, entry token is valid, game not finished, etc.
-                game.Player2 = new Player(player2Id, playerDisplayName);
+                game.Player2 = new Player
+                {
+                    PlayerId = player2Id,
+                    DisplayName = playerDisplayName,
+                    Points = 0
+                };
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }

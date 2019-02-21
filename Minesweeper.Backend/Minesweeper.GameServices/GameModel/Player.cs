@@ -2,14 +2,10 @@
 {
     public class Player
     {
-        public Player(string playerId, string displayName)
-        {
-            PlayerId = playerId;
-            DisplayName = displayName;
-        }
+        public string PlayerId { get; set; }
 
-        public string PlayerId { get; }
+        public string DisplayName { get; set; }
 
-        public string DisplayName { get; }
+        public int Points { get; set; }
     }
 }

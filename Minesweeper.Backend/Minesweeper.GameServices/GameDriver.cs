@@ -2,11 +2,22 @@
 using System.Linq;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.GameModel;
+using Minesweeper.GameServices.Providers;
 
 namespace Minesweeper.GameServices
 {
     public class GameDriver : IGameDriver
     {
+        private const int PointsForMineFound = 10;
+        private const int BonusPointsWindowSeconds = 5;
+
+        private readonly IDateTimeProvider _dateTimeProvider;
+
+        public GameDriver(IDateTimeProvider dateTimeProvider)
+        {
+            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        }
+
         public MoveResultType MakeMove(Game game, string playerId, int row, int column)
         {
             var isPlayer1 = game.Player1.PlayerId == playerId;
@@ -70,12 +81,14 @@ namespace Minesweeper.GameServices
 
         private void PerformMove(Game game, Players player, int row, int column)
         {
-            var utcNow = DateTime.UtcNow;
+            var utcNow = _dateTimeProvider.GetUtcDateTime();
             var table = game.GameTable;
 
             if (table.FieldMatrix[row, column] == FieldTypes.Mined)
             {
-                // TODO: Adjust points
+                var points = GetPointsForMineFound(game, player, utcNow);
+
+                AddPoints(game, player, points);
                 RecordMove(game, player, row, column, utcNow);
 
                 return;
@@ -154,7 +167,7 @@ namespace Minesweeper.GameServices
             }
         }
 
-        private static void RecordMove(Game game, Players player, int row, int column, DateTime utcDateTimeRecorded)
+        private void RecordMove(Game game, Players player, int row, int column, DateTime utcDateTimeRecorded)
         {
             game.Moves.Add(new GameMove
             {
@@ -163,6 +176,37 @@ namespace Minesweeper.GameServices
                 Column = column,
                 UtcDateTimeRecorded = utcDateTimeRecorded
             });
+        }
+
+        private void AddPoints(Game game, Players player, int points)
+        {
+            if (player == Players.Player1)
+            {
+                game.Player1.Points += points;
+            }
+            else
+            {
+                game.Player2.Points += points;
+            }
+        }
+
+        private int GetPointsForMineFound(Game game, Players player, DateTime utcDateOfMove)
+        {
+            var basePoints = PointsForMineFound;
+            var bonus = 0;
+
+            if (game.Moves.Count > 0)
+            {
+                var lastMove = game.Moves.Last();
+                var differenceSeconds = (int)Math.Floor((utcDateOfMove - lastMove.UtcDateTimeRecorded).TotalSeconds);
+
+                if (differenceSeconds >= 0 && differenceSeconds <= BonusPointsWindowSeconds)
+                {
+                    bonus = BonusPointsWindowSeconds - differenceSeconds;
+                }
+            }
+
+            return basePoints + bonus;
         }
     }
 }
