@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.DataStructures;
 using Minesweeper.GameServices.GameModel;
 using Minesweeper.GameServices.Providers;
 
@@ -20,8 +21,8 @@ namespace Minesweeper.GameServices
 
         public MoveResultType MakeMove(Game game, string playerId, int row, int column)
         {
-            var isPlayer1 = game.Player1.PlayerId == playerId;
-            var player = isPlayer1 ? Players.Player1 : Players.Player2;
+            var player = game.Player1.PlayerId == playerId ? Players.Player1 : Players.Player2;
+            var openedFieldLookup = FieldLookup.FromGame(game);
 
             var playerAllowedToMove = CheckPlayerCanMove(game, player);
             if (!playerAllowedToMove)
@@ -29,7 +30,7 @@ namespace Minesweeper.GameServices
                 return MoveResultType.NotYourTurn;
             }
 
-            var canPerformMove = CheckCanPerformMove(game, row, column);
+            var canPerformMove = CheckCanPerformMove(game.GameTable, openedFieldLookup, row, column);
             if (!canPerformMove)
             {
                 return MoveResultType.CannotMoveThere;
@@ -37,7 +38,7 @@ namespace Minesweeper.GameServices
 
             game.Status = GameStatus.InProgress;
 
-            PerformMove(game, player, row, column);
+            PerformMove(game, openedFieldLookup, player, row, column);
 
             var gameIsOver = GameIsOver(game);
             if (gameIsOver)
@@ -77,20 +78,18 @@ namespace Minesweeper.GameServices
             }
         }
 
-        private bool CheckCanPerformMove(Game game, int row, int column)
+        private bool CheckCanPerformMove(GameTable gameTable, FieldLookup fieldLookup, int row, int column)
         {
-            var table = game.GameTable;
-
             // Field is not yet open and within proper range
             return
                 row >= 0 &&
-                row < table.Rows &&
+                row < gameTable.Rows &&
                 column >= 0 &&
-                column < table.Columns &&
-                game.Moves.All(move => move.Row != row || move.Column != column);
+                column < gameTable.Columns &&
+                fieldLookup.IsFieldRegistered(row, column) == false;
         }
 
-        private void PerformMove(Game game, Players player, int row, int column)
+        private void PerformMove(Game game, FieldLookup fieldLookup, Players player, int row, int column)
         {
             var utcNow = _dateTimeProvider.GetUtcDateTime();
             var table = game.GameTable;
@@ -100,7 +99,7 @@ namespace Minesweeper.GameServices
                 var points = GetPointsForMineFound(game, player, utcNow);
 
                 AddPoints(game, player, points);
-                RecordMove(game, player, row, column, utcNow);
+                RecordMove(game, fieldLookup, player, row, column, utcNow);
 
                 return;
             }
@@ -135,30 +134,29 @@ namespace Minesweeper.GameServices
 
             if (neighboringMineCount == 0)
             {
-                DoRecursiveMove(game, player, row, column, utcNow);
+                DoRecursiveMove(game, fieldLookup, player, row, column, utcNow);
             }
             else
             {
-                RecordMove(game, player, row, column, utcNow);
+                RecordMove(game, fieldLookup, player, row, column, utcNow);
             }
         }
 
-        private void DoRecursiveMove(Game game, Players player, int row, int column, DateTime utcDateTimeRecorded)
+        private void DoRecursiveMove(Game game, FieldLookup fieldLookup, Players player, int row, int column, DateTime utcDateTimeRecorded)
         {
             var table = game.GameTable;
 
             var rowOverflown = row < 0 || row >= table.Rows;
             var colOverflown = column < 0 || column >= table.Columns;
             var isMined = table.FieldMatrix[row, column] == FieldTypes.Mined;
-            // TODO: Use a faster structure to look up opened fields
-            var isMovedOn = game.Moves.Any(m => m.Row == row && m.Column == column);
+            var isMovedOn = fieldLookup.IsFieldRegistered(row, column);
 
             if (rowOverflown || colOverflown || isMined || isMovedOn)
             {
                 return;
             }
 
-            RecordMove(game, player, row, column, utcDateTimeRecorded);
+            RecordMove(game, fieldLookup, player, row, column, utcDateTimeRecorded);
 
             for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
             {
@@ -170,13 +168,15 @@ namespace Minesweeper.GameServices
                         continue;
                     }
 
-                    DoRecursiveMove(game, player, row + rowOffset, column + colOffset, utcDateTimeRecorded);
+                    DoRecursiveMove(game, fieldLookup, player, row + rowOffset, column + colOffset, utcDateTimeRecorded);
                 }
             }
         }
 
-        private void RecordMove(Game game, Players player, int row, int column, DateTime utcDateTimeRecorded)
+        private void RecordMove(Game game, FieldLookup fieldLookup, Players player, int row, int column, DateTime utcDateTimeRecorded)
         {
+            fieldLookup.RegisterField(row, column);
+
             game.Moves.Add(new GameMove
             {
                 Player = player,
