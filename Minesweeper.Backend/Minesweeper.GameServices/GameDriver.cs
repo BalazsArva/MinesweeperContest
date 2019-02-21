@@ -70,7 +70,16 @@ namespace Minesweeper.GameServices
 
         private void PerformMove(Game game, Players player, int row, int column)
         {
+            var utcNow = DateTime.UtcNow;
             var table = game.GameTable;
+
+            if (table.FieldMatrix[row, column] == FieldTypes.Mined)
+            {
+                // TODO: Adjust points
+                RecordMove(game, player, row, column, utcNow);
+
+                return;
+            }
 
             var neighboringMineCount = 0;
             for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
@@ -99,20 +108,13 @@ namespace Minesweeper.GameServices
                 }
             }
 
-            var utcNow = DateTime.UtcNow;
             if (neighboringMineCount == 0)
             {
                 DoRecursiveMove(game, player, row, column, utcNow);
             }
             else
             {
-                game.Moves.Add(new GameMove
-                {
-                    Player = player,
-                    Row = row,
-                    Column = column,
-                    UtcDateTimeRecorded = utcNow
-                });
+                RecordMove(game, player, row, column, utcNow);
             }
         }
 
@@ -136,13 +138,7 @@ namespace Minesweeper.GameServices
                 return;
             }
 
-            game.Moves.Add(new GameMove
-            {
-                Player = player,
-                Row = row,
-                Column = column,
-                UtcDateTimeRecorded = utcDateTimeRecorded
-            });
+            RecordMove(game, player, row, column, utcDateTimeRecorded);
 
             for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
             {
@@ -156,6 +152,17 @@ namespace Minesweeper.GameServices
                     DoRecursiveMove(game, player, row + rowOffset, column + colOffset, utcDateTimeRecorded);
                 }
             }
+        }
+
+        private static void RecordMove(Game game, Players player, int row, int column, DateTime utcDateTimeRecorded)
+        {
+            game.Moves.Add(new GameMove
+            {
+                Player = player,
+                Row = row,
+                Column = column,
+                UtcDateTimeRecorded = utcDateTimeRecorded
+            });
         }
     }
 }
