@@ -14,6 +14,7 @@ namespace Minesweeper.GameServices.Extensions
                 .AddSingleton<IRandomNumberProvider, RandomNumberProvider>()
                 .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                 .AddSingleton<IGameDriver, GameDriver>()
+                .AddSingleton<IGameTableVisibilityComputer, GameTableVisibilityComputer>()
                 .AddSingleton<IGameService, GameService>()
                 .AddSingleton<IRandomPlayerSelector, RandomPlayerSelector>()
                 .AddSingleton<IGameTableGenerator, GameTableGenerator>()

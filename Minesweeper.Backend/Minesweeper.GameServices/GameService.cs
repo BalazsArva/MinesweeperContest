@@ -17,13 +17,15 @@ namespace Minesweeper.GameServices
         private readonly IGameGenerator _gameGenerator;
         private readonly IGameDriver _gameDriver;
         private readonly IGuidProvider _guidProvider;
+        private readonly IGameTableVisibilityComputer _gameTableVisibilityComputer;
 
-        public GameService(IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IGuidProvider guidProvider)
+        public GameService(IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IGuidProvider guidProvider, IGameTableVisibilityComputer gameTableVisibilityComputer)
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _gameGenerator = gameGenerator ?? throw new ArgumentNullException(nameof(gameGenerator));
             _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
             _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
+            _gameTableVisibilityComputer = gameTableVisibilityComputer ?? throw new ArgumentNullException(nameof(gameTableVisibilityComputer));
         }
 
         public async Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
@@ -78,6 +80,16 @@ namespace Minesweeper.GameServices
                 }
 
                 return new MoveResult { MoveResultType = movementResult };
+            }
+        }
+
+        public async Task<VisibleFieldType[,]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
+        {
+            using (var session = _documentStore.OpenAsyncSession())
+            {
+                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
+
+                return _gameTableVisibilityComputer.GetVisibleGameTableAsync(game);
             }
         }
     }
