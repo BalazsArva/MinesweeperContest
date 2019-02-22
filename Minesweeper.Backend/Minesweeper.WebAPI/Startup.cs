@@ -23,6 +23,14 @@ namespace Minesweeper.WebAPI
 
             services.AddRavenDb(Configuration);
             services.AddGameServices();
+            services.AddCors(/*cors =>
+            {
+                cors.AddPolicy("FrontendPolicy", new Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy
+                {
+                    Origins = { "http://localhost:9000" },
+                    IsOriginAllowed = true
+                });
+            }*/);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -36,6 +44,10 @@ namespace Minesweeper.WebAPI
                 app.UseHsts();
             }
 
+            app.UseCors(builder =>
+            {
+                builder.SetIsOriginAllowed(_ => true);
+            });
             app.UseHttpsRedirection();
             app.UseMvc();
         }
