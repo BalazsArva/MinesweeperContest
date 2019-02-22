@@ -1,0 +1,102 @@
+<template>
+  <page-header title="Game" subtitle="against XYZ"></page-header>
+
+  <div class="row">
+    <div class="col">
+      <game-stat stat.bind="elapsedSeconds" title="elapsed seconds (todo: convert to HH:mm:ss format)"></game-stat>
+    </div>
+    <div class="col">
+      <game-stat stat="0" title="your points"></game-stat>
+    </div>
+    <div class="col">
+      <game-stat stat="0" title="opponent's points"></game-stat>
+    </div>
+    <div class="col">
+      <game-stat stat="20" title="mines left"></game-stat>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="row" if.bind="gameTable">
+
+    <div class="col"></div>
+
+    <div class="col">
+
+      <table>
+        <tbody>
+          <tr repeat.for="row of gameTable">
+            <td repeat.for="col of row">
+
+              <!-- Unknown field -->
+              <button if.bind="col === 0" class="btn btn-secondary rounded-0" style="width:2.25em;height:2.25em;">
+
+              </button>
+
+              <button if.bind="col !== 0" class="btn btn-light rounded-0" style="width:2.25em;height:2.25em;">
+
+                <span class="align-top">
+                  <!-- Player 1 found mine -->
+                  <b if.bind="col === 1" class="text-primary">
+                    P1
+                  </b>
+
+                  <!-- Player 2 found mine -->
+                  <b if.bind="col === 2" class="text-danger">
+                    P2
+                  </b>
+
+                  <!-- 1 mines around -->
+                  <b if.bind="col === 4" class="text-success">
+                    1
+                  </b>
+
+                  <!-- 2 mines around -->
+                  <b if.bind="col === 5" class="text-info">
+                    2
+                  </b>
+
+                  <!-- 3 mines around -->
+                  <b if.bind="col === 6" class="text-primary">
+                    3
+                  </b>
+
+                  <!-- 4 mines around -->
+                  <b if.bind="col === 7" class="text-warning">
+                    4
+                  </b>
+
+                  <!-- 5 mines around -->
+                  <b if.bind="col === 8" class="text-danger">
+                    5
+                  </b>
+
+                  <!-- 6 mines around -->
+                  <b if.bind="col === 9" class="text-secondary">
+                    6
+                  </b>
+
+                  <!-- 7 mines around -->
+                  <b if.bind="col === 10" class="text-dark">
+                    7
+                  </b>
+
+                  <!-- 8 mines around -->
+                  <b if.bind="col === 11" class="text-dark">
+                    8
+                  </b>
+                </span>
+
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <div class="col"></div>
+
+  </div>
+</template>

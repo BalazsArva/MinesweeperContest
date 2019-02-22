@@ -2,13 +2,33 @@
 
   <label class="card ${ isSelected ? 'border-primary' : '' }" for="difficulty-${ difficulty.title }">
     <div class="card-body">
-      <h1 class="h5 card-title">
+      <h1 class="h3 card-title">
         ${ difficulty.title }
       </h1>
 
-      <p class="card-text">
-        ${ difficulty.width }&times;${ difficulty.height } grid with ${ difficulty.mines } mines
-      </p>
+      <div class="row">
+        <div class="col text-info">
+          <h2 class="h5 mb-0">
+            <b>
+              ${ difficulty.width }&times;${ difficulty.height }
+            </b>
+          </h2>
+          <small>
+            grid
+          </small>
+        </div>
+
+        <div class="col text-danger">
+          <h2 class="h5 mb-0">
+            <b>
+              ${ difficulty.mines }
+            </b>
+          </h2>
+          <small>
+            mines
+          </small>
+        </div>
+      </div>
 
       <p class="sr-only">
         <input type="radio" name.bind="inputGroup" checked.bind="isSelected" id="difficulty-${ difficulty.title }" />

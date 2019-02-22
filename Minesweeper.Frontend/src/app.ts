@@ -9,7 +9,7 @@ export class App {
   message = "Hello world";
 
   configureRouter(config: RouterConfiguration, router: Router) {
-    config.title = 'DishPlanner';
+    config.title = 'Minesweeper Contest';
 
     config.map([
       {
@@ -24,6 +24,12 @@ export class App {
         title: 'New game',
         name: 'newgame'
       },
+      {
+        route: 'games/game',
+        moduleId: PLATFORM.moduleName('./pages/game'),
+        title: 'Game',
+        name: 'game'
+      }
     ]);
 
     config.fallbackRoute('');
