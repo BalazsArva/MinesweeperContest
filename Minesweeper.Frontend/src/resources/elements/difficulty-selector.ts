@@ -3,5 +3,6 @@ import { Difficulty } from '../../interfaces/difficulty';
 
 export class DifficultySelector {
   @bindable difficulty: Difficulty = null;
+  @bindable inputGroup: string = 'difficulty';
 }
 

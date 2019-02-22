@@ -1,5 +1,6 @@
 <template>
-  <div class="card ${ isSelected ? 'border-primary' : '' }">
+
+  <label class="card ${ isSelected ? 'border-primary' : '' }" for="difficulty-${ difficulty.title }">
     <div class="card-body">
       <h1 class="h5 card-title">
         ${ difficulty.title }
@@ -9,9 +10,10 @@
         ${ difficulty.width }&times;${ difficulty.height } grid with ${ difficulty.mines } mines
       </p>
 
-      <button type="button" class="btn btn-info">
-        Select
-      </button>
+      <p class="sr-only">
+        <input type="radio" name.bind="inputGroup" checked.bind="isSelected" id="difficulty-${ difficulty.title }" />
+      </p>
     </div>
-  </div>
+  </label>
+
 </template>
