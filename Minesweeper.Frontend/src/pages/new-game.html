@@ -1,3 +1,26 @@
 <template>
     <page-header title="New game"></page-header>
+
+    <form>
+        <div class="form-group">
+            <label for="player-name">Name</label>
+            <input type="text" class="form-control" id="player-name" aria-describedby="player-name-help"
+                placeholder="Enter name" value.bind="displayName">
+            <small id="player-name-help" class="form-text text-muted">Enter your displayed name</small>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-12">
+                <label for="difficulty">Difficulty</label>
+            </div>
+            <div class="form-group col" repeat.for="diff of difficulties">
+                <difficulty-selector difficulty.bind="diff" is-selected.bind="selectedDifficulty === diff"
+                    (selected)="selectDifficulty($event)">
+                </difficulty-selector>
+            </div>
+        </div>
+
+        <hr />
+
+        <button type="submit" class="btn btn-primary">Start</button>
+    </form>
 </template>

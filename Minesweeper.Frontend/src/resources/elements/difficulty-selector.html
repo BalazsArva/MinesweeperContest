@@ -1,0 +1,17 @@
+<template>
+  <div class="card ${ isSelected ? 'border-primary' : '' }">
+    <div class="card-body">
+      <h1 class="h5 card-title">
+        ${ difficulty.title }
+      </h1>
+
+      <p class="card-text">
+        ${ difficulty.width }&times;${ difficulty.height } grid with ${ difficulty.mines } mines
+      </p>
+
+      <button type="button" class="btn btn-info">
+        Select
+      </button>
+    </div>
+  </div>
+</template>
