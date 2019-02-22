@@ -1,3 +1,10 @@
 <template>
-  <h1>${message}</h1>
+  <require from="styles/styles.scss"></require>
+
+  <navbar router.bind="router"></navbar>
+
+  <div class="container shadow-sm p-3 mb-5 bg-white">
+    <router-view></router-view>
+  </div>
+
 </template>
