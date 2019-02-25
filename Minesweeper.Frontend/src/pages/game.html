@@ -3,16 +3,16 @@
 
   <div class="row">
     <div class="col">
-      <game-stat stat.bind="elapsedSeconds" title="elapsed seconds (todo: convert to HH:mm:ss format)"></game-stat>
+      <game-stat stat.to-view="elapsedSeconds | secondsToTimespan" title="Time elapsed"></game-stat>
     </div>
     <div class="col">
-      <game-stat stat="0" title="your points"></game-stat>
+      <game-stat stat="0" title="Your points" color-class="success"></game-stat>
     </div>
     <div class="col">
-      <game-stat stat="0" title="opponent's points"></game-stat>
+      <game-stat stat="0" title="Opponent's points" color-class="danger"></game-stat>
     </div>
     <div class="col">
-      <game-stat stat="20" title="mines left"></game-stat>
+      <game-stat stat="20" title="Mines left"></game-stat>
     </div>
   </div>
 
