@@ -30,21 +30,21 @@
             <td repeat.for="col of row">
 
               <!-- Unknown field -->
-              <button if.bind="col === 0" class="btn btn-secondary rounded-0" style="width:2.25em;height:2.25em;">
+              <button if.bind="col === 0" class="btn btn-light border-secondary rounded-0" style="width:2.25em;height:2.25em;">
 
               </button>
 
-              <button if.bind="col !== 0" class="btn btn-light rounded-0" style="width:2.25em;height:2.25em;">
+              <button if.bind="col !== 0" class="btn btn-light rounded-0" style="width:2.25em;height:2.25em;" disabled>
 
                 <span class="align-top">
                   <!-- Player 1 found mine -->
                   <b if.bind="col === 1" class="text-primary">
-                    P1
+                    <i class="fas fa-flag"></i>
                   </b>
 
                   <!-- Player 2 found mine -->
                   <b if.bind="col === 2" class="text-danger">
-                    P2
+                    <i class="fas fa-flag"></i>
                   </b>
 
                   <!-- 1 mines around -->
