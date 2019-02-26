@@ -12,9 +12,8 @@
             <div class="form-group col-12">
                 <label for="difficulty">Difficulty</label>
             </div>
-            <div class="form-group col" repeat.for="diff of difficulties">
-                <difficulty-selector difficulty.bind="diff" is-selected.bind="selectedDifficulty === diff"
-                    (selected)="selectDifficulty($event)">
+            <div class="form-group col" repeat.for="diff of selectableDifficulties">
+                <difficulty-selector difficulty.bind="diff" selected-difficulty.bind="selectedDifficulty">
                 </difficulty-selector>
             </div>
         </div>

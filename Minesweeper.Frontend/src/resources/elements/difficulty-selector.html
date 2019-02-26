@@ -1,6 +1,6 @@
 <template>
 
-  <label class="card ${ isSelected ? 'border-primary' : '' }" for="difficulty-${ difficulty.title }">
+  <label class="card ${ isSelected ? 'border-info' : '' } cursor-hand" for="difficulty-${ difficulty.title }">
     <div class="card-body">
       <h1 class="h3 card-title">
         ${ difficulty.title }
@@ -31,7 +31,7 @@
       </div>
 
       <p class="sr-only">
-        <input type="radio" name.bind="inputGroup" checked.bind="isSelected" id="difficulty-${ difficulty.title }" />
+        <input type="radio" name.bind="inputGroup" checked.bind="selectedDifficulty" id="difficulty-${ difficulty.title }" model.bind="difficulty" />
       </p>
     </div>
   </label>
