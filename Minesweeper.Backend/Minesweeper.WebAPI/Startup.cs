@@ -44,10 +44,7 @@ namespace Minesweeper.WebAPI
                 app.UseHsts();
             }
 
-            app.UseCors(builder =>
-            {
-                builder.SetIsOriginAllowed(_ => true);
-            });
+            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials());
             app.UseHttpsRedirection();
             app.UseMvc();
         }

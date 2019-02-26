@@ -18,6 +18,14 @@
 
   <hr />
 
+  <div class="row">
+    <div class="col text-center">
+      Your turn
+    </div>
+  </div>
+
+  <hr />
+
   <div class="row" if.bind="gameTable">
 
     <div class="col"></div>
@@ -30,7 +38,8 @@
             <td repeat.for="col of row">
 
               <!-- Unknown field -->
-              <button if.bind="col === 0" class="btn btn-light border-secondary rounded-0" style="width:2.25em;height:2.25em;">
+              <button if.bind="col === 0" class="btn btn-light border-secondary rounded-0"
+                style="width:2.25em;height:2.25em;">
 
               </button>
 

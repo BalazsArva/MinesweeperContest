@@ -2,7 +2,7 @@
 import { HttpClient, json } from 'aurelia-fetch-client';
 import { autoinject } from 'aurelia-framework';
 
-const apiUrl = 'https://localhost:44382/api/games/'
+const apiUrl = 'https://localhost:5001/api/games/'
 
 @autoinject()
 export class GameService {

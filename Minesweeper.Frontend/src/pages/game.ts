@@ -54,9 +54,8 @@ export class Game {
       }
     }
 
-    //await this.gameService.getGameTable('2537e8e7-89e1-4747-b1ed-c6538ee56f03');
+    await this.gameService.getGameTable('2537e8e7-89e1-4747-b1ed-c6538ee56f03');
 
     this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
   }
-
 }
