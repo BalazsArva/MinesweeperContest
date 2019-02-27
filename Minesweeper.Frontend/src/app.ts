@@ -16,19 +16,29 @@ export class App {
         route: '',
         moduleId: PLATFORM.moduleName('./pages/home'),
         title: 'Home',
-        name: 'home'
+        name: 'home',
+        nav: false
       },
       {
         route: 'games/new',
         moduleId: PLATFORM.moduleName('./pages/new-game'),
         title: 'New game',
-        name: 'newgame'
+        name: 'newgame',
+        nav: false
+      },
+      {
+        route: 'games',
+        moduleId: PLATFORM.moduleName('./pages/lobby'),
+        title: 'Games',
+        name: 'lobby',
+        nav: true
       },
       {
         route: 'games/game/:gameId',
         moduleId: PLATFORM.moduleName('./pages/game'),
         title: 'Game',
-        name: 'game'
+        name: 'game',
+        nav: false
       }
     ]);
 

@@ -10,12 +10,14 @@
       <ul class="navbar-nav mr-auto">
 
         <template repeat.for="routeItem of router.routes">
-          <li class="nav-item ${routeItem.navModel.isActive ? 'active' : ''}">
-            <a class="nav-link" route-href="route.bind: routeItem.name">
-              ${ routeItem.title }
-              <span if.bind="routeItem.navModel.isActive" class="sr-only">(current)</span>
-            </a>
-          </li>
+          <template if.bind="routeItem.nav !== false">
+            <li class="nav-item ${routeItem.navModel.isActive ? 'active' : ''}">
+              <a class="nav-link" route-href="route.bind: routeItem.name">
+                ${ routeItem.title }
+                <span if.bind="routeItem.navModel.isActive" class="sr-only">(current)</span>
+              </a>
+            </li>
+          </template>
         </template>
 
       </ul>
