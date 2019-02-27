@@ -1,61 +1,64 @@
 import { autoinject } from "aurelia-framework";
-import { GameService } from "services/game-service";
+import { NavigationInstruction, RouteConfig } from 'aurelia-router';
 
-enum FieldTypes {
-  Unknown,
-  Player1FoundMine,
-  Player2FoundMine,
-  MinesAround0,
-  MinesAround1,
-  MinesAround2,
-  MinesAround3,
-  MinesAround4,
-  MinesAround5,
-  MinesAround6,
-  MinesAround7,
-  MinesAround8
+import { GameService, GetGameTableResponse } from "services/game-service";
+import { FieldTypes } from "../interfaces/field-types";
+
+interface Field {
+  fieldType: FieldTypes;
+  row: number;
+  column: number;
 }
 
 @autoinject()
 export class Game {
 
-  gameTable: FieldTypes[][] = null;
+  gameTable: Field[][] = null;
   timerHandle: number = null;
   elapsedSeconds = 0;
+  gameId: string = null;
 
   constructor(private gameService: GameService) {
   }
 
-  async activate() {
-    const rows = 16;
-    const cols = 24;
+  async activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) {
+    this.gameId = params.gameId;
 
-    this.gameTable = [];
-    let temp = [
-      FieldTypes.Unknown,
-      FieldTypes.Player1FoundMine,
-      FieldTypes.Player2FoundMine,
-      FieldTypes.MinesAround0,
-      FieldTypes.MinesAround1,
-      FieldTypes.MinesAround2,
-      FieldTypes.MinesAround3,
-      FieldTypes.MinesAround4,
-      FieldTypes.MinesAround5,
-      FieldTypes.MinesAround6,
-      FieldTypes.MinesAround7,
-      FieldTypes.MinesAround8
-    ]
+    await this.updateTable();
 
-    for (let row = 0; row < rows; ++row) {
-      this.gameTable.push([]);
+    this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
+  }
 
-      for (let col = 0; col < cols; ++col) {
-        this.gameTable[row][col] = temp[(row * col) % temp.length];
+  async updateTable() {
+    let table = await this.gameService.getGameTable(this.gameId);
+
+    let newTableState = [];
+    for (let row = 0; row < table.visibleTable.length; ++row) {
+      newTableState.push([]);
+
+      for (let col = 0; col < table.visibleTable[row].length; ++col) {
+        newTableState[row][col] = {
+          fieldType: table.visibleTable[row][col],
+          column: col,
+          row: row
+        };
       }
     }
 
-    await this.gameService.getGameTable('2537e8e7-89e1-4747-b1ed-c6538ee56f03');
+    this.gameTable = newTableState;
+  }
 
-    this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
+  async makeMove(row: number, col: number) {
+
+    // TODO: Remove eventually
+    let playersTemp = ["24341538-9afb-4ae8-b90e-baa85cac57b5", "68dbcce5-eb47-4e1f-928d-4709bc0811e8"];
+
+    let playerId = playersTemp[Math.floor(Math.random() * 2)];
+
+    console.log(playerId);
+
+    await this.gameService.makeMove(this.gameId, playerId, row, col);
+
+    await this.updateTable();
   }
 }

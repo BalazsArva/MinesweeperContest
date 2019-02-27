@@ -25,7 +25,7 @@ export class App {
         name: 'newgame'
       },
       {
-        route: 'games/game',
+        route: 'games/game/:gameId',
         moduleId: PLATFORM.moduleName('./pages/game'),
         title: 'Game',
         name: 'game'

@@ -26,73 +26,68 @@
 
   <hr />
 
-  <div class="row" if.bind="gameTable">
-
-    <div class="col"></div>
+  <div class="row justify-content-md-center" if.bind="gameTable">
 
     <div class="col">
 
-      <table>
+      <table class="col">
         <tbody>
           <tr repeat.for="row of gameTable">
-            <td repeat.for="col of row">
+            <td repeat.for="field of row">
 
               <!-- Unknown field -->
-              <button if.bind="col === 0" class="btn btn-light border-secondary rounded-0"
-                style="width:2.25em;height:2.25em;">
+              <button if.bind="field.fieldType === 0" class="btn btn-sm btn-light border-secondary rounded-0" style="width:2.25em;height:2.25em;" click.delegate="makeMove(field.row, field.column)"></button>
 
-              </button>
-
-              <button if.bind="col !== 0" class="btn btn-light rounded-0" style="width:2.25em;height:2.25em;" disabled>
+              <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light rounded-0" style="width:2.25em;height:2.25em;" disabled>
 
                 <span class="align-top">
                   <!-- Player 1 found mine -->
-                  <b if.bind="col === 1" class="text-primary">
+                  <b if.bind="field.fieldType === 1" class="text-primary">
                     <i class="fas fa-flag"></i>
                   </b>
 
                   <!-- Player 2 found mine -->
-                  <b if.bind="col === 2" class="text-danger">
+                  <b if.bind="field.fieldType === 2" class="text-danger">
                     <i class="fas fa-flag"></i>
                   </b>
 
                   <!-- 1 mines around -->
-                  <b if.bind="col === 4" class="text-success">
+                  <b if.bind="field.fieldType === 4" class="text-success">
                     1
                   </b>
 
                   <!-- 2 mines around -->
-                  <b if.bind="col === 5" class="text-info">
+                  <b if.bind="field.fieldType === 5" class="text-info">
                     2
                   </b>
 
                   <!-- 3 mines around -->
-                  <b if.bind="col === 6" class="text-primary">
+                  <b if.bind="field.fieldType === 6" class="text-primary">
                     3
                   </b>
 
                   <!-- 4 mines around -->
-                  <b if.bind="col === 7" class="text-warning">
+                  <b if.bind="field.fieldType === 7" class="text-warning">
                     4
                   </b>
 
                   <!-- 5 mines around -->
-                  <b if.bind="col === 8" class="text-danger">
+                  <b if.bind="field.fieldType === 8" class="text-danger">
                     5
                   </b>
 
                   <!-- 6 mines around -->
-                  <b if.bind="col === 9" class="text-secondary">
+                  <b if.bind="field.fieldType === 9" class="text-secondary">
                     6
                   </b>
 
                   <!-- 7 mines around -->
-                  <b if.bind="col === 10" class="text-dark">
+                  <b if.bind="field.fieldType === 10" class="text-dark">
                     7
                   </b>
 
                   <!-- 8 mines around -->
-                  <b if.bind="col === 11" class="text-dark">
+                  <b if.bind="field.fieldType === 11" class="text-dark">
                     8
                   </b>
                 </span>
@@ -104,8 +99,6 @@
       </table>
 
     </div>
-
-    <div class="col"></div>
 
   </div>
 </template>
