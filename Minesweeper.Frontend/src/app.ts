@@ -1,12 +1,8 @@
-import { Aurelia } from 'aurelia-framework';
 import { PLATFORM } from 'aurelia-pal';
-import { Router, RouterConfiguration, NavigationInstruction, PipelineStep, Next, Redirect } from 'aurelia-router';
-import { inject } from 'aurelia-framework';
-import environment from './environment';
+import { Router, RouterConfiguration } from 'aurelia-router';
 
 export class App {
   router: Router = null;
-  message = "Hello world";
 
   configureRouter(config: RouterConfiguration, router: Router) {
     config.title = 'Minesweeper Contest';
