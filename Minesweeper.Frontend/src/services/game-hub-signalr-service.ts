@@ -24,8 +24,13 @@ export class GameHubSignalRService {
             return;
         }
 
-        connection.on("gameTableChanged", (newGameTable) => {
+        connection.send("JoinGame", { gameId });
+
+        console.log(`SignalR connection to Game hub with GameId=${gameId} succeeded.`);
+
+        connection.on("GameTableUpdated", (newGameTable) => {
             console.log(newGameTable);
+            console.log("game table updated");
 
             this.eventAggregator.publish(`games:${gameId}:tableChanged`, { newGameTable });
         });

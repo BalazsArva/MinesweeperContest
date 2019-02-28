@@ -10,15 +10,15 @@ namespace Minesweeper.GameServices.Extensions
         public static IServiceCollection AddGameServices(this IServiceCollection services)
         {
             return services
-                .AddSingleton<IGuidProvider, GuidProvider>()
-                .AddSingleton<IRandomNumberProvider, RandomNumberProvider>()
-                .AddSingleton<IDateTimeProvider, DateTimeProvider>()
-                .AddSingleton<IGameDriver, GameDriver>()
-                .AddSingleton<IGameTableVisibilityComputer, GameTableVisibilityComputer>()
-                .AddSingleton<IGameService, GameService>()
-                .AddSingleton<IRandomPlayerSelector, RandomPlayerSelector>()
-                .AddSingleton<IGameTableGenerator, GameTableGenerator>()
-                .AddSingleton<IGameGenerator, GameGenerator>();
+                .AddScoped<IGuidProvider, GuidProvider>()
+                .AddScoped<IRandomNumberProvider, RandomNumberProvider>()
+                .AddScoped<IDateTimeProvider, DateTimeProvider>()
+                .AddScoped<IGameDriver, GameDriver>()
+                .AddScoped<IGameTableVisibilityComputer, GameTableVisibilityComputer>()
+                .AddScoped<IGameService, GameService>()
+                .AddScoped<IRandomPlayerSelector, RandomPlayerSelector>()
+                .AddScoped<IGameTableGenerator, GameTableGenerator>()
+                .AddScoped<IGameGenerator, GameGenerator>();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 using Minesweeper.DataAccess.RavenDb.Extensions;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Extensions;
@@ -13,14 +14,16 @@ namespace Minesweeper.GameServices
 {
     public class GameService : IGameService
     {
+        private readonly IMediator _mediator;
         private readonly IDocumentStore _documentStore;
         private readonly IGameGenerator _gameGenerator;
         private readonly IGameDriver _gameDriver;
         private readonly IGuidProvider _guidProvider;
         private readonly IGameTableVisibilityComputer _gameTableVisibilityComputer;
 
-        public GameService(IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IGuidProvider guidProvider, IGameTableVisibilityComputer gameTableVisibilityComputer)
+        public GameService(IMediator mediator, IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IGuidProvider guidProvider, IGameTableVisibilityComputer gameTableVisibilityComputer)
         {
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _gameGenerator = gameGenerator ?? throw new ArgumentNullException(nameof(gameGenerator));
             _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
@@ -77,6 +80,8 @@ namespace Minesweeper.GameServices
                 if (movementResult == MoveResultType.Success || movementResult == MoveResultType.GameOver)
                 {
                     await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+                    await PublishTableUpdatedAsync(gameId, cancellationToken);
                 }
 
                 return new MoveResult { MoveResultType = movementResult };
@@ -91,6 +96,14 @@ namespace Minesweeper.GameServices
 
                 return _gameTableVisibilityComputer.GetVisibleGameTableAsync(game);
             }
+        }
+
+        private async Task PublishTableUpdatedAsync(string gameId, CancellationToken cancellationToken)
+        {
+            // TODO: This is only an initial skeleton. Refactor so that only the changed fields are included.
+            var table = await GetVisibleGameTableAsync(gameId, cancellationToken);
+
+            await _mediator.Publish(new GameTableUpdatedNotification(gameId, table), cancellationToken);
         }
     }
 }

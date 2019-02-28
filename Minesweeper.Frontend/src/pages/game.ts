@@ -3,6 +3,7 @@ import { NavigationInstruction, RouteConfig } from 'aurelia-router';
 
 import { GameService, GetGameTableResponse } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
+import { GameHubSignalRService } from "services/game-hub-signalr-service";
 
 interface Field {
   fieldType: FieldTypes;
@@ -18,13 +19,16 @@ export class Game {
   elapsedSeconds = 0;
   gameId: string = null;
 
-  constructor(private gameService: GameService) {
+  constructor(private gameService: GameService, private gameHubService: GameHubSignalRService) {
   }
 
   async activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) {
-    this.gameId = params.gameId;
+    let gameId = <string>params.gameId;
+
+    this.gameId = gameId;
 
     await this.updateTable();
+    await this.gameHubService.connect(gameId);
 
     this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
   }
