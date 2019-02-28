@@ -2,6 +2,14 @@
   <page-header title="Lobby" subtitle="available games appear here"></page-header>
 
   <div class="row">
+    <div class="col">
+      <a class="btn btn-primary" route-href="route.bind: 'newgame'">Host a new game</a>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="row">
     <div class="col-md">
 
       <div class="form-group">
@@ -35,7 +43,7 @@
   </div>
 
   <hr />
-  
+
   <div class="row">
     <div class="col">
       <game-stat stat.to-view="availableGames" title="Available games"></game-stat>
