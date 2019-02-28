@@ -30,15 +30,17 @@
 
     <div class="col">
 
-      <table class="col">
+      <table class="col" style="width:auto;">
         <tbody>
           <tr repeat.for="row of gameTable">
             <td repeat.for="field of row">
 
               <!-- Unknown field -->
-              <button if.bind="field.fieldType === 0" class="btn btn-sm btn-light border-secondary rounded-0" style="width:2.25em;height:2.25em;" click.delegate="makeMove(field.row, field.column)"></button>
+              <button if.bind="field.fieldType === 0" class="btn btn-sm btn-light border-secondary rounded-0"
+                style="width:2.25em;height:2.25em;" click.delegate="makeMove(field.row, field.column)"></button>
 
-              <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light rounded-0" style="width:2.25em;height:2.25em;" disabled>
+              <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light rounded-0"
+                style="width:2.25em;height:2.25em;" disabled>
 
                 <span class="align-top">
                   <!-- Player 1 found mine -->

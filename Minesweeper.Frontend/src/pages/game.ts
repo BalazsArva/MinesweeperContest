@@ -73,9 +73,7 @@ export class Game {
   }
 
   async makeMove(row: number, col: number) {
-    // TODO: Remove eventually
-    let playersTemp = ["24341538-9afb-4ae8-b90e-baa85cac57b5", "68dbcce5-eb47-4e1f-928d-4709bc0811e8"];
-    let playerId = playersTemp[Math.floor(Math.random() * 2)];
+    let playerId = localStorage["playerId"];
 
     await this.gameService.makeMove(this.gameId, playerId, row, col);
   }
