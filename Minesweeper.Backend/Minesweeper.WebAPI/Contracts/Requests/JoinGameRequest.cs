@@ -2,6 +2,10 @@
 {
     public class JoinGameRequest
     {
-        public string GameId { get; set; }
+        public string PlayerId { get; set; }
+
+        public string EntryToken { get; set; }
+
+        public string DisplayName { get; set; }
     }
 }
