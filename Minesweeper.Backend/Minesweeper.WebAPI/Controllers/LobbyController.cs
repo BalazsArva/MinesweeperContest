@@ -64,7 +64,7 @@ namespace Minesweeper.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("game/{gameId}", Name = RouteNames.JoinGame)]
+        [Route("games/{gameId}", Name = RouteNames.JoinGame)]
         public async Task<IActionResult> JoinGame(string gameId, [FromBody]JoinGameRequest request, CancellationToken cancellationToken)
         {
             await _gameService.JoinGameAsync(gameId, request.PlayerId, request.DisplayName, request.EntryToken, cancellationToken).ConfigureAwait(false);

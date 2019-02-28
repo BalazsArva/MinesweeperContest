@@ -11,15 +11,18 @@
 
   <div class="row">
     <div class="col-md">
+      <form submit.delegate="saveUserInfo()">
+        <div class="form-group">
+          <label class="sr-only" for="join-game-name">Display name</label>
+          <input type="text" class="form-control" id="join-game-name" aria-describedby="join-game-name-help"
+            placeholder="Enter display name" value.bind="displayName" />
+          <small id="join-game-name-help" class="form-text text-muted">
+            Enter what you wish to be displayed as your name
+          </small>
+        </div>
 
-      <div class="form-group">
-        <label class="sr-only" for="join-game-name">Display name</label>
-        <input type="text" class="form-control" id="join-game-name" aria-describedby="join-game-name-help"
-          placeholder="Enter display name" value.bind="joinGameDisplayName" />
-        <small id="join-game-name-help" class="form-text text-muted">
-          Enter what you wish to be displayed as your name
-        </small>
-      </div>
+        <button type="submit" class="btn btn-primary">Save my info</button>
+      </form>
     </div>
 
     <div class="col-md">
@@ -34,6 +37,16 @@
             placeholder="Enter game id" value.bind="joinGameId" />
           <small id="join-game-id-help" class="form-text text-muted">
             The identifier of the game to join. Your inviter must have received this after creating the game.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="join-game-entry-token">Game entry token</label>
+          <input type="text" class="form-control" id="join-game-entry-token"
+            aria-describedby="join-game-entry-token-help" placeholder="Enter game entry token"
+            value.bind="joinGameEntryToken" />
+          <small id="join-game-entry-token-help" class="form-text text-muted">
+            An entry key for the game. Your inviter must have received this after creating the game.
           </small>
         </div>
 
