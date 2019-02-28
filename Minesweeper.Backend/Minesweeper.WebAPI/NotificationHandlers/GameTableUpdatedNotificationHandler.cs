@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.WebAPI.Contracts.SignalRNotifications;
 using Minesweeper.WebAPI.Hubs;
 using Minesweeper.WebAPI.Hubs.ClientContracts;
 
@@ -19,8 +20,10 @@ namespace Minesweeper.WebAPI.NotificationHandlers
 
         public async Task Handle(GameTableUpdatedNotification notification, CancellationToken cancellationToken)
         {
-            // TODO: Include the updated fields
-            await _hubContext.Clients.Group(notification.GameId).GameTableUpdated();
+            // TODO: Include only the changed fields
+            var signalRNotification = new GameTableUpdated(notification.Table);
+
+            await _hubContext.Clients.Group(notification.GameId).GameTableUpdated(signalRNotification);
         }
     }
 }

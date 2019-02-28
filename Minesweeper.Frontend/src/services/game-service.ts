@@ -1,4 +1,3 @@
-//import 'fetch';
 import { HttpClient, json } from 'aurelia-fetch-client';
 import { autoinject } from 'aurelia-framework';
 
@@ -35,7 +34,7 @@ export class GameService {
         }
     }
 
-    async makeMove(gameId: string, playerId: string, row: number, column: number): Promise<GetGameTableResponse> {
+    async makeMove(gameId: string, playerId: string, row: number, column: number): Promise<void> {
         let client = new HttpClient();
         let defaultHeaders = {
             'Accept': 'application/json',
@@ -55,9 +54,10 @@ export class GameService {
         try {
             let httpResponse = await client.fetch(`${gameId}/movement`, request);
 
-            let result = await httpResponse.json();
-
-            return <GetGameTableResponse>result;
+            // TODO: Do proper error handling
+            if (!httpResponse.ok) {
+                throw Error('Unexpected status code: ' + httpResponse.status);
+            }
         }
         catch (reason) {
             console.log(reason);

@@ -1,7 +1,8 @@
 import { autoinject } from "aurelia-framework";
 import { NavigationInstruction, RouteConfig } from 'aurelia-router';
+import { EventAggregator } from 'aurelia-event-aggregator';
 
-import { GameService, GetGameTableResponse } from "services/game-service";
+import { GameService } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
 import { GameHubSignalRService } from "services/game-hub-signalr-service";
 
@@ -19,7 +20,7 @@ export class Game {
   elapsedSeconds = 0;
   gameId: string = null;
 
-  constructor(private gameService: GameService, private gameHubService: GameHubSignalRService) {
+  constructor(private eventAggregator: EventAggregator, private gameService: GameService, private gameHubService: GameHubSignalRService) {
   }
 
   async activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) {
@@ -30,7 +31,26 @@ export class Game {
     await this.updateTable();
     await this.gameHubService.connect(gameId);
 
+    // TODO: Consider interrupted games 
     this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
+    this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, notification => {
+      let tmp: { table: FieldTypes[][] } = notification;
+
+      let newTableState = [];
+      for (let row = 0; row < tmp.table.length; ++row) {
+        newTableState.push([]);
+
+        for (let col = 0; col < tmp.table[row].length; ++col) {
+          newTableState[row][col] = {
+            fieldType: tmp.table[row][col],
+            column: col,
+            row: row
+          };
+        }
+      }
+
+      this.gameTable = newTableState;
+    });
   }
 
   async updateTable() {
@@ -53,16 +73,10 @@ export class Game {
   }
 
   async makeMove(row: number, col: number) {
-
     // TODO: Remove eventually
     let playersTemp = ["24341538-9afb-4ae8-b90e-baa85cac57b5", "68dbcce5-eb47-4e1f-928d-4709bc0811e8"];
-
     let playerId = playersTemp[Math.floor(Math.random() * 2)];
 
-    console.log(playerId);
-
     await this.gameService.makeMove(this.gameId, playerId, row, col);
-
-    await this.updateTable();
   }
 }

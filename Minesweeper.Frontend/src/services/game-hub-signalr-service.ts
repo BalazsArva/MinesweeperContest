@@ -4,13 +4,14 @@ import * as SignalR from '@aspnet/signalr';
 
 const gameHubUrl = 'https://localhost:5001/hubs/game';
 
-@autoinject
+@autoinject()
 export class GameHubSignalRService {
     constructor(private eventAggregator: EventAggregator) {
 
     }
 
     async connect(gameId: string) {
+        // TODO: Error handling
         let connection = new SignalR.HubConnectionBuilder()
             .withUrl(gameHubUrl)
             .build();
@@ -24,15 +25,10 @@ export class GameHubSignalRService {
             return;
         }
 
-        connection.send("JoinGame", { gameId });
+        await connection.send("JoinGame", { gameId });
 
-        console.log(`SignalR connection to Game hub with GameId=${gameId} succeeded.`);
-
-        connection.on("GameTableUpdated", (newGameTable) => {
-            console.log(newGameTable);
-            console.log("game table updated");
-
-            this.eventAggregator.publish(`games:${gameId}:tableChanged`, { newGameTable });
+        connection.on("GameTableUpdated", notification => {
+            this.eventAggregator.publish(`games:${gameId}:tableChanged`, notification);
         });
     }
 }
