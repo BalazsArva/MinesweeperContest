@@ -30,6 +30,7 @@ namespace Minesweeper.WebAPI.Controllers
         [Route("games")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
+            // TODO: Remove eventually
             var player1Id = "68dbcce5-eb47-4e1f-928d-4709bc0811e8";
             var player2Id = "24341538-9afb-4ae8-b90e-baa85cac57b5";
 
