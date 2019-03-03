@@ -108,33 +108,7 @@ namespace Minesweeper.GameServices
                 return;
             }
 
-            var neighboringMineCount = 0;
-            for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
-            {
-                var rowToCheck = row + rowOffset;
-
-                // Row out of range
-                if (rowToCheck < 0 || rowToCheck >= table.Rows)
-                {
-                    continue;
-                }
-
-                for (var colOffset = -1; colOffset <= 1; ++colOffset)
-                {
-                    var colToCheck = column + colOffset;
-
-                    // Column out of range
-                    if (colToCheck < 0 || colToCheck >= table.Columns)
-                    {
-                        continue;
-                    }
-
-                    if (table.FieldMatrix[rowToCheck, colToCheck] == FieldTypes.Mined)
-                    {
-                        ++neighboringMineCount;
-                    }
-                }
-            }
+            var neighboringMineCount = GetMinesAroundField(table, row, column);
 
             if (neighboringMineCount == 0)
             {
@@ -152,10 +126,16 @@ namespace Minesweeper.GameServices
 
             var rowOverflown = row < 0 || row >= table.Rows;
             var colOverflown = column < 0 || column >= table.Columns;
+
+            if (rowOverflown || colOverflown)
+            {
+                return;
+            }
+
             var isMined = table.FieldMatrix[row, column] == FieldTypes.Mined;
             var isMovedOn = fieldLookup.IsFieldRegistered(row, column);
 
-            if (rowOverflown || colOverflown || isMined || isMovedOn)
+            if (isMined || isMovedOn)
             {
                 return;
             }
@@ -172,7 +152,14 @@ namespace Minesweeper.GameServices
                         continue;
                     }
 
-                    DoRecursiveMove(game, fieldLookup, player, row + rowOffset, column + colOffset, utcDateTimeRecorded);
+                    var surroundingRow = row + rowOffset;
+                    var surroundingCol = column + colOffset;
+
+                    var hasZeroMinesAround = GetMinesAroundField(table, row, column) == 0;
+                    if (hasZeroMinesAround)
+                    {
+                        DoRecursiveMove(game, fieldLookup, player, surroundingRow, surroundingCol, utcDateTimeRecorded);
+                    }
                 }
             }
         }
@@ -219,6 +206,39 @@ namespace Minesweeper.GameServices
             }
 
             return basePoints + bonus;
+        }
+
+        private int GetMinesAroundField(GameTable table, int row, int column)
+        {
+            var neighboringMineCount = 0;
+            for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
+            {
+                var rowToCheck = row + rowOffset;
+
+                // Row out of range
+                if (rowToCheck < 0 || rowToCheck >= table.Rows)
+                {
+                    continue;
+                }
+
+                for (var colOffset = -1; colOffset <= 1; ++colOffset)
+                {
+                    var colToCheck = column + colOffset;
+
+                    // Column out of range
+                    if (colToCheck < 0 || colToCheck >= table.Columns)
+                    {
+                        continue;
+                    }
+
+                    if (table.FieldMatrix[rowToCheck, colToCheck] == FieldTypes.Mined)
+                    {
+                        ++neighboringMineCount;
+                    }
+                }
+            }
+
+            return neighboringMineCount;
         }
 
         private bool IsGameOver(Game game)

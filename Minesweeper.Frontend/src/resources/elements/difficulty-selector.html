@@ -1,0 +1,39 @@
+<template>
+  
+  <label class="card btn btn-light ${ isSelected ? 'border-info' : '' } cursor-hand" for="difficulty-${ difficulty.title }">
+    <div class="card-body">
+      <h1 class="h3 card-title">
+        ${ difficulty.title }
+      </h1>
+
+      <div class="row">
+        <div class="col text-info">
+          <h2 class="h5 mb-0">
+            <b>
+              ${ difficulty.width }&times;${ difficulty.height }
+            </b>
+          </h2>
+          <small>
+            grid
+          </small>
+        </div>
+
+        <div class="col text-danger">
+          <h2 class="h5 mb-0">
+            <b>
+              ${ difficulty.mines }
+            </b>
+          </h2>
+          <small>
+            mines
+          </small>
+        </div>
+      </div>
+
+      <p class="sr-only">
+        <input type="radio" name.bind="inputGroup" checked.bind="selectedDifficulty" id="difficulty-${ difficulty.title }" model.bind="difficulty" />
+      </p>
+    </div>
+  </label>
+
+</template>

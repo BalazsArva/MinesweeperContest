@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.WebAPI.Contracts.Requests;
+using Minesweeper.WebAPI.Contracts.Responses;
 
 namespace Minesweeper.WebAPI.Controllers
 {
@@ -16,6 +17,13 @@ namespace Minesweeper.WebAPI.Controllers
         public LobbyController(IGameService gameService)
         {
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
+        }
+
+        [HttpGet]
+        [Route("anonymous-id")]
+        public IActionResult RequestAnonymousPlayerId()
+        {
+            return Ok(new GetAnonymousPlayerIdResponse { PlayerId = Guid.NewGuid().ToString() });
         }
 
         [HttpGet]
@@ -42,7 +50,7 @@ namespace Minesweeper.WebAPI.Controllers
 
         [HttpPost]
         [Route("games", Name = RouteNames.CreateGame)]
-        public async Task<IActionResult> Post([FromBody] NewGameRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateGame([FromBody] NewGameRequest request, CancellationToken cancellationToken)
         {
             var result = await _gameService.StartNewGameAsync(request.PlayerId, request.DisplayName, request.TableRows, request.TableColumns, request.MineCount, cancellationToken).ConfigureAwait(false);
 
@@ -51,6 +59,17 @@ namespace Minesweeper.WebAPI.Controllers
                 gameId = result.GameId,
                 entryToken = result.EntryToken
             };
+
+            return CreatedAtRoute(RouteNames.Game, routeValues, null);
+        }
+
+        [HttpPost]
+        [Route("games/{gameId}", Name = RouteNames.JoinGame)]
+        public async Task<IActionResult> JoinGame(string gameId, [FromBody]JoinGameRequest request, CancellationToken cancellationToken)
+        {
+            await _gameService.JoinGameAsync(gameId, request.PlayerId, request.DisplayName, request.EntryToken, cancellationToken).ConfigureAwait(false);
+
+            var routeValues = new { gameId };
 
             return CreatedAtRoute(RouteNames.Game, routeValues, null);
         }

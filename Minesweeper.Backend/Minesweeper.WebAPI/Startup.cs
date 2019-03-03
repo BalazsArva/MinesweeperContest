@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minesweeper.DataAccess.RavenDb.Extensions;
 using Minesweeper.GameServices.Extensions;
+using Minesweeper.WebAPI.Hubs;
 
 namespace Minesweeper.WebAPI
 {
@@ -23,6 +25,9 @@ namespace Minesweeper.WebAPI
 
             services.AddRavenDb(Configuration);
             services.AddGameServices();
+            services.AddSignalR();
+            services.AddCors(cors => cors.AddPolicy("Frontend", configure => configure.SetIsOriginAllowed(url => url == "http://localhost:9000").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+            services.AddMediatR();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -36,7 +41,15 @@ namespace Minesweeper.WebAPI
                 app.UseHsts();
             }
 
+            app.UseCors("Frontend");
+
+            //app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()/*.AllowCredentials()*/);
             app.UseHttpsRedirection();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<GameHub>("/hubs/game");
+            });
             app.UseMvc();
         }
     }

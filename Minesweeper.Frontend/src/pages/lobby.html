@@ -1,0 +1,68 @@
+<template>
+  <page-header title="Lobby" subtitle="available games appear here"></page-header>
+
+  <div class="row">
+    <div class="col">
+      <a class="btn btn-primary" route-href="route.bind: 'newgame'">Host a new game</a>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="row">
+    <div class="col-md">
+      <form submit.delegate="saveUserInfo()">
+        <div class="form-group">
+          <label class="sr-only" for="join-game-name">Display name</label>
+          <input type="text" class="form-control" id="join-game-name" aria-describedby="join-game-name-help"
+            placeholder="Enter display name" value.bind="displayName" />
+          <small id="join-game-name-help" class="form-text text-muted">
+            Enter what you wish to be displayed as your name
+          </small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save my info</button>
+      </form>
+    </div>
+
+    <div class="col-md">
+      <form submit.delegate="joinGame()">
+        <div class="form-group">
+          If you were invited to a game, enter its Id here to join
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="join-game-id">Game Id</label>
+          <input type="text" class="form-control" id="join-game-id" aria-describedby="join-game-id-help"
+            placeholder="Enter game id" value.bind="joinGameId" />
+          <small id="join-game-id-help" class="form-text text-muted">
+            The identifier of the game to join. Your inviter must have received this after creating the game.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="join-game-entry-token">Game entry token</label>
+          <input type="text" class="form-control" id="join-game-entry-token"
+            aria-describedby="join-game-entry-token-help" placeholder="Enter game entry token"
+            value.bind="joinGameEntryToken" />
+          <small id="join-game-entry-token-help" class="form-text text-muted">
+            An entry key for the game. Your inviter must have received this after creating the game.
+          </small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Join</button>
+      </form>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="row">
+    <div class="col">
+      <game-stat stat.to-view="availableGames" title="Available games"></game-stat>
+    </div>
+  </div>
+
+  <hr />
+
+</template>
