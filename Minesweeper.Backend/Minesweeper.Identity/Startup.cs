@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minesweeper.Identity.Data;
+using Minesweeper.Identity.Data.Entities;
 
 namespace Minesweeper.Identity
 {
@@ -27,8 +28,9 @@ namespace Minesweeper.Identity
             services.AddDbContext<MinesweeperIdentityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Minesweeper.IdentityDb")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<MinesweeperIdentityDbContext>()
+                .AddUserManager<AspNetUserManager<AppUser>>()
                 .AddDefaultTokenProviders();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -51,7 +53,7 @@ namespace Minesweeper.Identity
                     // this enables automatic token cleanup. this is optional.
                     options.EnableTokenCleanup = true;
                 })
-                .AddAspNetIdentity<IdentityUser>();
+                .AddAspNetIdentity<AppUser>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
