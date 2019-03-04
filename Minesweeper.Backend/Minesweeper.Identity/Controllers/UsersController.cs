@@ -19,38 +19,6 @@ namespace Minesweeper.Identity.Controllers
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> RegisterUserTmp()
-        {
-            // TODO: Eventually delete
-            var request = new RegisterUserRequest { Email = $"test.user{DateTime.Now.Ticks}@example.com", Password = "Testing:123" };
-
-            var user = new AppUser
-            {
-                Email = request.Email,
-                // TODO: Maybe implement actual confirmation process
-                EmailConfirmed = true,
-                LockoutEnabled = true,
-                UserName = request.Email,
-                TwoFactorEnabled = false
-            };
-
-            var creationResult = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
-
-            if (creationResult.Succeeded)
-            {
-                return Ok();
-            }
-
-            // TODO: Improve the mapping (replace string.empty, etc)
-            foreach (var err in creationResult.Errors)
-            {
-                ModelState.AddModelError(string.Empty, err.Description);
-            }
-
-            return BadRequest(ModelState);
-        }
-
         [HttpPost]
         public async Task<IActionResult> RegisterUser(RegisterUserRequest request, CancellationToken cancellationToken)
         {
