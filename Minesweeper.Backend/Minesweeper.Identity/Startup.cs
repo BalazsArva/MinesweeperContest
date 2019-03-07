@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minesweeper.Identity.Data;
 using Minesweeper.Identity.Data.Entities;
+using Minesweeper.Identity.Data.Setup;
 
 namespace Minesweeper.Identity
 {
@@ -75,6 +77,19 @@ namespace Minesweeper.Identity
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            SeedDatabase(app);
+        }
+
+        private void SeedDatabase(IApplicationBuilder app)
+        {
+            // TODO: Only migrate if needed
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var identityServerConfigurationDbContext = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+
+                ClientSetup.EnsureClientsRegistered(identityServerConfigurationDbContext);
+            }
         }
     }
 }

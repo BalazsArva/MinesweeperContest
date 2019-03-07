@@ -25,5 +25,7 @@ export class Register {
         }
 
         await this.registrationService.registerUser(email, displayName, password);
+
+        // TODO: Reset fields if the request is successful, redirect user to login page
     }
 }
