@@ -5,22 +5,12 @@ import { FieldTypes } from "../interfaces/field-types";
 
 const apiUrl = 'https://localhost:5001/api/games/'
 
+// TODO: Implement proper error handling
 @autoinject()
 export class GameService {
 
     async getGameTable(gameId: string): Promise<GetGameTableResponse> {
-        let client = new HttpClient();
-        let defaultHeaders = {
-            'Accept': 'application/json',
-            'X-Requested-With': 'Fetch'
-        };
-
-        client.configure(config => {
-            config.withBaseUrl(apiUrl)
-                .withDefaults({
-                    headers: defaultHeaders
-                });
-        });
+        let client = this.createHttpClient();
 
         try {
             let httpResponse = await client.fetch(`${gameId}/table`, { method: 'get' });
@@ -35,21 +25,10 @@ export class GameService {
     }
 
     async makeMove(gameId: string, playerId: string, row: number, column: number): Promise<void> {
-        let client = new HttpClient();
-        let defaultHeaders = {
-            'Accept': 'application/json',
-            'X-Requested-With': 'Fetch'
-        };
+        let client = this.createHttpClient();
 
         let body = { column, row, playerId };
         let request = { method: 'post', body: json(body) };
-
-        client.configure(config => {
-            config.withBaseUrl(apiUrl)
-                .withDefaults({
-                    headers: defaultHeaders
-                });
-        });
 
         try {
             let httpResponse = await client.fetch(`${gameId}/movement`, request);
@@ -62,6 +41,23 @@ export class GameService {
         catch (reason) {
             console.log(reason);
         }
+    }
+
+    private createHttpClient(): HttpClient {
+        let client = new HttpClient();
+        let defaultHeaders = {
+            'Accept': 'application/json',
+            'X-Requested-With': 'Fetch'
+        };
+
+        client.configure(config => {
+            config.withBaseUrl(apiUrl)
+                .withDefaults({
+                    headers: defaultHeaders
+                });
+        });
+
+        return client;
     }
 }
 
