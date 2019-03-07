@@ -34,6 +34,8 @@ namespace Minesweeper.Identity
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.AddCors(cors => cors.AddPolicy("Frontend", configure => configure.SetIsOriginAllowed(url => url == "http://localhost:9000").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+
             services.AddIdentityServer()
                 // TODO: Replace with a proper signing credential later
                 .AddDeveloperSigningCredential()
@@ -66,6 +68,8 @@ namespace Minesweeper.Identity
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseCors("Frontend");
 
             app.UseIdentityServer();
 
