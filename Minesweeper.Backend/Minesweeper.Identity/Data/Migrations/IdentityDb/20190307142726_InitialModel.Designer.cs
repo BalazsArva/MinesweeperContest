@@ -10,7 +10,7 @@ using Minesweeper.Identity.Data;
 namespace Minesweeper.Identity.Data.Migrations.IdentityDb
 {
     [DbContext(typeof(MinesweeperIdentityDbContext))]
-    [Migration("20190303155304_InitialModel")]
+    [Migration("20190307142726_InitialModel")]
     partial class InitialModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,6 +140,8 @@ namespace Minesweeper.Identity.Data.Migrations.IdentityDb
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
+
+                    b.Property<string>("DisplayName");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);

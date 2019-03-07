@@ -139,6 +139,8 @@ namespace Minesweeper.Identity.Data.Migrations.IdentityDb
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
+                    b.Property<string>("DisplayName");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 

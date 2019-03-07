@@ -3,11 +3,11 @@ import configuration from '../../client-configuration';
 
 export class RegistrationService {
 
-    async registerUser(email: string, password: string) {
+    async registerUser(email: string, displayName: string, password: string) {
         const expectedStatus = 200;
 
         let client = this.createHttpClient();
-        let body = { email, password };
+        let body = { email, password, displayName };
         let request = { method: 'POST', body: json(body) };
 
         try {

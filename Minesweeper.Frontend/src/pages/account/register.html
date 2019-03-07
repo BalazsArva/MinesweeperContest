@@ -1,24 +1,53 @@
 <template>
     <page-header title="Register an account"></page-header>
 
-    <form submit.delegate="register()">
+    <hr />
 
-        <div class="form-group">
-            <label for="email-address">E-mail address</label>
-            <input type="email" class="form-control" id="email-address" aria-describedby="email-address-help"
-                   placeholder="you@example.com" value.bind="email" />
-            <small id="email-address-help" class="form-text text-muted">
-                Your e-mail address. This will be used to log in.
-            </small>
+    <form submit.delegate="register()">
+        <div class="form-group row ">
+            <label class="col-sm-2 col-form-label" for="email-address">E-mail address</label>
+
+            <div class="col-sm-10 mb-3">
+                <input type="email" class="form-control" id="email-address" aria-describedby="email-address-help"
+                       placeholder="you@example.com" value.bind="email" />
+                <small id="email-address-help" class="form-text text-muted">
+                    Your e-mail address. This will be used to log in.
+                </small>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" aria-describedby="password-help"
-                   placeholder="Your password" value.bind="password" />
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="display-name">Display name</label>
+
+            <div class="col-sm-10 mb-3">
+                <input type="text" class="form-control" id="display-name" aria-describedby="display-name-help"
+                       placeholder="TheBestGamer" value.bind="displayName" />
+                <small id="display-name-help" class="form-text text-muted">
+                    You will appear with this name to other players. You can change this later.
+                </small>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="password">Password</label>
+
+            <div class="col-sm-10 mb-3">
+                <input type="password" class="form-control" id="password" aria-describedby="password-help"
+                       placeholder="Your password" value.bind="password" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="confirm-password">Confirm password</label>
+
+            <div class="col-sm-10 mb-3">
+                <input type="password" class="form-control" id="confirm-password" aria-describedby="confirm-password-help"
+                       placeholder="Repeat your password" value.bind="passwordConfirmation" />
+            </div>
         </div>
 
         <hr />
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
+
 </template>

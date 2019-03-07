@@ -22,8 +22,11 @@ namespace Minesweeper.Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterUser(RegisterUserRequest request, CancellationToken cancellationToken)
         {
+            // TODO: Validation
+
             var user = new AppUser
             {
+                DisplayName = request.DisplayName,
                 Email = request.Email,
                 // TODO: Maybe implement actual confirmation process
                 EmailConfirmed = true,
