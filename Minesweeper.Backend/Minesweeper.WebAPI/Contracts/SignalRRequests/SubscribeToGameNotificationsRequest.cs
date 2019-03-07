@@ -1,6 +1,6 @@
 ﻿namespace Minesweeper.WebAPI.Contracts.SignalRRequests
 {
-    public class JoinGameRequest
+    public class SubscribeToGameNotificationsRequest
     {
         public string GameId { get; set; }
     }

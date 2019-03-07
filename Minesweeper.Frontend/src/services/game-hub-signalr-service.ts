@@ -25,7 +25,7 @@ export class GameHubSignalRService {
             return;
         }
 
-        await connection.send("JoinGame", { gameId });
+        await connection.send("SubscribeToGameNotifications", { gameId });
 
         connection.on("GameTableUpdated", notification => {
             this.eventAggregator.publish(`games:${gameId}:tableChanged`, notification);

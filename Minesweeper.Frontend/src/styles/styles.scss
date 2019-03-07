@@ -1,14 +1,21 @@
 @import '~bootstrap/scss/bootstrap.scss';
 
-html, body {
-    height: 100%;
-    background-color: #f0f0f0;
+html,
+body {
+  height: 100%;
+  background-color: #f0f0f0;
 }
 
 body {
-    margin-top:85px;
+  margin-top: 85px;
 }
 
 .cursor-hand {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+.btn-game-table {
+  width: 2.25em;
+  height: 2.25em;
+  border-radius: 0;
 }
