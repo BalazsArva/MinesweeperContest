@@ -1,0 +1,24 @@
+<template>
+    <page-header title="Register an account"></page-header>
+
+    <form submit.delegate="register()">
+
+        <div class="form-group">
+            <label for="email-address">E-mail address</label>
+            <input type="email" class="form-control" id="email-address" aria-describedby="email-address-help"
+                   placeholder="you@example.com" value.bind="email" />
+            <small id="email-address-help" class="form-text text-muted">
+                Your e-mail address. This will be used to log in.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" aria-describedby="password-help"
+                   placeholder="Your password" value.bind="password" />
+        </div>
+
+        <hr />
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</template>
