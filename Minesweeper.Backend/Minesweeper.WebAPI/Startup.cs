@@ -28,6 +28,13 @@ namespace Minesweeper.WebAPI
             services.AddSignalR();
             services.AddCors(cors => cors.AddPolicy("Frontend", configure => configure.SetIsOriginAllowed(url => url == "http://localhost:9000").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
             services.AddMediatR();
+
+            services
+                .AddAuthentication(opts =>
+                {
+                    opts.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddCookie();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -42,6 +49,7 @@ namespace Minesweeper.WebAPI
             }
 
             app.UseCors("Frontend");
+            app.UseAuthentication();
 
             //app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()/*.AllowCredentials()*/);
             app.UseHttpsRedirection();

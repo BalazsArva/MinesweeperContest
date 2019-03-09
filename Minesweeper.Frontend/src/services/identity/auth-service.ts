@@ -3,26 +3,16 @@ import configuration from "../../client-configuration";
 
 export class AuthService {
 
-    async authorizeUser(email: string, password: string) {
+    async authenticateUser(email: string, password: string) {
         const expectedStatus = 200;
 
         let client = this.createHttpClient();
-        let request = { method: "GET" };
-        let url = "authorize?";
-        // let url = "token?";
+        let body = { email, password };
+        let request = { method: "POST", body: json(body) };
 
-        url += "client_id=Minesweeper.Frontend&";
-        url += "scope=Game&";
-        url += "response_type=token&";
-        url += "grant_type=password&";
-        url += "username=" + encodeURIComponent(email) + "&";
-        url += "password=" + encodeURIComponent(password) + "&";
-        url += "redirect_uri=http%3A%2F%2Flocalhost%3A9000";
-
-        alert(url)
 
         try {
-            let httpResponse = await client.fetch(url, request);
+            let httpResponse = await client.fetch("", request);
 
             if (httpResponse.status === expectedStatus) {
                 return;
@@ -43,7 +33,7 @@ export class AuthService {
         };
 
         client.configure(config => {
-            config.withBaseUrl(configuration.identityConnectBaseUrl)
+            config.withBaseUrl(configuration.accountApiBaseUrl)
                 .withDefaults({
                     headers: defaultHeaders
                 });

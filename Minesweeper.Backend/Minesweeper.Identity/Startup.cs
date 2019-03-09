@@ -89,6 +89,8 @@ namespace Minesweeper.Identity
                 var identityServerConfigurationDbContext = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
 
                 ClientSetup.EnsureClientsRegistered(identityServerConfigurationDbContext);
+                ApiResourceSetup.EnsureApiResourcesRegistered(identityServerConfigurationDbContext);
+                IdentityResourceSetup.EnsureClientsRegistered(identityServerConfigurationDbContext);
             }
         }
     }

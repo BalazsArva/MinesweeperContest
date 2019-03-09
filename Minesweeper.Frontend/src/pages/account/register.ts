@@ -25,9 +25,9 @@ export class Register {
             return;
         }
 
-        // await this.registrationService.registerUser(email, displayName, password);
+        //await this.registrationService.registerUser(email, displayName, password);
 
-        await this.authService.authorizeUser(email, password);
+        await this.authService.authenticateUser(email, password);
 
         // TODO: Reset fields if the request is successful, redirect user to login page
     }

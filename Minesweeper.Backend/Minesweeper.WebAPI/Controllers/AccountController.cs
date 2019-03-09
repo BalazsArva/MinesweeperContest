@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.WebAPI.Contracts.Requests;
@@ -13,66 +14,55 @@ using Newtonsoft.Json;
 namespace Minesweeper.WebAPI.Controllers
 {
     // See https://github.com/onelogin/openid-connect-dotnet-core-sample
+    [Route("api/[controller]")]
+    [ApiController]
     public class AccountController : Controller
     {
+        private const string AccessTokenClaimKey = "access_token";
+
         // TODO: Move to config
-        private const string ONELOGIN_OPENID_CONNECT_CLIENT_ID = "your-onelogin-openid-connect-client-id";
-        private const string ONELOGIN_OPENID_CONNECT_CLIENT_SECRET = "your-onelogin-openid-connect-client-secret";
-        private const string ONELOGIN_OIDC_REGION = "openid-connect"; // For EU us openid-connect-eu
+        private const string ClientId = "Minesweeper.API";
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
-        {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync();
-
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
+        private const string ClientSecret = "your-onelogin-openid-connect-client-secret";
+        private const string IdentityApiBaseUrl = "https://localhost:5003";
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginRequest loginModel, string returnUrl = "/home/dashboard")
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginRequest loginModel)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
-            var token = await LoginUser(loginModel.Username, loginModel.Password);
+            var token = await LoginUser(loginModel.Email, loginModel.Password);
 
             if (!string.IsNullOrEmpty(token.AccessToken))
             {
-                // We need to call OIDC again to get the user claims
                 var user = await GetUserInfo(token.AccessToken);
 
                 var claims = new List<Claim>
-          {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("onelogin-access-token", token.AccessToken)
-          };
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(AccessTokenClaimKey, token.AccessToken)
+                };
 
                 var userIdentity = new ClaimsIdentity(claims, "login");
 
-                ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-                await HttpContext.SignInAsync(principal);
+                var principal = new ClaimsPrincipal(userIdentity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                //Just redirect to our index after logging in.
-                return Redirect(returnUrl);
+                return Ok();
             }
 
+            // TODO: Improve error feedback
             ModelState.AddModelError(string.Empty, "Login Failed");
-            return View(loginModel);
+            return BadRequest(loginModel);
         }
 
-        [HttpGet]
+        [HttpDelete]
         public async Task<IActionResult> Logout()
         {
-            await LogoutUser(User.FindFirstValue("onelogin-access-token"));
+            await LogoutUser(User.FindFirstValue(AccessTokenClaimKey));
             await HttpContext.SignOutAsync();
 
-            // TODO: Provide valid route
-            return RedirectToAction("Index", "Home");
+            return Ok();
         }
 
         private async Task<OidcTokenResponse> LoginUser(string username, string password)
@@ -87,15 +77,15 @@ namespace Minesweeper.WebAPI.Controllers
                 // e.g. Authorization: basic <base64 encoded ("client_id:client_secret")>
                 var formData = new FormUrlEncodedContent(new[]
                 {
-              new KeyValuePair<string, string>("username", username),
-              new KeyValuePair<string, string>("password", password),
-              new KeyValuePair<string, string>("client_id", ONELOGIN_OPENID_CONNECT_CLIENT_ID),
-              new KeyValuePair<string, string>("client_secret", ONELOGIN_OPENID_CONNECT_CLIENT_SECRET),
-              new KeyValuePair<string, string>("grant_type", "password"),
-              new KeyValuePair<string, string>("scope", "openid profile email")
-          });
+                    new KeyValuePair<string, string>("username", username),
+                    new KeyValuePair<string, string>("password", password),
+                    new KeyValuePair<string, string>("client_id", ClientId),
+                    new KeyValuePair<string, string>("client_secret", ClientSecret),
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("scope", "Minesweeper.Apis.Game Minesweeper.Identity openid")
+                });
 
-                var uri = string.Format("https://{0}.onelogin.com/oidc/token", ONELOGIN_OIDC_REGION);
+                var uri = $"{IdentityApiBaseUrl}/connect/token";
 
                 var res = await client.PostAsync(uri, formData);
 
@@ -109,6 +99,7 @@ namespace Minesweeper.WebAPI.Controllers
 
         private async Task<bool> LogoutUser(string accessToken)
         {
+            // TODO: Should not create a http client all the time. A global singleton one will do.
             using (var client = new HttpClient())
             {
                 // The Token Endpoint Authentication Method must be set to POST if you
@@ -119,13 +110,13 @@ namespace Minesweeper.WebAPI.Controllers
                 // e.g. Authorization: basic <base64 encoded ("client_id:client_secret")>
                 var formData = new FormUrlEncodedContent(new[]
                 {
-              new KeyValuePair<string, string>("token", accessToken),
-              new KeyValuePair<string, string>("token_type_hint", "access_token"),
-              new KeyValuePair<string, string>("client_id", ONELOGIN_OPENID_CONNECT_CLIENT_ID),
-              new KeyValuePair<string, string>("client_secret", ONELOGIN_OPENID_CONNECT_CLIENT_SECRET)
-          });
+                    new KeyValuePair<string, string>("token", accessToken),
+                    new KeyValuePair<string, string>("token_type_hint", "access_token"),
+                    new KeyValuePair<string, string>("client_id", ClientId),
+                    new KeyValuePair<string, string>("client_secret", ClientSecret)
+                });
 
-                var uri = string.Format("https://{0}.onelogin.com/oidc/token/revocation", ONELOGIN_OIDC_REGION);
+                var uri = $"{IdentityApiBaseUrl}/connect/revocation";
 
                 var res = await client.PostAsync(uri, formData);
 
@@ -139,7 +130,7 @@ namespace Minesweeper.WebAPI.Controllers
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var uri = string.Format("https://{0}.onelogin.com/oidc/me", ONELOGIN_OIDC_REGION);
+                var uri = $"{IdentityApiBaseUrl}/connect/userinfo";
 
                 var res = await client.GetAsync(uri);
 
