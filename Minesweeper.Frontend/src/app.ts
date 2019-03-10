@@ -40,13 +40,18 @@ export class App {
                 route: "account/register",
                 moduleId: PLATFORM.moduleName("./pages/account/register"),
                 title: "Register an account",
-                name: "register"
+                linkText: "Register",
+                name: "register",
+                nav: false,
+                navInUserWidgetNotLoggedIn: true
             },
             {
                 route: "account/login",
                 moduleId: PLATFORM.moduleName("./pages/account/login"),
                 title: "Log in",
-                name: "login"
+                name: "login",
+                nav: false,
+                navInUserWidgetNotLoggedIn: true
             }
         ]);
 

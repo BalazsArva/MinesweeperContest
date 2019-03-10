@@ -1,7 +1,13 @@
 import { HttpClient, json } from "aurelia-fetch-client";
 import configuration from "../../client-configuration";
+import { autoinject } from "aurelia-framework";
+import { EventAggregator } from "aurelia-event-aggregator";
 
+@autoinject()
 export class AuthService {
+
+    constructor(private eventAggregator: EventAggregator) {
+    }
 
     async authenticateUser(email: string, password: string): Promise<LoginResult> {
         const expectedStatus = 200;
@@ -14,7 +20,8 @@ export class AuthService {
             let httpResponse = await client.fetch("", request);
 
             if (httpResponse.status === expectedStatus) {
-                // TODO: Emit an event so dependent stuff can update themselves (e.g. user widget in navbar, subscribe to notifications, etc.)
+                this.eventAggregator.publish(AccountServiceEvents.LoggedIn);
+
                 return { success: true };
             }
 
@@ -52,4 +59,9 @@ export class AuthService {
 export interface LoginResult {
     success: boolean;
     errorMessage?: string;
+}
+
+export enum AccountServiceEvents {
+    LoggedIn = "Account:General:LoggedIn",
+    LoggedOut = "Account:General:LoggedOut"
 }
