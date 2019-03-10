@@ -68,7 +68,7 @@ namespace Minesweeper.GameServices
                     throw new GameNotFoundException();
                 }
 
-                if ((game.InvitedPlayerId != null && game.InvitedPlayerId != player2Id) || game.Player2 != null)
+                if ((game.InvitedPlayerId != null && game.InvitedPlayerId != player2Id) || game.Player2 != null || game.Player1.PlayerId == player2Id)
                 {
                     throw new ActionNotAllowedException("You are not allowed to join the requested game.");
                 }
