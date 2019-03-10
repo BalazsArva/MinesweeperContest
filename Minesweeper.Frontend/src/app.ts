@@ -23,7 +23,7 @@ export class App {
                 nav: false
             },
             {
-                route: "games",
+                route: "lobby",
                 moduleId: PLATFORM.moduleName("./pages/lobby"),
                 title: "Games",
                 name: "lobby",
@@ -41,6 +41,12 @@ export class App {
                 moduleId: PLATFORM.moduleName("./pages/account/register"),
                 title: "Register an account",
                 name: "register"
+            },
+            {
+                route: "account/login",
+                moduleId: PLATFORM.moduleName("./pages/account/login"),
+                title: "Log in",
+                name: "login"
             }
         ]);
 

@@ -1,6 +1,5 @@
 import { autoinject } from 'aurelia-framework';
 import { RegistrationService } from 'services/identity/registration-service';
-import { AuthService } from 'services/identity/auth-service';
 
 @autoinject
 export class Register {
@@ -9,7 +8,7 @@ export class Register {
     password = "";
     passwordConfirmation = "";
 
-    constructor(private registrationService: RegistrationService, private authService: AuthService) {
+    constructor(private registrationService: RegistrationService) {
     }
 
     async register() {
@@ -25,9 +24,7 @@ export class Register {
             return;
         }
 
-        //await this.registrationService.registerUser(email, displayName, password);
-
-        await this.authService.authenticateUser(email, password);
+        await this.registrationService.registerUser(email, displayName, password);
 
         // TODO: Reset fields if the request is successful, redirect user to login page
     }
