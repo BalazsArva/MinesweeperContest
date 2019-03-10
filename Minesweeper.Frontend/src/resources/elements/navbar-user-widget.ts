@@ -1,5 +1,5 @@
 import { EventAggregator, Subscription } from "aurelia-event-aggregator";
-import { AccountServiceEvents } from "services/identity/auth-service";
+import { AccountServiceEvents, AuthService } from "services/identity/auth-service";
 import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
@@ -10,7 +10,7 @@ export class NavbarUserWidget {
 
     isLoggedIn = false;
 
-    constructor(private eventAggregator: EventAggregator, private router: Router) {
+    constructor(private authService: AuthService, private eventAggregator: EventAggregator, private router: Router) {
     }
 
     attached() {
@@ -31,5 +31,15 @@ export class NavbarUserWidget {
 
     loggedOut() {
         this.isLoggedIn = false;
+    }
+
+    async logOut() {
+        let result = await this.authService.logOut();
+        if (result.success) {
+            return this.router.navigateToRoute("home");
+        }
+
+        // TODO: Implement more user-friendly feedback
+        alert(result.errorMessage);
     }
 }

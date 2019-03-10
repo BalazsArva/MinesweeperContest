@@ -17,7 +17,6 @@
         </ul>
     </template>
 
-
     <template if.bind="isLoggedIn">
         <ul class="navbar-nav mr-auto">
 
@@ -33,6 +32,12 @@
             </template>
 
         </ul>
+
+        <form submit.delegate="logOut()">
+            <button type="submit" class="btn btn-link">
+                Log out
+            </button>
+        </form>
     </template>
 
 </template>

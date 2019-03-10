@@ -60,7 +60,7 @@ namespace Minesweeper.WebAPI.Controllers
         public async Task<IActionResult> Logout()
         {
             await LogoutUser(User.FindFirstValue(AccessTokenClaimKey));
-            await HttpContext.SignOutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return Ok();
         }
