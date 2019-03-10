@@ -31,16 +31,6 @@ namespace Minesweeper.GameServices
             _gameTableVisibilityComputer = gameTableVisibilityComputer ?? throw new ArgumentNullException(nameof(gameTableVisibilityComputer));
         }
 
-        public async Task<bool> CanAccessGameAsync(string playerId, string gameId, CancellationToken cancellationToken)
-        {
-            using (var session = _documentStore.OpenAsyncSession())
-            {
-                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
-
-                return game.Player1.PlayerId == gameId || game.Player2.PlayerId == playerId;
-            }
-        }
-
         public async Task<string> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
