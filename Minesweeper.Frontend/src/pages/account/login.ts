@@ -16,7 +16,7 @@ export class Login {
         let password = this.password;
 
         // TODO: Validation, display errors
-        let result = await this.authService.authenticateUser(email, password);
+        let result = await this.authService.logIn(email, password);
         if (result.success) {
             this.resetFields();
             

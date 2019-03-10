@@ -9,7 +9,7 @@ export class AuthService {
     constructor(private eventAggregator: EventAggregator) {
     }
 
-    async authenticateUser(email: string, password: string): Promise<LoginResult> {
+    async logIn(email: string, password: string): Promise<LoginResult> {
         const expectedStatus = 200;
 
         let client = this.createHttpClient();
