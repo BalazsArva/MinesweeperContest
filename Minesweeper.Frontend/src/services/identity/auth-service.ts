@@ -14,7 +14,10 @@ export class AuthService {
 
         let client = this.createHttpClient();
         let body = { email, password };
-        let request = { method: "POST", body: json(body) };
+
+        // The 'credentials: "include"' must be set not only when using the auth cookie, but also when accessing
+        // the authentication endpoint. See https://stackoverflow.com/a/51726055/4205470
+        let request = { method: "POST", credentials: "include", body: json(body) };
 
         try {
             let httpResponse = await client.fetch("", request);

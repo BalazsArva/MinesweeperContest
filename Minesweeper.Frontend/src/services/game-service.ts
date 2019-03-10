@@ -1,9 +1,9 @@
-import { HttpClient, json } from 'aurelia-fetch-client';
-import { autoinject } from 'aurelia-framework';
+import { HttpClient, json } from "aurelia-fetch-client";
+import { autoinject } from "aurelia-framework";
 
 import { FieldTypes } from "../interfaces/field-types";
 
-const apiUrl = 'https://localhost:5001/api/games/'
+const apiUrl = "https://localhost:5001/api/games/"
 
 // TODO: Implement proper error handling
 @autoinject()
@@ -13,7 +13,7 @@ export class GameService {
         let client = this.createHttpClient();
 
         try {
-            let httpResponse = await client.fetch(`${gameId}/table`, { method: 'get' });
+            let httpResponse = await client.fetch(`${gameId}/table`, { method: "get", credentials: "include" });
 
             let result = await httpResponse.json();
 
@@ -28,14 +28,14 @@ export class GameService {
         let client = this.createHttpClient();
 
         let body = { column, row, playerId };
-        let request = { method: 'post', body: json(body) };
+        let request = { method: "post", body: json(body) };
 
         try {
             let httpResponse = await client.fetch(`${gameId}/movement`, request);
 
             // TODO: Do proper error handling
             if (!httpResponse.ok) {
-                throw Error('Unexpected status code: ' + httpResponse.status);
+                throw Error("Unexpected status code: " + httpResponse.status);
             }
         }
         catch (reason) {
@@ -46,8 +46,8 @@ export class GameService {
     private createHttpClient(): HttpClient {
         let client = new HttpClient();
         let defaultHeaders = {
-            'Accept': 'application/json',
-            'X-Requested-With': 'Fetch'
+            "Accept": "application/json",
+            "X-Requested-With": "Fetch"
         };
 
         client.configure(config => {
