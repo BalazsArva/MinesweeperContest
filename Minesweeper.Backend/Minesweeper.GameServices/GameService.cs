@@ -91,6 +91,7 @@ namespace Minesweeper.GameServices
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
+                // TODO: Concurrency protection
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 var movementResult = _gameDriver.MakeMove(game, playerId, row, column);
