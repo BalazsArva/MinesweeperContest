@@ -35,6 +35,8 @@ namespace Minesweeper.WebAPI
                     opts.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddCookie();
+            //.AddJwtBearer("",opts=>opts.)
+            //.AddOpenIdConnect(opts=>opts.)
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

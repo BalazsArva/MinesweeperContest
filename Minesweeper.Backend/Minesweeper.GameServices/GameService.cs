@@ -62,17 +62,17 @@ namespace Minesweeper.GameServices
             }
         }
 
-        public async Task JoinGameAsync(string gameId, string player2Id, string playerDisplayName, string entryToken, CancellationToken cancellationToken)
+        public async Task JoinGameAsync(string gameId, string player2Id, string player2DisplayName, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
-                // TODO: Validate: Player2 is unset, entry token is valid, game not finished, etc.
+                // TODO: Validate: Player2 is unset, game is not invitation-based or the invited player is the passed one, game not finished, concurrency etc.
                 game.Player2 = new Player
                 {
                     PlayerId = player2Id,
-                    DisplayName = playerDisplayName,
+                    DisplayName = player2DisplayName,
                     Points = 0
                 };
 

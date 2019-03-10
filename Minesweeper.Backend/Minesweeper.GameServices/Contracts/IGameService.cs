@@ -9,7 +9,7 @@ namespace Minesweeper.GameServices.Contracts
 
         Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken);
 
-        Task JoinGameAsync(string gameId, string player2Id, string playerDisplayName, string entryToken, CancellationToken cancellationToken);
+        Task JoinGameAsync(string gameId, string player2Id, string player2DisplayName, CancellationToken cancellationToken);
 
         Task<MoveResult> MakeMoveAsync(string gameId, string playerId, int row, int column, CancellationToken cancellationToken);
 
