@@ -31,5 +31,19 @@ namespace Minesweeper.DataAccess.RavenDb.Extensions
 
             return prefix;
         }
+
+        public static string TrimCollectionPrefixFromDocumentId<TDocument>(this IDocumentStore documentStore, string entityId)
+        {
+            var prefix = documentStore.Conventions.GetCollectionName(typeof(TDocument));
+            var separator = documentStore.Conventions.IdentityPartsSeparator;
+            var prefixWithSeparator = $"{prefix}{separator}";
+
+            if (entityId.StartsWith(prefixWithSeparator))
+            {
+                return entityId.Substring(prefixWithSeparator.Length);
+            }
+
+            return entityId;
+        }
     }
 }

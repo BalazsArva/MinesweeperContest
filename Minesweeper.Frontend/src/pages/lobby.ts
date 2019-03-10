@@ -1,22 +1,33 @@
 import { autoinject } from "aurelia-framework";
 
-import { LobbyService } from "services/lobby-service";
+import { LobbyService, GetAvailableGamesResult, GetAvailableGamesResponse, AvailableGame } from "services/lobby-service";
 import { GameService } from "services/game-service";
 
 
 @autoinject
 export class Lobby {
-  availableGames: number = 0;
-  joinGameId: string = null;
+    joinGameId: string = null;
+    total: number = 0;
+    availableGames: AvailableGame[] = [];
 
-  constructor(private lobbyService: LobbyService, private gameService: GameService) {
-  }
+    constructor(private lobbyService: LobbyService, private gameService: GameService) {
+    }
 
-  activate() {
-  }
+    async activate() {
+        await this.refreshGames();
+    }
 
-  async joinGame() {
+    async refreshGames() {
+        let result = await this.lobbyService.getAvailableGames(1, 10);
 
-    await this.gameService.joinGame(this.joinGameId);
-  }
+        // TODO: Validation, display errors
+        if (result.success) {
+            this.total = result.response.total;
+            this.availableGames = result.response.availableGames;
+        }
+    }
+
+    async joinGame(gameId: string) {
+        await this.gameService.joinGame(gameId);
+    }
 }

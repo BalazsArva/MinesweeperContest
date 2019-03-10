@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.WebAPI.Contracts.Responses;
+using Minesweeper.WebAPI.Extensions;
 
 namespace Minesweeper.WebAPI.Controllers
 {
@@ -10,19 +13,23 @@ namespace Minesweeper.WebAPI.Controllers
     [ApiController]
     public class LobbyController : ControllerBase
     {
-        private readonly IGameService _gameService;
+        private readonly ILobbyService _lobbyService;
 
-        public LobbyController(IGameService gameService)
+        public LobbyController(ILobbyService lobbyService)
         {
-            _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
+            _lobbyService = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
         }
 
         [HttpGet]
-        [Route("games")]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken)
+        [Route("")]
+        [Authorize]
+        public async Task<IActionResult> Get([FromQuery]int page = 1, [FromQuery]int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            // TODO: Implement this
-            throw new NotImplementedException();
+            var userId = User.GetUserId();
+
+            var results = await _lobbyService.GetAvailableGamesAsync(userId, page, pageSize, cancellationToken).ConfigureAwait(false);
+
+            return Ok(new GetAvailableGamesResponse(results));
         }
     }
 }

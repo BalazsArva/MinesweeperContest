@@ -14,7 +14,7 @@ namespace Minesweeper.GameServices.GameModel
         {
         }
 
-        public GameTable(int rows, int columns)
+        public GameTable(int rows, int columns, int mines)
         {
             if (rows < MinRows)
             {
@@ -39,12 +39,17 @@ namespace Minesweeper.GameServices.GameModel
             Rows = rows;
             Columns = columns;
 
+            // TODO: Review whether this is appropriate here, it is a difficulty concern, not directly related to the table as a data structure. Maybe should implemen a difficulty prop on the game itself.
+            Mines = mines;
+
             FieldMatrix = new FieldTypes[rows, columns];
         }
 
         public int Rows { get; set; }
 
         public int Columns { get; set; }
+
+        public int Mines { get; set; }
 
         public FieldTypes[,] FieldMatrix { get; set; }
     }
