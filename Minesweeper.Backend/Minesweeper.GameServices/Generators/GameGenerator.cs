@@ -26,7 +26,6 @@ namespace Minesweeper.GameServices.Generators
 
             return new Game
             {
-                EntryToken = _guidProvider.GenerateGuidString(),
                 UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime(),
                 GameTable = gameTable,
                 StarterPlayer = starterPlayer,

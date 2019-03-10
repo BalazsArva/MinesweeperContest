@@ -9,8 +9,6 @@ namespace Minesweeper.GameServices.GameModel
 
         public DateTime UtcDateTimeStarted { get; set; }
 
-        public string EntryToken { get; set; }
-
         public GameTable GameTable { get; set; }
 
         public Players StarterPlayer { get; set; }

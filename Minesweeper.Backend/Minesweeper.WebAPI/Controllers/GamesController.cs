@@ -68,10 +68,10 @@ namespace Minesweeper.WebAPI.Controllers
 
             var routeValues = new
             {
-                gameId = result.GameId,
-                entryToken = result.EntryToken
+                gameId = result
             };
 
+            // TODO: Provide proper route once it is finalized
             return CreatedAtRoute(RouteNames.Game, routeValues, null);
         }
 

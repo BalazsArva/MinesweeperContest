@@ -41,7 +41,7 @@ namespace Minesweeper.GameServices
             }
         }
 
-        public async Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
+        public async Task<string> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
@@ -58,7 +58,7 @@ namespace Minesweeper.GameServices
                 await session.StoreAsync(game, cancellationToken).ConfigureAwait(false);
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-                return new NewGameInfo(game.Id, game.EntryToken);
+                return game.Id;
             }
         }
 
