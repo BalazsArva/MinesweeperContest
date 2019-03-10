@@ -1,47 +1,37 @@
 import { autoinject } from "aurelia-framework";
 
-import { LobbyService } from "services/lobby-service";
+import { LobbyService, GetAvailableGamesResult, GetAvailableGamesResponse, AvailableGame } from "services/lobby-service";
+import { GameService } from "services/game-service";
+import { Router } from "aurelia-router";
 
-const PlayerIdLocalStorageKey = "playerId";
-const DisplayNameLocalStorageKey = "displayName";
 
 @autoinject
 export class Lobby {
-  availableGames: number = 0;
-  joinGameId: string = null;
-  joinGameEntryToken: string = null;
-  displayName: string = null;
+    joinGameId: string = null;
+    total: number = 0;
+    availableGames: AvailableGame[] = [];
 
-  constructor(private lobbyService: LobbyService) {
-  }
-
-  activate() {
-    this.displayName = localStorage[DisplayNameLocalStorageKey];
-  }
-
-  async joinGame() {
-    let playerId = localStorage[PlayerIdLocalStorageKey];
-    let displayName = localStorage[DisplayNameLocalStorageKey];
-
-    await this.lobbyService.joinGame(this.joinGameId, playerId, this.joinGameEntryToken, displayName);
-  }
-
-  async saveUserInfo() {
-
-    if (!this.displayName) {
-      // TODO: Show alert 
-      return;
+    constructor(private lobbyService: LobbyService, private gameService: GameService, private router: Router) {
     }
 
-    let playerId = localStorage[PlayerIdLocalStorageKey];
-
-    if (!playerId) {
-      let response = await this.lobbyService.getAnonymousPlayerId();
-
-      playerId = response.playerId;
-      localStorage[PlayerIdLocalStorageKey] = playerId;
+    async activate() {
+        await this.refreshGames();
     }
 
-    localStorage[DisplayNameLocalStorageKey] = this.displayName
-  }
+    async refreshGames() {
+        let result = await this.lobbyService.getAvailableGames(1, 10);
+
+        // TODO: Validation, display errors
+        if (result.success) {
+            this.total = result.response.total;
+            this.availableGames = result.response.availableGames;
+        }
+    }
+
+    async joinGame(gameId: string) {
+        // TODO: Validate success before redirecting
+        await this.gameService.joinGame(gameId);
+
+        return this.router.navigateToRoute("game", { gameId });
+    }
 }

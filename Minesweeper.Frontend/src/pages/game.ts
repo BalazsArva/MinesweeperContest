@@ -73,8 +73,6 @@ export class Game {
   }
 
   async makeMove(row: number, col: number) {
-    let playerId = localStorage["playerId"];
-
-    await this.gameService.makeMove(this.gameId, playerId, row, col);
+    await this.gameService.makeMove(this.gameId, row, col);
   }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Minesweeper.GameServices.GameModel;
-using Minesweeper.GameServices.Providers;
 
 namespace Minesweeper.GameServices.Generators
 {
@@ -8,15 +7,11 @@ namespace Minesweeper.GameServices.Generators
     {
         private readonly IGameTableGenerator _gameTableGenerator;
         private readonly IRandomPlayerSelector _randomPlayerSelector;
-        private readonly IGuidProvider _guidProvider;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public GameGenerator(IGameTableGenerator gameTableGenerator, IRandomPlayerSelector randomPlayerSelector, IGuidProvider guidProvider, IDateTimeProvider dateTimeProvider)
+        public GameGenerator(IGameTableGenerator gameTableGenerator, IRandomPlayerSelector randomPlayerSelector)
         {
             _gameTableGenerator = gameTableGenerator ?? throw new ArgumentNullException(nameof(gameTableGenerator));
             _randomPlayerSelector = randomPlayerSelector ?? throw new ArgumentNullException(nameof(randomPlayerSelector));
-            _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
-            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
         public Game GenerateGame(int tableRows, int tableColumns, int mineCount)
@@ -26,8 +21,6 @@ namespace Minesweeper.GameServices.Generators
 
             return new Game
             {
-                EntryToken = _guidProvider.GenerateGuidString(),
-                UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime(),
                 GameTable = gameTable,
                 StarterPlayer = starterPlayer,
                 Status = GameStatus.NotStarted

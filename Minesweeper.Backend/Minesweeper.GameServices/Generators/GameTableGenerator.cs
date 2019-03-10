@@ -16,7 +16,7 @@ namespace Minesweeper.GameServices.Generators
 
         public GameTable GenerateGameTable(int rows, int columns, int mineCount)
         {
-            var gameTable = new GameTable(rows, columns);
+            var gameTable = new GameTable(rows, columns, mineCount);
 
             var minedFields = Enumerable
                 .Range(0, rows)

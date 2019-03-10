@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Minesweeper.DataAccess.RavenDb.Extensions;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
 using Minesweeper.GameServices.Generators;
@@ -18,36 +19,29 @@ namespace Minesweeper.GameServices
         private readonly IDocumentStore _documentStore;
         private readonly IGameGenerator _gameGenerator;
         private readonly IGameDriver _gameDriver;
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IGuidProvider _guidProvider;
         private readonly IGameTableVisibilityComputer _gameTableVisibilityComputer;
 
-        public GameService(IMediator mediator, IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IGuidProvider guidProvider, IGameTableVisibilityComputer gameTableVisibilityComputer)
+        public GameService(IMediator mediator, IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IDateTimeProvider dateTimeProvider, IGuidProvider guidProvider, IGameTableVisibilityComputer gameTableVisibilityComputer)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _gameGenerator = gameGenerator ?? throw new ArgumentNullException(nameof(gameGenerator));
             _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
+            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
             _gameTableVisibilityComputer = gameTableVisibilityComputer ?? throw new ArgumentNullException(nameof(gameTableVisibilityComputer));
         }
 
-        public async Task<bool> CanAccessGameAsync(string playerId, string gameId, CancellationToken cancellationToken)
-        {
-            using (var session = _documentStore.OpenAsyncSession())
-            {
-                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
-
-                return game.Player1.PlayerId == gameId || game.Player2.PlayerId == playerId;
-            }
-        }
-
-        public async Task<NewGameInfo> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
+        public async Task<string> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, string invitedPlayerId, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
                 var game = _gameGenerator.GenerateGame(tableRows, tableColumns, mineCount);
 
                 game.Id = _documentStore.GetPrefixedDocumentId<Game>(_guidProvider.GenerateGuidString());
+                game.InvitedPlayerId = string.IsNullOrWhiteSpace(invitedPlayerId) ? null : invitedPlayerId;
                 game.Player1 = new Player
                 {
                     PlayerId = hostPlayerId,
@@ -58,24 +52,37 @@ namespace Minesweeper.GameServices
                 await session.StoreAsync(game, cancellationToken).ConfigureAwait(false);
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-                return new NewGameInfo(game.Id, game.EntryToken);
+                return game.Id;
             }
         }
 
-        public async Task JoinGameAsync(string gameId, string player2Id, string playerDisplayName, string entryToken, CancellationToken cancellationToken)
+        public async Task JoinGameAsync(string gameId, string player2Id, string player2DisplayName, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
+                var changeVector = session.Advanced.GetChangeVectorFor(game);
 
-                // TODO: Validate: Player2 is unset, entry token is valid, game not finished, etc.
+                if (game == null)
+                {
+                    throw new GameNotFoundException();
+                }
+
+                if ((game.InvitedPlayerId != null && game.InvitedPlayerId != player2Id) || game.Player2 != null || game.Player1.PlayerId == player2Id)
+                {
+                    throw new ActionNotAllowedException("You are not allowed to join the requested game.");
+                }
+
+                game.UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime();
                 game.Player2 = new Player
                 {
                     PlayerId = player2Id,
-                    DisplayName = playerDisplayName,
+                    DisplayName = player2DisplayName,
                     Points = 0
                 };
 
+                // TODO: Investigate what exception is thrown when a concurrent update occurs (because of the changevector) and rethrow an appropriate custom exception
+                await session.StoreAsync(game, changeVector, game.Id, cancellationToken).ConfigureAwait(false);
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }
@@ -84,6 +91,7 @@ namespace Minesweeper.GameServices
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
+                // TODO: Concurrency protection
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 var movementResult = _gameDriver.MakeMove(game, playerId, row, column);
@@ -102,6 +110,7 @@ namespace Minesweeper.GameServices
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
+                // TODO: Validate user id
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 return _gameTableVisibilityComputer.GetVisibleGameTableAsync(game);
