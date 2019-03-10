@@ -7,7 +7,7 @@ namespace Minesweeper.GameServices.GameModel
     {
         public string Id { get; set; }
 
-        public DateTime UtcDateTimeStarted { get; set; }
+        public DateTime? UtcDateTimeStarted { get; set; }
 
         public GameTable GameTable { get; set; }
 
@@ -20,6 +20,8 @@ namespace Minesweeper.GameServices.GameModel
         public Player Player2 { get; set; }
 
         public GameStatus Status { get; set; }
+
+        public string InvitedPlayerId { get; set; }
 
         public List<GameMove> Moves { get; set; } = new List<GameMove>();
     }

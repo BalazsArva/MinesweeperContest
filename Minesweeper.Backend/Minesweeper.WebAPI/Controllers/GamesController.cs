@@ -64,7 +64,7 @@ namespace Minesweeper.WebAPI.Controllers
             var userId = User.GetUserId();
             var displayName = userId;
 
-            var result = await _gameService.StartNewGameAsync(userId, displayName, request.TableRows, request.TableColumns, request.MineCount, cancellationToken).ConfigureAwait(false);
+            var result = await _gameService.StartNewGameAsync(userId, displayName, request.InvitedPlayerId, request.TableRows, request.TableColumns, request.MineCount, cancellationToken).ConfigureAwait(false);
 
             var routeValues = new
             {
