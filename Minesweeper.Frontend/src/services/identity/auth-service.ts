@@ -8,7 +8,7 @@ export class AuthService {
 
         let client = this.createHttpClient();
         let body = { email, password };
-        let request = { method: "POST", body: json(body) };
+        let request = { method: "POST", body: json(body),credentials: 'include' };
 
 
         try {
