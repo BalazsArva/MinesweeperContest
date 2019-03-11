@@ -106,6 +106,41 @@ namespace Minesweeper.GameServices
             }
         }
 
+        public async Task MarkFieldAsync(string gameId, string playerId, int row, int column, MarkType markType, CancellationToken cancellationToken)
+        {
+            using (var session = _documentStore.OpenAsyncSession())
+            {
+                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
+
+                if (game.Player1.PlayerId != playerId && game.Player2.PlayerId != playerId)
+                {
+                    throw new ActionNotAllowedException("You are not involved in that game.");
+                }
+
+                var isPlayer1 = game.Player1.PlayerId == playerId;
+                var marks = game.Player1.PlayerId == playerId ? game.Player1Marks : game.Player2Marks;
+
+                // TODO: Index overflow and underflow check here and everywhere else
+                marks[row, column] = markType == MarkType.Empty
+                    ? MarkTypes.Empty
+                    : markType == MarkType.None
+                        ? MarkTypes.None
+                        : MarkTypes.Unknown;
+
+                if (isPlayer1)
+                {
+                    // TODO: This thros an exception. Fix it.
+                    session.Advanced.Patch<Game, MarkTypes[,]>(game.Id, g => g.Player1Marks, marks);
+                }
+                else
+                {
+                    session.Advanced.Patch<Game, MarkTypes[,]>(game.Id, g => g.Player2Marks, marks);
+                }
+
+                await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
         public async Task<VisibleFieldType[,]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())

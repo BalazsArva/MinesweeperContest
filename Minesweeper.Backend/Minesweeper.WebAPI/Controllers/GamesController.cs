@@ -43,13 +43,29 @@ namespace Minesweeper.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("{gameId}/movement")]
+        [Route("{gameId}/make-move")]
+        [Authorize]
         public async Task<IActionResult> MakeMove(string gameId, [FromBody]MakeMoveRequest request, CancellationToken cancellationToken)
         {
             var userId = User.GetUserId();
 
             // TODO: This is only temp
             await _gameService.MakeMoveAsync(gameId, userId, request.Row, request.Column, cancellationToken).ConfigureAwait(false);
+
+            // TODO: Error handling
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("{gameId}/mark-field")]
+        [Authorize]
+        public async Task<IActionResult> MarkField(string gameId, [FromBody]MarkFieldRequest request, CancellationToken cancellationToken)
+        {
+            var userId = User.GetUserId();
+
+            // TODO: This is only temp
+            // TODO: Expose a separate enum type for mark type
+            await _gameService.MarkFieldAsync(gameId, userId, request.Row, request.Column, request.MarkType, cancellationToken).ConfigureAwait(false);
 
             // TODO: Error handling
             return Ok();

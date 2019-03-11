@@ -31,7 +31,26 @@ export class GameService {
         let request = { method: "post", body: json(body), credentials: "include" };
 
         try {
-            let httpResponse = await client.fetch(`${gameId}/movement`, request);
+            let httpResponse = await client.fetch(`${gameId}/make-move`, request);
+
+            // TODO: Do proper error handling
+            if (!httpResponse.ok) {
+                throw Error("Unexpected status code: " + httpResponse.status);
+            }
+        }
+        catch (reason) {
+            console.log(reason);
+        }
+    }
+
+    async markField(gameId: string, row: number, column: number, markType: MarkTypes): Promise<void> {
+        let client = this.createHttpClient();
+
+        let body = { column, row, markType };
+        let request = { method: "post", body: json(body), credentials: "include" };
+
+        try {
+            let httpResponse = await client.fetch(`${gameId}/mark-field`, request);
 
             // TODO: Do proper error handling
             if (!httpResponse.ok) {
@@ -123,3 +142,5 @@ export class GameService {
 export interface GetGameTableResponse {
     visibleTable: FieldTypes[][];
 }
+
+export type MarkTypes = "None" | "Empty" | "Unknown";

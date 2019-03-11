@@ -22,6 +22,8 @@ namespace Minesweeper.GameServices.Generators
             return new Game
             {
                 GameTable = gameTable,
+                Player1Marks = new MarkTypes[tableRows, tableColumns],
+                Player2Marks = new MarkTypes[tableRows, tableColumns],
                 StarterPlayer = starterPlayer,
                 Status = GameStatus.NotStarted
             };
