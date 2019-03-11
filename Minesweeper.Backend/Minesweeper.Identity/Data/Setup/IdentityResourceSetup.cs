@@ -7,6 +7,7 @@ namespace Minesweeper.Identity.Data.Setup
 {
     public static class IdentityResourceSetup
     {
+        // TODO: Delete if no longer needed
         private static List<IdentityResource> _knownIdentityResources = new List<IdentityResource>
         {
             new IdentityResource

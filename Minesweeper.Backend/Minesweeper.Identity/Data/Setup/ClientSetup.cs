@@ -20,10 +20,10 @@ namespace Minesweeper.Identity.Data.Setup
                 Enabled = true,
                 ClientId = "Minesweeper.API",
                 RequireClientSecret = false,
-                ClientSecrets=new List<ClientSecret>
+                ClientSecrets = new List<ClientSecret>
                 {
                     // TODO: Set up secret
-                    //new IdentityServer4.EntityFramework.Entities.ClientSecret{ Value = "Secret".Sha256() }
+                    // new IdentityServer4.EntityFramework.Entities.ClientSecret{ Value = "Secret".Sha256() }
                 },
                 ClientName = "Minesweeper game",
                 Description = "The minesweeper game's browser application.",
@@ -31,7 +31,7 @@ namespace Minesweeper.Identity.Data.Setup
                 {
                     // TODO: This does not allow postman
                     // TODO: Make these configurable
-                    new ClientCorsOrigin { Origin = "http://localhost:9000"}
+                    new ClientCorsOrigin { Origin = "http://localhost:9000" }
                 },
 
                 // TODO: Refactor this
