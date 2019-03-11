@@ -1,6 +1,6 @@
-import { autoinject } from 'aurelia-framework';
-import { Router } from 'aurelia-router';
-import { AuthService } from 'services/identity/auth-service';
+import { autoinject } from "aurelia-framework";
+import { Router } from "aurelia-router";
+import { AuthService } from "services/identity/auth-service";
 
 @autoinject
 export class Login {
@@ -8,22 +8,33 @@ export class Login {
     password = "";
     generalErrorMessage = "";
 
+    isBusy = false;
+
     constructor(private authService: AuthService, private router: Router) {
     }
 
     async login() {
+        if (this.isBusy) {
+            return;
+        }
+
         let email = this.email;
         let password = this.password;
+
+        this.isBusy = true;
 
         // TODO: Validation, display errors
         let result = await this.authService.logIn(email, password);
         if (result.success) {
+            this.isBusy = false;
             this.resetFields();
-            
-            return this.router.navigateToRoute('lobby');
+
+            return this.router.navigateToRoute("lobby");
         }
 
         this.generalErrorMessage = result.errorMessage;
+
+        this.isBusy = false;
     }
 
     resetFields() {
