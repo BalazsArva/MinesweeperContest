@@ -12,8 +12,9 @@ export class GameService {
     async getGameTable(gameId: string): Promise<GetGameTableResponse> {
         let client = this.createHttpClient();
 
+        // TODO: Proper error handling
         try {
-            let httpResponse = await client.fetch(`${gameId}/table`, { method: "get", credentials: "include" });
+            let httpResponse = await client.fetch(`${gameId}/table`, { method: "GET", credentials: "include" });
 
             let result = await httpResponse.json();
 
@@ -21,6 +22,35 @@ export class GameService {
         }
         catch (reason) {
             console.log(reason);
+        }
+    }
+
+    async getPlayerMarks(gameId: string): Promise<GetPlayerMarksResponse> {
+        let client = this.createHttpClient();
+
+        try {
+            let httpResponse = await client.fetch(`${gameId}/player-marks`, { method: "GET", credentials: "include" });
+
+            if (httpResponse.ok) {
+                let result = <{ marks: MarkTypes[][] }>(await httpResponse.json());
+
+                return {
+                    success: true,
+                    marks: result.marks
+                };
+            }
+
+            // TODO: Provide more details
+            return {
+                success: false,
+                errorMessage: "Failed to fetch your field marks. Status code: " + httpResponse.status
+            }
+        }
+        catch (reason) {
+            return {
+                success: false,
+                errorMessage: "A network error occured when trying to fetch your field marks. Please try again later."
+            };
         }
     }
 
@@ -141,6 +171,12 @@ export class GameService {
 
 export interface GetGameTableResponse {
     visibleTable: FieldTypes[][];
+}
+
+export interface GetPlayerMarksResponse {
+    success: boolean;
+    errorMessage?: string;
+    marks?: MarkTypes[][];
 }
 
 export type MarkTypes = "None" | "Empty" | "Unknown";

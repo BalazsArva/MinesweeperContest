@@ -121,11 +121,7 @@ namespace Minesweeper.GameServices
                 var marks = game.Player1.PlayerId == playerId ? game.Player1Marks : game.Player2Marks;
 
                 // TODO: Index overflow and underflow check here and everywhere else
-                marks[row, column] = markType == MarkType.Empty
-                    ? MarkTypes.Empty
-                    : markType == MarkType.None
-                        ? MarkTypes.None
-                        : MarkTypes.Unknown;
+                marks[row, column] = MapContractMarkTypeToEntityMarkType(markType);
 
                 if (isPlayer1)
                 {
@@ -138,6 +134,35 @@ namespace Minesweeper.GameServices
                 }
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<MarkType[,]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)
+        {
+            using (var session = _documentStore.OpenAsyncSession())
+            {
+                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
+
+                var isPlayer1 = game.Player1.PlayerId == playerId;
+                var isPlayer2 = game.Player2.PlayerId == playerId;
+
+                if (!isPlayer1 && !isPlayer2)
+                {
+                    throw new ActionNotAllowedException("You are not involved in that game.");
+                }
+
+                var playerMarks = isPlayer1 ? game.Player1Marks : game.Player2Marks;
+                var result = new MarkType[playerMarks.GetLength(0), playerMarks.GetLength(1)];
+
+                for (var row = 0; row < playerMarks.GetLength(0); ++row)
+                {
+                    for (var col = 0; col < playerMarks.GetLength(1); ++col)
+                    {
+                        result[row, col] = MapEntityMarkTypeToContractMarkType(playerMarks[row, col]);
+                    }
+                }
+
+                return result;
             }
         }
 
@@ -158,6 +183,24 @@ namespace Minesweeper.GameServices
             var table = await GetVisibleGameTableAsync(gameId, cancellationToken);
 
             await _mediator.Publish(new GameTableUpdatedNotification(gameId, table), cancellationToken);
+        }
+
+        private MarkType MapEntityMarkTypeToContractMarkType(MarkTypes markType)
+        {
+            return markType == MarkTypes.Empty
+                ? MarkType.Empty
+                : markType == MarkTypes.None
+                    ? MarkType.None
+                    : MarkType.Unknown;
+        }
+
+        private MarkTypes MapContractMarkTypeToEntityMarkType(MarkType markType)
+        {
+            return markType == MarkType.Empty
+                ? MarkTypes.Empty
+                : markType == MarkType.None
+                    ? MarkTypes.None
+                    : MarkTypes.Unknown;
         }
     }
 }

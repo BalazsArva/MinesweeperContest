@@ -13,6 +13,8 @@ namespace Minesweeper.GameServices.Contracts
 
         Task MarkFieldAsync(string gameId, string playerId, int row, int column, MarkType markType, CancellationToken cancellationToken);
 
+        Task<MarkType[,]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken);
+
         Task<VisibleFieldType[,]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken);
     }
 }

@@ -75,16 +75,23 @@ export class Game {
     }
 
     async updateMarks() {
-        let newTableState: MarkTypes[][] = [];
+        let marks = await this.gameService.getPlayerMarks(this.gameId);
+
+        // TODO: Show a message
+        if (!marks.success) {
+            return;
+        }
+
+        let newMarksState = [];
         for (let row = 0; row < this.gameTable.length; ++row) {
-            newTableState.push([]);
+            newMarksState.push([]);
 
             for (let col = 0; col < this.gameTable[row].length; ++col) {
-                newTableState[row][col] = "None";
+                newMarksState[row][col] = marks.marks[row][col];
             }
         }
 
-        this.marks = newTableState;
+        this.marks = newMarksState;
     }
 
     async clickField(e: MouseEvent, row: number, col: number) {

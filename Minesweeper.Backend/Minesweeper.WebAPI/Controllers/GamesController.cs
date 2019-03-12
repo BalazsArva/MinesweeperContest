@@ -42,6 +42,18 @@ namespace Minesweeper.WebAPI.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("{gameId}/player-marks")]
+        [Authorize]
+        public async Task<IActionResult> GetPlayerMarks(string gameId, CancellationToken cancellationToken)
+        {
+            var userId = User.GetUserId();
+
+            var playerMarks = await _gameService.GetPlayerMarksAsync(gameId, userId, cancellationToken).ConfigureAwait(false);
+
+            return Ok(new GetPlayerMarksResponse { Marks = playerMarks });
+        }
+
         [HttpPost]
         [Route("{gameId}/make-move")]
         [Authorize]
