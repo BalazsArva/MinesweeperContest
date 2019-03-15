@@ -117,20 +117,19 @@ namespace Minesweeper.GameServices
                     throw new ActionNotAllowedException("You are not involved in that game.");
                 }
 
-                var isPlayer1 = game.Player1.PlayerId == playerId;
-                var marks = game.Player1.PlayerId == playerId ? game.Player1Marks : game.Player2Marks;
-
                 // TODO: Index overflow and underflow check here and everywhere else
-                marks[row, column] = MapContractMarkTypeToEntityMarkType(markType);
+                var isPlayer1 = game.Player1.PlayerId == playerId;
+
+                var newMark = MapContractMarkTypeToEntityMarkType(markType);
 
                 if (isPlayer1)
                 {
-                    // TODO: This thros an exception. Fix it.
-                    session.Advanced.Patch<Game, MarkTypes[,]>(game.Id, g => g.Player1Marks, marks);
+                    // TODO: This throws an exception. Fix it.
+                    session.Advanced.Patch<Game, MarkTypes>(game.Id, g => g.Player1Marks[row][column], newMark);
                 }
                 else
                 {
-                    session.Advanced.Patch<Game, MarkTypes[,]>(game.Id, g => g.Player2Marks, marks);
+                    session.Advanced.Patch<Game, MarkTypes>(game.Id, g => g.Player2Marks[row][column], newMark);
                 }
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -152,13 +151,16 @@ namespace Minesweeper.GameServices
                 }
 
                 var playerMarks = isPlayer1 ? game.Player1Marks : game.Player2Marks;
-                var result = new MarkType[playerMarks.GetLength(0), playerMarks.GetLength(1)];
+                var rows = playerMarks.Length;
+                var columns = playerMarks[0].Length;
 
-                for (var row = 0; row < playerMarks.GetLength(0); ++row)
+                var result = new MarkType[rows, columns];
+
+                for (var row = 0; row < rows; ++row)
                 {
-                    for (var col = 0; col < playerMarks.GetLength(1); ++col)
+                    for (var col = 0; col < columns; ++col)
                     {
-                        result[row, col] = MapEntityMarkTypeToContractMarkType(playerMarks[row, col]);
+                        result[row, col] = MapEntityMarkTypeToContractMarkType(playerMarks[row][col]);
                     }
                 }
 

@@ -25,8 +25,8 @@ namespace Minesweeper.GameServices.GameModel
 
         public List<GameMove> Moves { get; set; } = new List<GameMove>();
 
-        public MarkTypes[,] Player1Marks { get; set; }
+        public MarkTypes[][] Player1Marks { get; set; }
 
-        public MarkTypes[,] Player2Marks { get; set; }
+        public MarkTypes[][] Player2Marks { get; set; }
     }
 }

@@ -96,18 +96,21 @@ export class Game {
 
     async clickField(e: MouseEvent, row: number, col: number) {
         if (e.button === 0) {
-            await this.makeMove(row, col);
+            return await this.makeMove(e, row, col);
         }
         else if (e.button === 2) {
-            await this.markField(row, col);
+            return await this.markField(e, row, col);
         }
     }
 
-    async makeMove(row: number, col: number) {
+    async makeMove(e: MouseEvent, row: number, col: number) {
         await this.gameService.makeMove(this.gameId, row, col);
+
+        e.preventDefault();
+        return false;
     }
 
-    async markField(row: number, col: number) {
+    async markField(e: MouseEvent, row: number, col: number) {
         let targetMarkType: MarkTypes;
         let currentMarkType = this.marks[row][col];
 
@@ -125,5 +128,11 @@ export class Game {
 
         // TODO: Error handling
         await this.gameService.markField(this.gameId, row, col, targetMarkType);
+
+        // TODO: Don't update the whole marks matrix all the time
+        await this.updateMarks();
+
+        e.preventDefault();
+        return false;
     }
 }

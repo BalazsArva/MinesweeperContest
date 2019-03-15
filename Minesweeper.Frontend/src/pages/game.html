@@ -38,10 +38,10 @@
                             <!-- Unopened field -->
                             <button if.bind="field.fieldType === 0" class="btn btn-sm btn-light btn-game-table border-secondary"
                                 click.delegate="clickField($event, field.row, field.column)">
-                                <span if.bind="marks[field.row][field.column] === 'Empty'">
+                                <span if.bind="marks[field.row][field.column] === 1">
                                     &times;
                                 </span>
-                                <span if.bind="marks[field.row][field.column] === 'Unknown'">
+                                <span if.bind="marks[field.row][field.column] === 2">
                                     ?
                                 </span>
                             </button>
