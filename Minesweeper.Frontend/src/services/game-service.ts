@@ -179,4 +179,10 @@ export interface GetPlayerMarksResponse {
     marks?: MarkTypes[][];
 }
 
-export type MarkTypes = "None" | "Empty" | "Unknown";
+//export type MarkTypes = "None" | "Empty" | "Unknown";
+
+export enum MarkTypes {
+    None = 0,
+    Empty = 1,
+    Unknown = 2
+}

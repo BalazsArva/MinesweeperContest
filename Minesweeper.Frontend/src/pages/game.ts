@@ -111,14 +111,14 @@ export class Game {
         let targetMarkType: MarkTypes;
         let currentMarkType = this.marks[row][col];
 
-        if (currentMarkType === "None") {
-            targetMarkType = "Empty";
+        if (currentMarkType === MarkTypes.None) {
+            targetMarkType = MarkTypes.Empty;
         }
-        else if (currentMarkType === "Empty") {
-            targetMarkType = "Unknown";
+        else if (currentMarkType === MarkTypes.Empty) {
+            targetMarkType = MarkTypes.Unknown;
         }
         else {
-            targetMarkType = "None";
+            targetMarkType = MarkTypes.None;
         }
 
         this.marks[row][col] = targetMarkType;
