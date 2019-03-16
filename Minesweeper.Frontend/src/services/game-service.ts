@@ -73,7 +73,7 @@ export class GameService {
         }
     }
 
-    async markField(gameId: string, row: number, column: number, markType: MarkTypes): Promise<void> {
+    async markField(gameId: string, row: number, column: number, markType: MarkTypes): Promise<MarkFieldResult> {
         let client = this.createHttpClient();
 
         let body = { column, row, markType };
@@ -82,13 +82,21 @@ export class GameService {
         try {
             let httpResponse = await client.fetch(`${gameId}/mark-field`, request);
 
-            // TODO: Do proper error handling
-            if (!httpResponse.ok) {
-                throw Error("Unexpected status code: " + httpResponse.status);
+            if (httpResponse.ok) {
+                return { success: true };
+            }
+
+            // TODO: Include more details
+            return {
+                success: false,
+                errorMessage: "Failed to mark field."
             }
         }
         catch (reason) {
-            console.log(reason);
+            return {
+                success: false,
+                errorMessage: "A network error occured when trying to set the field mark. Please try again later."
+            };
         }
     }
 
@@ -179,10 +187,13 @@ export interface GetPlayerMarksResponse {
     marks?: MarkTypes[][];
 }
 
-//export type MarkTypes = "None" | "Empty" | "Unknown";
-
 export enum MarkTypes {
     None = 0,
     Empty = 1,
     Unknown = 2
+}
+
+export interface MarkFieldResult {
+    success: boolean;
+    errorMessage?: string;
 }

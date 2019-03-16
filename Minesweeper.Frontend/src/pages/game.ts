@@ -1,5 +1,4 @@
 import { autoinject } from "aurelia-framework";
-import { NavigationInstruction, RouteConfig } from 'aurelia-router';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 import { GameService, MarkTypes } from "services/game-service";
@@ -24,7 +23,7 @@ export class Game {
     constructor(private eventAggregator: EventAggregator, private gameService: GameService, private gameHubService: GameHubSignalRService) {
     }
 
-    async activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) {
+    async activate(params: any) {
         let gameId = <string>params.gameId;
 
         this.gameId = gameId;
@@ -129,13 +128,13 @@ export class Game {
             targetMarkType = MarkTypes.None;
         }
 
-        this.marks[row][col] = targetMarkType;
-
-        // TODO: Error handling
-        await this.gameService.markField(this.gameId, row, col, targetMarkType);
-
-        // TODO: Don't update the whole marks matrix all the time
-        await this.updateMarks();
+        let result = await this.gameService.markField(this.gameId, row, col, targetMarkType);
+        if (result.success) {
+            this.marks[row][col] = targetMarkType;
+        }
+        else {
+            // TODO: Error handling
+        }
 
         e.preventDefault();
         return false;
