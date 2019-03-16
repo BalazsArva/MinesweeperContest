@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Minesweeper.GameServices.Contracts;
-using Minesweeper.GameServices.DataStructures;
 using Minesweeper.GameServices.GameModel;
 using Minesweeper.GameServices.Providers;
 
@@ -10,7 +9,6 @@ namespace Minesweeper.GameServices
     public class GameDriver : IGameDriver
     {
         private const int PointsForMineFound = 10;
-        private const int BonusPointsWindowSeconds = 5;
 
         private readonly IDateTimeProvider _dateTimeProvider;
 
@@ -22,7 +20,6 @@ namespace Minesweeper.GameServices
         public MoveResultType MakeMove(Game game, string playerId, int row, int column)
         {
             var player = game.Player1.PlayerId == playerId ? Players.Player1 : Players.Player2;
-            var openedFieldLookup = FieldLookup.FromGame(game);
 
             var playerAllowedToMove = CheckPlayerCanMove(game, player);
             if (!playerAllowedToMove)
@@ -30,7 +27,7 @@ namespace Minesweeper.GameServices
                 return MoveResultType.NotYourTurn;
             }
 
-            var canPerformMove = CheckCanPerformMove(game.GameTable, openedFieldLookup, row, column);
+            var canPerformMove = CheckCanPerformMove(game, row, column);
             if (!canPerformMove)
             {
                 return MoveResultType.CannotMoveThere;
@@ -38,7 +35,7 @@ namespace Minesweeper.GameServices
 
             game.Status = GameStatus.InProgress;
 
-            PerformMove(game, openedFieldLookup, player, row, column);
+            PerformMove(game, player, row, column);
 
             var gameIsOver = IsGameOver(game);
             if (gameIsOver)
@@ -59,88 +56,64 @@ namespace Minesweeper.GameServices
                 return false;
             }
 
-            var isFirstMove = game.Moves.Count == 0;
-            if (isFirstMove)
-            {
-                return game.StarterPlayer == player;
-            }
-            else
-            {
-                var lastMove = game.Moves.Last();
-                var lastMoveWasOnMine = game.GameTable.FieldMatrix[lastMove.Row, lastMove.Column] == FieldTypes.Mined;
-
-                if (lastMoveWasOnMine)
-                {
-                    // If last move was on mine, the player who did that move is allowed to do the next as well.
-                    return lastMove.Player == player;
-                }
-                else
-                {
-                    // Otherwise it's the other player's turn.
-                    return lastMove.Player != player;
-                }
-            }
+            return game.NextPlayer == player;
         }
 
-        private bool CheckCanPerformMove(GameTable gameTable, FieldLookup fieldLookup, int row, int column)
+        private bool CheckCanPerformMove(Game game, int row, int column)
         {
             // Field is not yet open and within proper range
             return
                 row >= 0 &&
-                row < gameTable.Rows &&
+                row < game.Rows &&
                 column >= 0 &&
-                column < gameTable.Columns &&
-                fieldLookup.IsFieldRegistered(row, column) == false;
+                column < game.Columns &&
+                game.VisibleTable[row][column] == GameModel.VisibleFieldType.Unknown;
         }
 
-        private void PerformMove(Game game, FieldLookup fieldLookup, Players player, int row, int column)
+        private void PerformMove(Game game, Players player, int row, int column)
         {
             var utcNow = _dateTimeProvider.GetUtcDateTime();
-            var table = game.GameTable;
 
-            if (table.FieldMatrix[row, column] == FieldTypes.Mined)
+            if (game.BaseTable[row][column] == FieldTypes.Mined)
             {
-                var points = GetPointsForMineFound(game, player, utcNow);
-
-                AddPoints(game, player, points);
-                RecordMove(game, fieldLookup, player, row, column, utcNow);
+                AddPoints(game, player, PointsForMineFound);
+                RecordMove(game, player, row, column, utcNow);
 
                 return;
             }
 
-            var neighboringMineCount = GetMinesAroundField(table, row, column);
-
+            var neighboringMineCount = GetMinesAroundField(game, row, column);
             if (neighboringMineCount == 0)
             {
-                DoRecursiveMove(game, fieldLookup, player, row, column, utcNow);
+                DoRecursiveMove(game, player, row, column, utcNow);
             }
             else
             {
-                RecordMove(game, fieldLookup, player, row, column, utcNow);
+                RecordMove(game, player, row, column, utcNow);
             }
+
+            game.NextPlayer = player == Players.Player1 ? Players.Player2 : Players.Player1;
         }
 
-        private void DoRecursiveMove(Game game, FieldLookup fieldLookup, Players player, int row, int column, DateTime utcDateTimeRecorded)
+        private void DoRecursiveMove(Game game, Players player, int row, int column, DateTime utcDateTimeRecorded)
         {
-            var table = game.GameTable;
-
-            var rowOverflown = row < 0 || row >= table.Rows;
-            var colOverflown = column < 0 || column >= table.Columns;
+            var rowOverflown = row < 0 || row >= game.Rows;
+            var colOverflown = column < 0 || column >= game.Columns;
 
             if (rowOverflown || colOverflown)
             {
                 return;
             }
 
-            var isMined = table.FieldMatrix[row, column] == FieldTypes.Mined;
-            var isMovedOn = fieldLookup.IsFieldRegistered(row, column);
+            var isMined = game.BaseTable[row][column] == FieldTypes.Mined;
+            var isMovedOn = game.VisibleTable[row][column] != GameModel.VisibleFieldType.Unknown;
 
             if (isMined || isMovedOn)
             {
                 return;
             }
 
-            RecordMove(game, fieldLookup, player, row, column, utcDateTimeRecorded);
+            RecordMove(game, player, row, column, utcDateTimeRecorded);
 
             for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
             {
@@ -152,29 +125,67 @@ namespace Minesweeper.GameServices
                         continue;
                     }
 
-                    var surroundingRow = row + rowOffset;
-                    var surroundingCol = column + colOffset;
+                    var recursionRow = row + rowOffset;
+                    var recursionCol = column + colOffset;
 
-                    var hasZeroMinesAround = GetMinesAroundField(table, row, column) == 0;
+                    var hasZeroMinesAround = GetMinesAroundField(game, row, column) == 0;
                     if (hasZeroMinesAround)
                     {
-                        DoRecursiveMove(game, fieldLookup, player, surroundingRow, surroundingCol, utcDateTimeRecorded);
+                        DoRecursiveMove(game, player, recursionRow, recursionCol, utcDateTimeRecorded);
                     }
                 }
             }
         }
 
-        private void RecordMove(Game game, FieldLookup fieldLookup, Players player, int row, int column, DateTime utcDateTimeRecorded)
+        private void RecordMove(Game game, Players player, int row, int col, DateTime utcDateTimeRecorded)
         {
-            fieldLookup.RegisterField(row, column);
-
-            game.Moves.Add(new GameMove
+            if (game.BaseTable[row][col] == FieldTypes.Mined)
             {
-                Player = player,
-                Row = row,
-                Column = column,
-                UtcDateTimeRecorded = utcDateTimeRecorded
-            });
+                game.VisibleTable[row][col] = player == Players.Player1 ? GameModel.VisibleFieldType.Player1FoundMine : GameModel.VisibleFieldType.Player2FoundMine;
+            }
+            else
+            {
+                // TODO: Should cache this value somewhere
+                var minesAround = GetMinesAroundField(game, row, col);
+                switch (minesAround)
+                {
+                    case 0:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround0;
+                        break;
+
+                    case 1:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround1;
+                        break;
+
+                    case 2:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround2;
+                        break;
+
+                    case 3:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround3;
+                        break;
+
+                    case 4:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround4;
+                        break;
+
+                    case 5:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround5;
+                        break;
+
+                    case 6:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround6;
+                        break;
+
+                    case 7:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround7;
+                        break;
+
+                    case 8:
+                        game.VisibleTable[row][col] = GameModel.VisibleFieldType.MinesAround8;
+                        break;
+                }
+            }
         }
 
         private void AddPoints(Game game, Players player, int points)
@@ -189,26 +200,7 @@ namespace Minesweeper.GameServices
             }
         }
 
-        private int GetPointsForMineFound(Game game, Players player, DateTime utcDateOfMove)
-        {
-            var basePoints = PointsForMineFound;
-            var bonus = 0;
-
-            if (game.Moves.Count > 0)
-            {
-                var lastMove = game.Moves.Last();
-                var differenceSeconds = (int)Math.Floor((utcDateOfMove - lastMove.UtcDateTimeRecorded).TotalSeconds);
-
-                if (differenceSeconds >= 0 && differenceSeconds <= BonusPointsWindowSeconds)
-                {
-                    bonus = BonusPointsWindowSeconds - differenceSeconds;
-                }
-            }
-
-            return basePoints + bonus;
-        }
-
-        private int GetMinesAroundField(GameTable table, int row, int column)
+        private int GetMinesAroundField(Game game, int row, int column)
         {
             var neighboringMineCount = 0;
             for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
@@ -216,7 +208,7 @@ namespace Minesweeper.GameServices
                 var rowToCheck = row + rowOffset;
 
                 // Row out of range
-                if (rowToCheck < 0 || rowToCheck >= table.Rows)
+                if (rowToCheck < 0 || rowToCheck >= game.Rows)
                 {
                     continue;
                 }
@@ -226,12 +218,12 @@ namespace Minesweeper.GameServices
                     var colToCheck = column + colOffset;
 
                     // Column out of range
-                    if (colToCheck < 0 || colToCheck >= table.Columns)
+                    if (colToCheck < 0 || colToCheck >= game.Columns)
                     {
                         continue;
                     }
 
-                    if (table.FieldMatrix[rowToCheck, colToCheck] == FieldTypes.Mined)
+                    if (game.BaseTable[rowToCheck][colToCheck] == FieldTypes.Mined)
                     {
                         ++neighboringMineCount;
                     }
@@ -243,9 +235,9 @@ namespace Minesweeper.GameServices
 
         private bool IsGameOver(Game game)
         {
-            var table = game.GameTable;
+            var foundMines = game.VisibleTable.Sum(arr => arr.Count(field => field == GameModel.VisibleFieldType.Player1FoundMine || field == GameModel.VisibleFieldType.Player2FoundMine));
 
-            return game.Moves.Count == table.Rows * table.Columns;
+            return foundMines == game.Mines;
         }
 
         private Players? DetermineWinner(Game game)

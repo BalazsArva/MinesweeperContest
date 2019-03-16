@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Minesweeper.GameServices.GameModel
 {
@@ -9,9 +8,7 @@ namespace Minesweeper.GameServices.GameModel
 
         public DateTime? UtcDateTimeStarted { get; set; }
 
-        public GameTable GameTable { get; set; }
-
-        public Players StarterPlayer { get; set; }
+        public Players NextPlayer { get; set; }
 
         public Players? Winner { get; set; }
 
@@ -23,7 +20,15 @@ namespace Minesweeper.GameServices.GameModel
 
         public string InvitedPlayerId { get; set; }
 
-        public List<GameMove> Moves { get; set; } = new List<GameMove>();
+        public int Rows { get; set; }
+
+        public int Columns { get; set; }
+
+        public int Mines { get; set; }
+
+        public FieldTypes[][] BaseTable { get; set; }
+
+        public VisibleFieldType[][] VisibleTable { get; set; }
 
         public MarkTypes[][] Player1Marks { get; set; }
 

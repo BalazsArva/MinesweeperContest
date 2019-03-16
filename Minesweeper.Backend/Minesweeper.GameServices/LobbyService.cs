@@ -31,7 +31,7 @@ namespace Minesweeper.GameServices
                     .Where(g => g.InvitedPlayerId == null && g.Status == GameStatus.NotStarted && g.Player2 == null && g.Player1.PlayerId != userId)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
-                    .Select(g => new { g.Id, Player1Id = g.Player1.PlayerId, Player1DisplayName = g.Player1.DisplayName, g.GameTable.Rows, g.GameTable.Columns, g.GameTable.Mines })
+                    .Select(g => new { g.Id, Player1Id = g.Player1.PlayerId, Player1DisplayName = g.Player1.DisplayName, g.Rows, g.Columns, g.Mines })
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
@@ -63,9 +63,9 @@ namespace Minesweeper.GameServices
                         Player1DisplayName = g.Player1.DisplayName,
                         Player2Id = g.Player2.PlayerId,
                         Player2DisplayName = g.Player2.DisplayName,
-                        g.GameTable.Rows,
-                        g.GameTable.Columns,
-                        g.GameTable.Mines
+                        g.Rows,
+                        g.Columns,
+                        g.Mines
                     })
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);

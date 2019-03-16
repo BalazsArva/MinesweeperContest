@@ -21,9 +21,8 @@ namespace Minesweeper.GameServices
         private readonly IGameDriver _gameDriver;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IGuidProvider _guidProvider;
-        private readonly IGameTableVisibilityComputer _gameTableVisibilityComputer;
 
-        public GameService(IMediator mediator, IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IDateTimeProvider dateTimeProvider, IGuidProvider guidProvider, IGameTableVisibilityComputer gameTableVisibilityComputer)
+        public GameService(IMediator mediator, IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IDateTimeProvider dateTimeProvider, IGuidProvider guidProvider)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
@@ -31,7 +30,6 @@ namespace Minesweeper.GameServices
             _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
-            _gameTableVisibilityComputer = gameTableVisibilityComputer ?? throw new ArgumentNullException(nameof(gameTableVisibilityComputer));
         }
 
         public async Task<string> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, string invitedPlayerId, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
@@ -124,7 +122,6 @@ namespace Minesweeper.GameServices
 
                 if (isPlayer1)
                 {
-                    // TODO: This throws an exception. Fix it.
                     session.Advanced.Patch<Game, MarkTypes>(game.Id, g => g.Player1Marks[row][column], newMark);
                 }
                 else
@@ -168,14 +165,23 @@ namespace Minesweeper.GameServices
             }
         }
 
-        public async Task<VisibleFieldType[,]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
+        public async Task<Contracts.VisibleFieldType[,]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
                 // TODO: Validate user id
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
-                return _gameTableVisibilityComputer.GetVisibleGameTableAsync(game);
+                var result = new Contracts.VisibleFieldType[game.Rows, game.Columns];
+                for (var row = 0; row < game.Rows; ++row)
+                {
+                    for (var col = 0; col < game.Columns; ++col)
+                    {
+                        result[row, col] = MapEntityVisibleFieldTypeToContractFieldType(game.VisibleTable[row][col]);
+                    }
+                }
+
+                return result;
             }
         }
 
@@ -203,6 +209,25 @@ namespace Minesweeper.GameServices
                 : markType == MarkType.None
                     ? MarkTypes.None
                     : MarkTypes.Unknown;
+        }
+
+        private Contracts.VisibleFieldType MapEntityVisibleFieldTypeToContractFieldType(GameModel.VisibleFieldType visibleFieldType)
+        {
+            switch (visibleFieldType)
+            {
+                case GameModel.VisibleFieldType.MinesAround0: return Contracts.VisibleFieldType.MinesAround0;
+                case GameModel.VisibleFieldType.MinesAround1: return Contracts.VisibleFieldType.MinesAround1;
+                case GameModel.VisibleFieldType.MinesAround2: return Contracts.VisibleFieldType.MinesAround2;
+                case GameModel.VisibleFieldType.MinesAround3: return Contracts.VisibleFieldType.MinesAround3;
+                case GameModel.VisibleFieldType.MinesAround4: return Contracts.VisibleFieldType.MinesAround4;
+                case GameModel.VisibleFieldType.MinesAround5: return Contracts.VisibleFieldType.MinesAround5;
+                case GameModel.VisibleFieldType.MinesAround6: return Contracts.VisibleFieldType.MinesAround6;
+                case GameModel.VisibleFieldType.MinesAround7: return Contracts.VisibleFieldType.MinesAround7;
+                case GameModel.VisibleFieldType.MinesAround8: return Contracts.VisibleFieldType.MinesAround8;
+                case GameModel.VisibleFieldType.Unknown: return Contracts.VisibleFieldType.Unknown;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(visibleFieldType), $"The value {(int)visibleFieldType} is not valid for this parameter.");
+            }
         }
     }
 }
