@@ -7,6 +7,7 @@ import { GameHubSignalRService } from "services/game-hub-signalr-service";
 
 interface Field {
     fieldType: FieldTypes;
+    markType: MarkTypes;
     row: number;
     column: number;
 }
@@ -15,7 +16,6 @@ interface Field {
 export class Game {
 
     gameTable: Field[][] = null;
-    marks: MarkTypes[][] = null;
     timerHandle: number = null;
     elapsedSeconds = 0;
     gameId: string = null;
@@ -57,13 +57,14 @@ export class Game {
     async updateTable() {
         let table = await this.gameService.getGameTable(this.gameId);
 
-        let newTableState = [];
+        let newTableState: Field[][] = [];
         for (let row = 0; row < table.visibleTable.length; ++row) {
             newTableState.push([]);
 
             for (let col = 0; col < table.visibleTable[row].length; ++col) {
                 newTableState[row][col] = {
                     fieldType: table.visibleTable[row][col],
+                    markType: MarkTypes.None,
                     column: col,
                     row: row
                 };
@@ -81,16 +82,11 @@ export class Game {
             return;
         }
 
-        let newMarksState = [];
         for (let row = 0; row < this.gameTable.length; ++row) {
-            newMarksState.push([]);
-
             for (let col = 0; col < this.gameTable[row].length; ++col) {
-                newMarksState[row][col] = marks.marks[row][col];
+                this.gameTable[row][col].markType = marks.marks[row][col];
             }
         }
-
-        this.marks = newMarksState;
     }
 
     async clickField(e: MouseEvent, row: number, col: number) {
@@ -104,7 +100,7 @@ export class Game {
 
     async makeMove(e: MouseEvent, row: number, col: number) {
         // Prevent moving on marked field
-        if (this.marks[row][col] !== MarkTypes.None) {
+        if (this.gameTable[row][col].markType !== MarkTypes.None) {
             return;
         }
 
@@ -116,7 +112,7 @@ export class Game {
 
     async markField(e: MouseEvent, row: number, col: number) {
         let targetMarkType: MarkTypes;
-        let currentMarkType = this.marks[row][col];
+        let currentMarkType = this.gameTable[row][col].markType;
 
         if (currentMarkType === MarkTypes.None) {
             targetMarkType = MarkTypes.Empty;
@@ -130,7 +126,7 @@ export class Game {
 
         let result = await this.gameService.markField(this.gameId, row, col, targetMarkType);
         if (result.success) {
-            this.marks[row][col] = targetMarkType;
+            this.gameTable[row][col].markType = targetMarkType;
         }
         else {
             // TODO: Error handling
