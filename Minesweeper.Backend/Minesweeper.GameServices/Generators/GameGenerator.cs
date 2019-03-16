@@ -41,13 +41,16 @@ namespace Minesweeper.GameServices.Generators
             return new Game
             {
                 BaseTable = GenerateBaseTable(tableRows, tableColumns, mineCount),
+                VisibleTable = visibleTable,
                 Player1Marks = player1Marks,
                 Player2Marks = player2Marks,
                 NextPlayer = starterPlayer,
                 Status = GameStatus.NotStarted,
                 Rows = tableRows,
                 Columns = tableColumns,
-                Mines = mineCount
+                Mines = mineCount,
+                Player1 = new Player(),
+                Player2 = new Player()
             };
         }
 

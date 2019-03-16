@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -40,12 +41,8 @@ namespace Minesweeper.GameServices
 
                 game.Id = _documentStore.GetPrefixedDocumentId<Game>(_guidProvider.GenerateGuidString());
                 game.InvitedPlayerId = string.IsNullOrWhiteSpace(invitedPlayerId) ? null : invitedPlayerId;
-                game.Player1 = new Player
-                {
-                    PlayerId = hostPlayerId,
-                    DisplayName = hostPlayerDisplayName,
-                    Points = 0
-                };
+                game.Player1.PlayerId = hostPlayerId;
+                game.Player1.DisplayName = hostPlayerDisplayName;
 
                 await session.StoreAsync(game, cancellationToken).ConfigureAwait(false);
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -66,18 +63,14 @@ namespace Minesweeper.GameServices
                     throw new GameNotFoundException();
                 }
 
-                if ((game.InvitedPlayerId != null && game.InvitedPlayerId != player2Id) || game.Player2 != null || game.Player1.PlayerId == player2Id)
+                if ((game.InvitedPlayerId != null && game.InvitedPlayerId != player2Id) || game.Player2.PlayerId != null || game.Player1.PlayerId == player2Id)
                 {
                     throw new ActionNotAllowedException("You are not allowed to join the requested game.");
                 }
 
                 game.UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime();
-                game.Player2 = new Player
-                {
-                    PlayerId = player2Id,
-                    DisplayName = player2DisplayName,
-                    Points = 0
-                };
+                game.Player2.PlayerId = player2Id;
+                game.Player2.DisplayName = player2DisplayName;
 
                 // TODO: Investigate what exception is thrown when a concurrent update occurs (because of the changevector) and rethrow an appropriate custom exception
                 await session.StoreAsync(game, changeVector, game.Id, cancellationToken).ConfigureAwait(false);
@@ -92,12 +85,23 @@ namespace Minesweeper.GameServices
                 // TODO: Concurrency protection
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
+                var currentPlayer = game.NextPlayer;
+                var currentVisibleTable = CloneVisibleFields(game.VisibleTable);
+
                 var movementResult = _gameDriver.MakeMove(game, playerId, row, column);
+
                 if (movementResult == MoveResultType.Success || movementResult == MoveResultType.GameOver)
                 {
                     await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-                    await PublishTableUpdatedAsync(gameId, cancellationToken);
+                    await PublishTableUpdatedAsync(gameId, currentVisibleTable, game.VisibleTable, cancellationToken);
+                }
+
+                if (movementResult == MoveResultType.Success && currentPlayer != game.NextPlayer)
+                {
+                    var nextPlayerId = game.NextPlayer == Players.Player1 ? game.Player1.PlayerId : game.Player2.PlayerId;
+
+                    await PublishPlayersTurnAsync(gameId, nextPlayerId, cancellationToken).ConfigureAwait(false);
                 }
 
                 return new MoveResult { MoveResultType = movementResult };
@@ -185,12 +189,29 @@ namespace Minesweeper.GameServices
             }
         }
 
-        private async Task PublishTableUpdatedAsync(string gameId, CancellationToken cancellationToken)
+        private async Task PublishTableUpdatedAsync(string gameId, GameModel.VisibleFieldType[][] previousTableState, GameModel.VisibleFieldType[][] newTableState, CancellationToken cancellationToken)
         {
-            // TODO: This is only an initial skeleton. Refactor so that only the changed fields are included.
-            var table = await GetVisibleGameTableAsync(gameId, cancellationToken);
+            var fieldUpdates = new List<GameTableUpdatedNotification.FieldUpdate>(previousTableState.Length * previousTableState[0].Length);
 
-            await _mediator.Publish(new GameTableUpdatedNotification(gameId, table), cancellationToken);
+            for (var row = 0; row < previousTableState.Length; ++row)
+            {
+                for (var col = 0; col < previousTableState[0].Length; ++col)
+                {
+                    if (previousTableState[row][col] != newTableState[row][col])
+                    {
+                        var fieldType = MapEntityVisibleFieldTypeToContractFieldType(newTableState[row][col]);
+
+                        fieldUpdates.Add(new GameTableUpdatedNotification.FieldUpdate(row, col, fieldType));
+                    }
+                }
+            }
+
+            await _mediator.Publish(new GameTableUpdatedNotification(gameId, fieldUpdates), cancellationToken);
+        }
+
+        private async Task PublishPlayersTurnAsync(string gameId, string nextPlayerId, CancellationToken cancellationToken)
+        {
+            await _mediator.Publish(new PlayersTurnNotification(gameId, nextPlayerId), cancellationToken);
         }
 
         private MarkType MapEntityMarkTypeToContractMarkType(MarkTypes markType)
@@ -224,10 +245,29 @@ namespace Minesweeper.GameServices
                 case GameModel.VisibleFieldType.MinesAround6: return Contracts.VisibleFieldType.MinesAround6;
                 case GameModel.VisibleFieldType.MinesAround7: return Contracts.VisibleFieldType.MinesAround7;
                 case GameModel.VisibleFieldType.MinesAround8: return Contracts.VisibleFieldType.MinesAround8;
+                case GameModel.VisibleFieldType.Player1FoundMine: return Contracts.VisibleFieldType.Player1FoundMine;
+                case GameModel.VisibleFieldType.Player2FoundMine: return Contracts.VisibleFieldType.Player2FoundMine;
                 case GameModel.VisibleFieldType.Unknown: return Contracts.VisibleFieldType.Unknown;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(visibleFieldType), $"The value {(int)visibleFieldType} is not valid for this parameter.");
             }
+        }
+
+        private GameModel.VisibleFieldType[][] CloneVisibleFields(GameModel.VisibleFieldType[][] visibleFields)
+        {
+            var result = new GameModel.VisibleFieldType[visibleFields.Length][];
+
+            for (var row = 0; row < visibleFields.Length; ++row)
+            {
+                result[row] = new GameModel.VisibleFieldType[visibleFields[row].Length];
+
+                for (var col = 0; col < visibleFields[row].Length; ++col)
+                {
+                    result[row][col] = visibleFields[row][col];
+                }
+            }
+
+            return result;
         }
     }
 }

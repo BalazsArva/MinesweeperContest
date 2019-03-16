@@ -20,8 +20,7 @@ namespace Minesweeper.WebAPI.NotificationHandlers
 
         public async Task Handle(GameTableUpdatedNotification notification, CancellationToken cancellationToken)
         {
-            // TODO: Include only the changed fields
-            var signalRNotification = new GameTableUpdated(notification.Table);
+            var signalRNotification = new GameTableUpdated(notification.FieldUpdates);
 
             await _hubContext.Clients.Group(notification.GameId).GameTableUpdated(signalRNotification);
         }

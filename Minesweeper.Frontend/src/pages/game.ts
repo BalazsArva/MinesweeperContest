@@ -35,22 +35,13 @@ export class Game {
         // TODO: Consider interrupted games 
         this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
         this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, notification => {
-            let tmp: { table: FieldTypes[][] } = notification;
+            // TODO: Create interface
+            let tmp: { fieldUpdates: { row: number; column: number; fieldType: FieldTypes }[] } = notification;
 
-            let newTableState = [];
-            for (let row = 0; row < tmp.table.length; ++row) {
-                newTableState.push([]);
-
-                for (let col = 0; col < tmp.table[row].length; ++col) {
-                    newTableState[row][col] = {
-                        fieldType: tmp.table[row][col],
-                        column: col,
-                        row: row
-                    };
-                }
+            for (let i = 0; i < tmp.fieldUpdates.length; ++i) {
+                let fieldUpdate = tmp.fieldUpdates[i];
+                this.gameTable[fieldUpdate.row][fieldUpdate.column].fieldType = fieldUpdate.fieldType;
             }
-
-            this.gameTable = newTableState;
         });
     }
 

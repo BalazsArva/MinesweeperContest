@@ -1,14 +1,16 @@
-﻿using Minesweeper.GameServices.Contracts;
+﻿using System.Collections.Generic;
+using Minesweeper.GameServices.Contracts;
 
 namespace Minesweeper.WebAPI.Contracts.SignalRNotifications
 {
     public class GameTableUpdated
     {
-        public GameTableUpdated(VisibleFieldType[,] table)
+        public GameTableUpdated(IEnumerable<GameTableUpdatedNotification.FieldUpdate> fieldUpdates)
         {
-            Table = table;
+            // TODO: Introduce own contract
+            FieldUpdates = fieldUpdates;
         }
 
-        public VisibleFieldType[,] Table { get; }
+        public IEnumerable<GameTableUpdatedNotification.FieldUpdate> FieldUpdates { get; }
     }
 }
