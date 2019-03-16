@@ -1,7 +1,7 @@
 import { HttpClient, json } from "aurelia-fetch-client";
-import configuration from "../../client-configuration";
 import { autoinject } from "aurelia-framework";
-import { EventAggregator } from "aurelia-event-aggregator";
+
+import configuration from "../../client-configuration";
 
 @autoinject()
 export class AccountService {
@@ -67,4 +67,5 @@ export interface GetUserInfoResult {
 }
 
 export interface UserInfo {
+    // TODO: Implement
 }
