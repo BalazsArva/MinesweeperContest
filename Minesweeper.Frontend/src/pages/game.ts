@@ -104,6 +104,11 @@ export class Game {
     }
 
     async makeMove(e: MouseEvent, row: number, col: number) {
+        // Prevent moving on marked field
+        if (this.marks[row][col] !== MarkTypes.None) {
+            return;
+        }
+
         await this.gameService.makeMove(this.gameId, row, col);
 
         e.preventDefault();
@@ -132,6 +137,11 @@ export class Game {
         // TODO: Don't update the whole marks matrix all the time
         await this.updateMarks();
 
+        e.preventDefault();
+        return false;
+    }
+
+    contextMenu(e: MouseEvent) {
         e.preventDefault();
         return false;
     }
