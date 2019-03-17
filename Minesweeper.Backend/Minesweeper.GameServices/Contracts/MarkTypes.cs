@@ -1,6 +1,6 @@
 ﻿namespace Minesweeper.GameServices.Contracts
 {
-    public enum MarkType
+    public enum MarkTypes
     {
         None,
 

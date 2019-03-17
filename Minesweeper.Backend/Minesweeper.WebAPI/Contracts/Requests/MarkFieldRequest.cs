@@ -8,6 +8,6 @@ namespace Minesweeper.WebAPI.Contracts.Requests
 
         public int Column { get; set; }
 
-        public MarkType MarkType { get; set; }
+        public MarkTypes MarkType { get; set; }
     }
 }

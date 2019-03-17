@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Minesweeper.DataAccess.RavenDb.Extensions;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
@@ -108,7 +109,7 @@ namespace Minesweeper.GameServices
             }
         }
 
-        public async Task MarkFieldAsync(string gameId, string playerId, int row, int column, MarkType markType, CancellationToken cancellationToken)
+        public async Task MarkFieldAsync(string gameId, string playerId, int row, int column, Contracts.MarkTypes markType, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
@@ -122,22 +123,22 @@ namespace Minesweeper.GameServices
                 // TODO: Index overflow and underflow check here and everywhere else
                 var isPlayer1 = game.Player1.PlayerId == playerId;
 
-                var newMark = MapContractMarkTypeToEntityMarkType(markType);
+                var newMark = MarkTypeConverter.FromContract(markType);
 
                 if (isPlayer1)
                 {
-                    session.Advanced.Patch<Game, MarkTypes>(game.Id, g => g.Player1Marks[row][column], newMark);
+                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player1Marks[row][column], (GameModel.MarkTypes)newMark);
                 }
                 else
                 {
-                    session.Advanced.Patch<Game, MarkTypes>(game.Id, g => g.Player2Marks[row][column], newMark);
+                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player2Marks[row][column], (GameModel.MarkTypes)newMark);
                 }
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public async Task<MarkType[,]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)
+        public async Task<Contracts.MarkTypes[,]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
@@ -155,13 +156,13 @@ namespace Minesweeper.GameServices
                 var rows = playerMarks.Length;
                 var columns = playerMarks[0].Length;
 
-                var result = new MarkType[rows, columns];
+                var result = new Contracts.MarkTypes[rows, columns];
 
                 for (var row = 0; row < rows; ++row)
                 {
                     for (var col = 0; col < columns; ++col)
                     {
-                        result[row, col] = MapEntityMarkTypeToContractMarkType(playerMarks[row][col]);
+                        result[row, col] = MarkTypeConverter.ToContract(playerMarks[row][col]);
                     }
                 }
 
@@ -181,7 +182,7 @@ namespace Minesweeper.GameServices
                 {
                     for (var col = 0; col < game.Columns; ++col)
                     {
-                        result[row, col] = MapEntityVisibleFieldTypeToContractFieldType(game.VisibleTable[row][col]);
+                        result[row, col] = FieldTypeConverter.ToContract(game.VisibleTable[row][col]);
                     }
                 }
 
@@ -199,7 +200,7 @@ namespace Minesweeper.GameServices
                 {
                     if (previousTableState[row][col] != newTableState[row][col])
                     {
-                        var fieldType = MapEntityVisibleFieldTypeToContractFieldType(newTableState[row][col]);
+                        var fieldType = FieldTypeConverter.ToContract(newTableState[row][col]);
 
                         fieldUpdates.Add(new GameTableUpdatedNotification.FieldUpdate(row, col, fieldType));
                     }
@@ -212,45 +213,6 @@ namespace Minesweeper.GameServices
         private async Task PublishPlayersTurnAsync(string gameId, string nextPlayerId, CancellationToken cancellationToken)
         {
             await _mediator.Publish(new PlayersTurnNotification(gameId, nextPlayerId), cancellationToken);
-        }
-
-        private MarkType MapEntityMarkTypeToContractMarkType(MarkTypes markType)
-        {
-            return markType == MarkTypes.Empty
-                ? MarkType.Empty
-                : markType == MarkTypes.None
-                    ? MarkType.None
-                    : MarkType.Unknown;
-        }
-
-        private MarkTypes MapContractMarkTypeToEntityMarkType(MarkType markType)
-        {
-            return markType == MarkType.Empty
-                ? MarkTypes.Empty
-                : markType == MarkType.None
-                    ? MarkTypes.None
-                    : MarkTypes.Unknown;
-        }
-
-        private Contracts.VisibleFieldType MapEntityVisibleFieldTypeToContractFieldType(GameModel.VisibleFieldType visibleFieldType)
-        {
-            switch (visibleFieldType)
-            {
-                case GameModel.VisibleFieldType.MinesAround0: return Contracts.VisibleFieldType.MinesAround0;
-                case GameModel.VisibleFieldType.MinesAround1: return Contracts.VisibleFieldType.MinesAround1;
-                case GameModel.VisibleFieldType.MinesAround2: return Contracts.VisibleFieldType.MinesAround2;
-                case GameModel.VisibleFieldType.MinesAround3: return Contracts.VisibleFieldType.MinesAround3;
-                case GameModel.VisibleFieldType.MinesAround4: return Contracts.VisibleFieldType.MinesAround4;
-                case GameModel.VisibleFieldType.MinesAround5: return Contracts.VisibleFieldType.MinesAround5;
-                case GameModel.VisibleFieldType.MinesAround6: return Contracts.VisibleFieldType.MinesAround6;
-                case GameModel.VisibleFieldType.MinesAround7: return Contracts.VisibleFieldType.MinesAround7;
-                case GameModel.VisibleFieldType.MinesAround8: return Contracts.VisibleFieldType.MinesAround8;
-                case GameModel.VisibleFieldType.Player1FoundMine: return Contracts.VisibleFieldType.Player1FoundMine;
-                case GameModel.VisibleFieldType.Player2FoundMine: return Contracts.VisibleFieldType.Player2FoundMine;
-                case GameModel.VisibleFieldType.Unknown: return Contracts.VisibleFieldType.Unknown;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(visibleFieldType), $"The value {(int)visibleFieldType} is not valid for this parameter.");
-            }
         }
 
         private GameModel.VisibleFieldType[][] CloneVisibleFields(GameModel.VisibleFieldType[][] visibleFields)
