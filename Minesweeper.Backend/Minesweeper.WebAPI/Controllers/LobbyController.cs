@@ -23,13 +23,25 @@ namespace Minesweeper.WebAPI.Controllers
         [HttpGet]
         [Route("")]
         [Authorize]
-        public async Task<IActionResult> Get([FromQuery]int page = 1, [FromQuery]int pageSize = 10, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAvailableGames([FromQuery]int page = 1, [FromQuery]int pageSize = 10, CancellationToken cancellationToken = default)
         {
             var userId = User.GetUserId();
 
             var results = await _lobbyService.GetAvailableGamesAsync(userId, page, pageSize, cancellationToken).ConfigureAwait(false);
 
             return Ok(new GetAvailableGamesResponse(results));
+        }
+
+        [HttpGet]
+        [Route("my-games")]
+        [Authorize]
+        public async Task<IActionResult> GetPlayersActiveGames([FromQuery]int page = 1, [FromQuery]int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            var userId = User.GetUserId();
+
+            var results = await _lobbyService.GetPlayersActiveGamesAsync(userId, page, pageSize, cancellationToken).ConfigureAwait(false);
+
+            return Ok(new GetPlayersActiveGamesResponse(results));
         }
     }
 }

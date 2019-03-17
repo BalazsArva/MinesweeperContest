@@ -14,11 +14,9 @@ namespace Minesweeper.GameServices.Extensions
                 .AddScoped<IRandomNumberProvider, RandomNumberProvider>()
                 .AddScoped<IDateTimeProvider, DateTimeProvider>()
                 .AddScoped<IGameDriver, GameDriver>()
-                .AddScoped<IGameTableVisibilityComputer, GameTableVisibilityComputer>()
                 .AddScoped<IGameService, GameService>()
                 .AddScoped<ILobbyService, LobbyService>()
                 .AddScoped<IRandomPlayerSelector, RandomPlayerSelector>()
-                .AddScoped<IGameTableGenerator, GameTableGenerator>()
                 .AddScoped<IGameGenerator, GameGenerator>();
         }
     }

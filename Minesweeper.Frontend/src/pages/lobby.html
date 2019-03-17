@@ -3,7 +3,10 @@
 
     <div class="row">
         <div class="col">
-            <game-stat stat.to-view="total" title="Games available"></game-stat>
+            <game-stat stat.to-view="availableGamesTotal" title="Games available"></game-stat>
+        </div>
+        <div class="col">
+            <game-stat stat.to-view="playersGamesTotal" title="My games"></game-stat>
         </div>
         <div class="col text-right">
             <button type="button" class="btn btn-secondary" click.delegate="refreshGames()">
@@ -19,7 +22,10 @@
 
     <div class="row">
         <div class="col">
-            <table class="table table-hover table-borderless">
+            <p if.bind="availableGamesLoading">
+                Loading available games...
+            </p>
+            <table if.bind="!availableGamesLoading" class="table table-hover table-borderless">
                 <thead>
                     <tr>
                         <th>Host player</th>
@@ -36,6 +42,36 @@
                         <td>
                             <form submit.delegate="joinGame(availableGame.gameId)">
                                 <button type="submit" class="btn btn-primary">Join</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <p if.bind="playersGamesLoading">
+                Loading your active games...
+            </p>
+            <table if.bind="!playersGamesLoading" class="table table-hover table-borderless">
+                <thead>
+                    <tr>
+                        <th>Other player</th>
+                        <th>Size</th>
+                        <th>Mines</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="playersGame of playersGames">
+                        <td>${ playersGame.otherPlayerDisplayName }</td>
+                        <td>${ playersGame.rows }&times;${ playersGame.columns }</td>
+                        <td>${ playersGame.mines }</td>
+                        <td>
+                            <form submit.delegate="goToGame(playersGame.gameId)">
+                                <button type="submit" class="btn btn-primary">Go</button>
                             </form>
                         </td>
                     </tr>

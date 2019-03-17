@@ -38,6 +38,39 @@ export class LobbyService {
         }
     }
 
+    async getPlayersGames(page: number, pageSize: number): Promise<GetPlayersGamesResult> {
+        const expectedStatus = 200;
+
+        let client = this.createHttpClient();
+        let request = { method: "GET", credentials: "include" };
+        let url = `my-games?page=${page}&pageSize=${pageSize}`;
+
+        try {
+            let httpResponse = await client.fetch(url, request);
+
+            if (httpResponse.status === expectedStatus) {
+                let result = <GetPlayersGamesResponse>(await httpResponse.json());
+
+                return {
+                    success: true,
+                    response: result
+                };
+            }
+
+            // TODO: Include more details
+            return {
+                success: false,
+                errorMessage: "Retrieving the player's games failed."
+            };
+        }
+        catch (reason) {
+            return {
+                success: false,
+                errorMessage: "A network error occured when trying to retrieve the player's games. Please try again later."
+            };
+        }
+    }
+
     private createHttpClient(): HttpClient {
         let client = new HttpClient();
         let defaultHeaders = {
@@ -71,6 +104,26 @@ export interface AvailableGame {
     gameId: string;
     hostPlayerId: string;
     hostPlayerDisplayName: string;
+    rows: number;
+    columns: number;
+    mines: number;
+}
+
+export interface GetPlayersGamesResult {
+    success: boolean;
+    errorMessage?: string;
+    response?: GetPlayersGamesResponse;
+}
+
+export interface GetPlayersGamesResponse {
+    total: number;
+    playersGames: PlayersGame[]
+}
+
+export interface PlayersGame {
+    gameId: string;
+    otherPlayerId: string;
+    otherPlayerDisplayName: string;
     rows: number;
     columns: number;
     mines: number;

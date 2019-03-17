@@ -26,6 +26,15 @@ namespace Minesweeper.WebAPI.Controllers
         private const string ClientSecret = "your-onelogin-openid-connect-client-secret";
         private const string IdentityApiBaseUrl = "https://localhost:5003";
 
+        // TODO: This returns 500 because of challenge failure instead of 401 when the user is not authenticated. Fix it here and everywhere else as unauthenticated requests will be 500 instead of 401.
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            // TODO: Return user information
+            return Ok();
+        }
+
         [HttpPost]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]

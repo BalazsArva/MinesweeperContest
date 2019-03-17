@@ -12,8 +12,9 @@ export class GameService {
     async getGameTable(gameId: string): Promise<GetGameTableResponse> {
         let client = this.createHttpClient();
 
+        // TODO: Proper error handling
         try {
-            let httpResponse = await client.fetch(`${gameId}/table`, { method: "get", credentials: "include" });
+            let httpResponse = await client.fetch(`${gameId}/table`, { method: "GET", credentials: "include" });
 
             let result = await httpResponse.json();
 
@@ -24,6 +25,35 @@ export class GameService {
         }
     }
 
+    async getPlayerMarks(gameId: string): Promise<GetPlayerMarksResponse> {
+        let client = this.createHttpClient();
+
+        try {
+            let httpResponse = await client.fetch(`${gameId}/player-marks`, { method: "GET", credentials: "include" });
+
+            if (httpResponse.ok) {
+                let result = <{ marks: MarkTypes[][] }>(await httpResponse.json());
+
+                return {
+                    success: true,
+                    marks: result.marks
+                };
+            }
+
+            // TODO: Provide more details
+            return {
+                success: false,
+                errorMessage: "Failed to fetch your field marks. Status code: " + httpResponse.status
+            }
+        }
+        catch (reason) {
+            return {
+                success: false,
+                errorMessage: "A network error occured when trying to fetch your field marks. Please try again later."
+            };
+        }
+    }
+
     async makeMove(gameId: string, row: number, column: number): Promise<void> {
         let client = this.createHttpClient();
 
@@ -31,7 +61,7 @@ export class GameService {
         let request = { method: "post", body: json(body), credentials: "include" };
 
         try {
-            let httpResponse = await client.fetch(`${gameId}/movement`, request);
+            let httpResponse = await client.fetch(`${gameId}/make-move`, request);
 
             // TODO: Do proper error handling
             if (!httpResponse.ok) {
@@ -40,6 +70,33 @@ export class GameService {
         }
         catch (reason) {
             console.log(reason);
+        }
+    }
+
+    async markField(gameId: string, row: number, column: number, markType: MarkTypes): Promise<MarkFieldResult> {
+        let client = this.createHttpClient();
+
+        let body = { column, row, markType };
+        let request = { method: "post", body: json(body), credentials: "include" };
+
+        try {
+            let httpResponse = await client.fetch(`${gameId}/mark-field`, request);
+
+            if (httpResponse.ok) {
+                return { success: true };
+            }
+
+            // TODO: Include more details
+            return {
+                success: false,
+                errorMessage: "Failed to mark field."
+            }
+        }
+        catch (reason) {
+            return {
+                success: false,
+                errorMessage: "A network error occured when trying to set the field mark. Please try again later."
+            };
         }
     }
 
@@ -122,4 +179,21 @@ export class GameService {
 
 export interface GetGameTableResponse {
     visibleTable: FieldTypes[][];
+}
+
+export interface GetPlayerMarksResponse {
+    success: boolean;
+    errorMessage?: string;
+    marks?: MarkTypes[][];
+}
+
+export enum MarkTypes {
+    None = 0,
+    Empty = 1,
+    Unknown = 2
+}
+
+export interface MarkFieldResult {
+    success: boolean;
+    errorMessage?: string;
 }
