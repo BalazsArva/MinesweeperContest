@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Minesweeper.DataAccess.RavenDb.Extensions;
+using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
@@ -87,7 +88,7 @@ namespace Minesweeper.GameServices
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 var currentPlayer = game.NextPlayer;
-                var currentVisibleTable = CloneVisibleFields(game.VisibleTable);
+                var currentVisibleTable = EnumArrayCloner.Clone(game.VisibleTable);
 
                 var movementResult = _gameDriver.MakeMove(game, playerId, row, column);
 
@@ -138,7 +139,7 @@ namespace Minesweeper.GameServices
             }
         }
 
-        public async Task<Contracts.MarkTypes[,]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)
+        public async Task<Contracts.MarkTypes[][]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
@@ -153,40 +154,19 @@ namespace Minesweeper.GameServices
                 }
 
                 var playerMarks = isPlayer1 ? game.Player1Marks : game.Player2Marks;
-                var rows = playerMarks.Length;
-                var columns = playerMarks[0].Length;
 
-                var result = new Contracts.MarkTypes[rows, columns];
-
-                for (var row = 0; row < rows; ++row)
-                {
-                    for (var col = 0; col < columns; ++col)
-                    {
-                        result[row, col] = MarkTypeConverter.ToContract(playerMarks[row][col]);
-                    }
-                }
-
-                return result;
+                return EnumArrayCloner.CloneAndMap(playerMarks, MarkTypeConverter.ToContract);
             }
         }
 
-        public async Task<Contracts.VisibleFieldType[,]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
+        public async Task<Contracts.VisibleFieldType[][]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
                 // TODO: Validate user id
                 var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
-                var result = new Contracts.VisibleFieldType[game.Rows, game.Columns];
-                for (var row = 0; row < game.Rows; ++row)
-                {
-                    for (var col = 0; col < game.Columns; ++col)
-                    {
-                        result[row, col] = FieldTypeConverter.ToContract(game.VisibleTable[row][col]);
-                    }
-                }
-
-                return result;
+                return EnumArrayCloner.CloneAndMap(game.VisibleTable, FieldTypeConverter.ToContract);
             }
         }
 
@@ -213,23 +193,6 @@ namespace Minesweeper.GameServices
         private async Task PublishPlayersTurnAsync(string gameId, string nextPlayerId, CancellationToken cancellationToken)
         {
             await _mediator.Publish(new PlayersTurnNotification(gameId, nextPlayerId), cancellationToken);
-        }
-
-        private GameModel.VisibleFieldType[][] CloneVisibleFields(GameModel.VisibleFieldType[][] visibleFields)
-        {
-            var result = new GameModel.VisibleFieldType[visibleFields.Length][];
-
-            for (var row = 0; row < visibleFields.Length; ++row)
-            {
-                result[row] = new GameModel.VisibleFieldType[visibleFields[row].Length];
-
-                for (var col = 0; col < visibleFields[row].Length; ++col)
-                {
-                    result[row][col] = visibleFields[row][col];
-                }
-            }
-
-            return result;
         }
     }
 }

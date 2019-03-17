@@ -4,6 +4,6 @@ namespace Minesweeper.WebAPI.Contracts.Requests
 {
     public class GetPlayerMarksResponse
     {
-        public MarkTypes[,] Marks { get; set; }
+        public MarkTypes[][] Marks { get; set; }
     }
 }
