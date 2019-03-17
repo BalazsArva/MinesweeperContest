@@ -128,11 +128,11 @@ namespace Minesweeper.GameServices
 
                 if (isPlayer1)
                 {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player1Marks[row][column], (GameModel.MarkTypes)newMark);
+                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player1Marks[row][column], newMark);
                 }
                 else
                 {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player2Marks[row][column], (GameModel.MarkTypes)newMark);
+                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player2Marks[row][column], newMark);
                 }
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
