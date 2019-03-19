@@ -22,9 +22,17 @@
 
     <div class="row">
         <div class="col">
-            <p if.bind="availableGamesLoading">
-                Loading available games...
-            </p>
+            <div if.bind="availableGamesLoading">
+                <div class="m-5">
+                    <p class="text-center" aria-hidden="true">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                    </p>
+                    <p class="text-center">
+                        Loading available games...
+                    </p>
+                </div>
+
+            </div>
             <table if.bind="!availableGamesLoading" class="table table-hover table-borderless">
                 <thead>
                     <tr>
@@ -52,9 +60,18 @@
 
     <div class="row">
         <div class="col">
-            <p if.bind="playersGamesLoading">
-                Loading your active games...
-            </p>
+            <div if.bind="playersGamesLoading">
+                <div class="m-5">
+                    <p class="text-center" aria-hidden="true">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                    </p>
+                    <p class="text-center">
+                        Loading your active games...
+                    </p>
+                </div>
+
+            </div>
+
             <table if.bind="!playersGamesLoading" class="table table-hover table-borderless">
                 <thead>
                     <tr>
