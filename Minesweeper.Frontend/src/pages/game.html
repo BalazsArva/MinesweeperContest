@@ -37,7 +37,7 @@
 
                             <!-- Unopened field -->
                             <button if.bind="field.fieldType === 0" class="btn btn-sm btn-light btn-game-table border-secondary"
-                                click.delegate="clickField($event, field.row, field.column)" contextmenu.delegate="contextMenu($event)">
+                                click.delegate="makeMove($event, field.row, field.column)" contextmenu.delegate="markField($event, field.row, field.column)">
                                 <span if.bind="field.markType === 1">
                                     <i class="fas fa-times"></i>
                                 </span>
@@ -47,8 +47,7 @@
                             </button>
 
                             <!-- Opened field -->
-                            <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light btn-game-table"
-                                disabled>
+                            <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light btn-game-table" disabled>
 
                                 <span class="align-top">
                                     <!-- Player 1 found mine -->

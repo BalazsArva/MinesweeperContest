@@ -80,16 +80,12 @@ export class Game {
         }
     }
 
-    async clickField(e: MouseEvent, row: number, col: number) {
-        if (e.button === 0) {
-            return await this.makeMove(e, row, col);
-        }
-        else if (e.button === 2) {
-            return await this.markField(e, row, col);
-        }
-    }
-
     async makeMove(e: MouseEvent, row: number, col: number) {
+        // Left mouse button
+        if (e.button !== 0) {
+            return;
+        }
+
         // Prevent moving on marked field
         if (this.gameTable[row][col].markType !== MarkTypes.None) {
             return;
@@ -102,6 +98,11 @@ export class Game {
     }
 
     async markField(e: MouseEvent, row: number, col: number) {
+        // Right mouse button
+        if (e.button !== 2) {
+            return;
+        }
+
         let targetMarkType: MarkTypes;
         let currentMarkType = this.gameTable[row][col].markType;
 
@@ -123,11 +124,6 @@ export class Game {
             // TODO: Error handling
         }
 
-        e.preventDefault();
-        return false;
-    }
-
-    contextMenu(e: MouseEvent) {
         e.preventDefault();
         return false;
     }
