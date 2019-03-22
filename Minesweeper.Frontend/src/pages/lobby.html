@@ -20,50 +20,96 @@
 
     <hr />
 
-    <div class="row">
-        <div class="col">
-            <div if.bind="availableGamesLoading">
-                <div class="m-5">
-                    <p class="text-center" aria-hidden="true">
-                        <i class="fas fa-spinner fa-pulse"></i>
+    <!-- Available games -->
+    <template if.bind="availableGamesLoading">
+        <p class="text-center" aria-hidden="true">
+            <i class="fas fa-spinner fa-pulse"></i>
+        </p>
+        <p class="text-center">
+            Loading available games...
+        </p>
+    </template>
+
+    <template if.bind="!availableGamesLoading">
+        <div class="row">
+            <div class="col">
+                <h1 class="h5 py-3">
+                    Available games
+                </h1>
+            </div>
+        </div>
+
+        <template repeat.for="availableGame of availableGames">
+
+            <div class="row py-1 align-items-center" style="background-color: #f8f8f8;border-top: 1px solid #eaeaea;">
+                <div class="col-sm-6">
+                    <div class="media">
+                        <img class="mr-3 mt-1" src="http://placehold.it/32x32"
+                            alt="Avatar of ${ availableGame.hostPlayerDisplayName }" />
+                        <div class="media-body">
+
+                            <template if.one-time="availableGame.hostPlayerDisplayName">
+                                <small class="text-muted">Playing against</small>
+                                <p class="h6 m-0">
+                                    ${ availableGame.hostPlayerDisplayName }
+                                </p>
+                            </template>
+
+                            <template if.one-time="!availableGame.hostPlayerDisplayName">
+                                <small class="text-muted">
+                                    No opponent yet
+                                </small>
+                            </template>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-2">
+                    <p class="m-0 p-0 text-center text-info">
+                        <b>${ availableGame.rows }&times;${ availableGame.columns }</b>
                     </p>
-                    <p class="text-center">
-                        Loading available games...
+                    <p class="m-0 p-0 text-center">
+                        <small>
+                            grid
+                        </small>
                     </p>
+                </div>
+                <div class="col-6 col-sm-2">
+                    <p class="m-0 p-0 text-center text-info">
+                        <b>${ availableGame.mines }</b>
+                    </p>
+                    <p class="m-0 p-0 text-center">
+                        <small>
+                            mines
+                        </small>
+                    </p>
+                </div>
+                <div class="col-sm-2 text-right">
+                    <form submit.delegate="joinGame(availableGame.gameId)">
+                        <button type="submit" class="btn btn-info btn-sm">
+                            <i class="fas fa-plus"></i>
+                            <span class="ml-1">
+                                Join
+                            </span>
+                        </button>
+                    </form>
                 </div>
 
             </div>
-            <table if.bind="!availableGamesLoading" class="table table-hover table-borderless">
-                <thead>
-                    <tr>
-                        <th>Host player</th>
-                        <th>Size</th>
-                        <th>Mines</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr repeat.for="availableGame of availableGames">
-                        <td>${ availableGame.hostPlayerDisplayName }</td>
-                        <td>${ availableGame.rows }&times;${ availableGame.columns }</td>
-                        <td>${ availableGame.mines }</td>
-                        <td>
-                            <form submit.delegate="joinGame(availableGame.gameId)">
-                                <button type="submit" class="btn btn-primary">Join</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
+        </template>
+    </template>
+    <!-- End of available games -->
+
+    <div class="my-5"></div>
+
+    <!-- Player's ongoing games -->
     <template if.bind="playersGamesLoading">
         <p class="text-center" aria-hidden="true">
             <i class="fas fa-spinner fa-pulse"></i>
         </p>
         <p class="text-center">
-            Loading your active games...
+            Loading your ongoing games...
         </p>
     </template>
 
@@ -79,7 +125,7 @@
         <template repeat.for="playersGame of playersGames">
 
             <div class="row py-1 align-items-center" style="background-color: #f8f8f8;border-top: 1px solid #eaeaea;">
-                <div class="col-6">
+                <div class="col-sm-6">
                     <div class="media">
                         <img class="mr-3 mt-1" src="http://placehold.it/32x32"
                             alt="Avatar of ${ playersGame.otherPlayerDisplayName }" />
@@ -101,7 +147,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-2">
+                <div class="col-6 col-sm-2">
                     <p class="m-0 p-0 text-center text-info">
                         <b>${ playersGame.rows }&times;${ playersGame.columns }</b>
                     </p>
@@ -111,7 +157,7 @@
                         </small>
                     </p>
                 </div>
-                <div class="col-2">
+                <div class="col-6 col-sm-2">
                     <p class="m-0 p-0 text-center text-info">
                         <b>${ playersGame.mines }</b>
                     </p>
@@ -121,7 +167,7 @@
                         </small>
                     </p>
                 </div>
-                <div class="col-2 text-right">
+                <div class="col-sm-2 text-right">
                     <a route-href="route: game; params.bind: { gameId: playersGame.gameId }"
                         class="btn btn-info btn-sm">
                         <i class="fas fa-play"></i>
@@ -135,5 +181,6 @@
 
         </template>
     </template>
+    <!-- End of player's ongoing games -->
 
 </template>
