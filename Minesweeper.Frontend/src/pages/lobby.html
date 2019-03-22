@@ -58,45 +58,6 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col">
-            <div if.bind="playersGamesLoading">
-                <div class="m-5">
-                    <p class="text-center" aria-hidden="true">
-                        <i class="fas fa-spinner fa-pulse"></i>
-                    </p>
-                    <p class="text-center">
-                        Loading your active games...
-                    </p>
-                </div>
-
-            </div>
-
-            <table if.bind="!playersGamesLoading" class="table table-hover table-borderless">
-                <thead>
-                    <tr>
-                        <th>Other player</th>
-                        <th>Size</th>
-                        <th>Mines</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr repeat.for="playersGame of playersGames">
-                        <td>${ playersGame.otherPlayerDisplayName }</td>
-                        <td>${ playersGame.rows }&times;${ playersGame.columns }</td>
-                        <td>${ playersGame.mines }</td>
-                        <td>
-                            <form submit.delegate="goToGame(playersGame.gameId)">
-                                <button type="submit" class="btn btn-primary btn-sm">Go</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
     <template if.bind="playersGamesLoading">
         <p class="text-center" aria-hidden="true">
             <i class="fas fa-spinner fa-pulse"></i>
@@ -161,14 +122,13 @@
                     </p>
                 </div>
                 <div class="col-2 text-right">
-                    <form submit.delegate="goToGame(playersGame.gameId)">
-                        <button type="submit" class="btn btn-info btn-sm">
-                            <i class="fas fa-play"></i>
-                            <span class="ml-1">
-                                Play
-                            </span>
-                        </button>
-                    </form>
+                    <a route-href="route: game; params.bind: { gameId: playersGame.gameId }"
+                        class="btn btn-info btn-sm">
+                        <i class="fas fa-play"></i>
+                        <span class="ml-1">
+                            Play
+                        </span>
+                    </a>
                 </div>
 
             </div>
