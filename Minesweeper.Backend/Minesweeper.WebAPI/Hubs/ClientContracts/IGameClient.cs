@@ -5,6 +5,6 @@ namespace Minesweeper.WebAPI.Hubs.ClientContracts
 {
     public interface IGameClient
     {
-        Task GameTableUpdated(GameTableUpdated notification);
+        Task GameTableUpdated(GameTableUpdatedSignalRNotification notification);
     }
 }

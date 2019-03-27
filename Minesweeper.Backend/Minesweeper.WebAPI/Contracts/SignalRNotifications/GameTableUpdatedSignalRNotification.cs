@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace Minesweeper.WebAPI.Contracts.SignalRNotifications
 {
-    public class GameTableUpdated
+    public class GameTableUpdatedSignalRNotification
     {
-        public GameTableUpdated(IEnumerable<GameServices.Contracts.FieldUpdate> fieldUpdates)
+        public GameTableUpdatedSignalRNotification(IEnumerable<GameServices.Contracts.FieldUpdate> fieldUpdates)
         {
             FieldUpdates = fieldUpdates.Select(u => new FieldUpdate(u)).ToList();
         }
