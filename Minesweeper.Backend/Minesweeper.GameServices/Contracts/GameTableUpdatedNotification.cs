@@ -5,22 +5,6 @@ namespace Minesweeper.GameServices.Contracts
 {
     public class GameTableUpdatedNotification : INotification
     {
-        public class FieldUpdate
-        {
-            public FieldUpdate(int row, int column, VisibleFieldType fieldType)
-            {
-                Row = row;
-                Column = column;
-                FieldType = fieldType;
-            }
-
-            public int Row { get; }
-
-            public int Column { get; }
-
-            public VisibleFieldType FieldType { get; }
-        }
-
         public GameTableUpdatedNotification(string gameId, IEnumerable<FieldUpdate> fieldUpdates)
         {
             GameId = gameId;
@@ -30,5 +14,21 @@ namespace Minesweeper.GameServices.Contracts
         public string GameId { get; }
 
         public IEnumerable<FieldUpdate> FieldUpdates { get; }
+    }
+
+    public class FieldUpdate
+    {
+        public FieldUpdate(int row, int column, VisibleFieldType fieldType)
+        {
+            Row = row;
+            Column = column;
+            FieldType = fieldType;
+        }
+
+        public int Row { get; }
+
+        public int Column { get; }
+
+        public VisibleFieldType FieldType { get; }
     }
 }

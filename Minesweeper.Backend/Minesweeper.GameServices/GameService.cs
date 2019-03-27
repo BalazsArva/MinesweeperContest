@@ -172,7 +172,7 @@ namespace Minesweeper.GameServices
 
         private async Task PublishTableUpdatedAsync(string gameId, GameModel.VisibleFieldType[][] previousTableState, GameModel.VisibleFieldType[][] newTableState, CancellationToken cancellationToken)
         {
-            var fieldUpdates = new List<GameTableUpdatedNotification.FieldUpdate>(previousTableState.Length * previousTableState[0].Length);
+            var fieldUpdates = new List<FieldUpdate>(previousTableState.Length * previousTableState[0].Length);
 
             for (var row = 0; row < previousTableState.Length; ++row)
             {
@@ -182,7 +182,7 @@ namespace Minesweeper.GameServices
                     {
                         var fieldType = FieldTypeConverter.ToContract(newTableState[row][col]);
 
-                        fieldUpdates.Add(new GameTableUpdatedNotification.FieldUpdate(row, col, fieldType));
+                        fieldUpdates.Add(new FieldUpdate(row, col, fieldType));
                     }
                 }
             }
