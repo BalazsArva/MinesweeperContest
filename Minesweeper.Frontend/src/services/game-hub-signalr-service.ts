@@ -1,6 +1,9 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
+
 import * as SignalR from '@aspnet/signalr';
+
+import { FieldTypes } from '../interfaces/field-types';
 
 const gameHubUrl = 'https://localhost:5001/hubs/game';
 
@@ -31,4 +34,14 @@ export class GameHubSignalRService {
             this.eventAggregator.publish(`games:${gameId}:tableChanged`, notification);
         });
     }
+}
+
+export interface GameTableUpdatedNotification {
+    fieldUpdates: FieldUpdate[];
+}
+
+export interface FieldUpdate {
+    row: number;
+    column: number;
+    fieldType: FieldTypes;
 }

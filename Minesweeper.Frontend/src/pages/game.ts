@@ -3,7 +3,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 
 import { GameService, MarkTypes } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
-import { GameHubSignalRService } from "services/game-hub-signalr-service";
+import { GameHubSignalRService, GameTableUpdatedNotification } from "services/game-hub-signalr-service";
 
 interface Field {
     fieldType: FieldTypes;
@@ -34,12 +34,9 @@ export class Game {
 
         // TODO: Consider interrupted games 
         this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
-        this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, notification => {
-            // TODO: Create interface
-            let tmp: { fieldUpdates: { row: number; column: number; fieldType: FieldTypes }[] } = notification;
-
-            for (let i = 0; i < tmp.fieldUpdates.length; ++i) {
-                let fieldUpdate = tmp.fieldUpdates[i];
+        this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, (notification: GameTableUpdatedNotification) => {
+            for (let i = 0; i < notification.fieldUpdates.length; ++i) {
+                let fieldUpdate = notification.fieldUpdates[i];
                 this.gameTable[fieldUpdate.row][fieldUpdate.column].fieldType = fieldUpdate.fieldType;
             }
         });
