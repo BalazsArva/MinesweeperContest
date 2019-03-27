@@ -41,6 +41,7 @@ namespace Minesweeper.GameServices
             {
                 var game = _gameGenerator.GenerateGame(tableRows, tableColumns, mineCount);
 
+                // TODO: Validate that the invited player's Id is not the same as the host's Id.
                 game.Id = _documentStore.GetPrefixedDocumentId<Game>(_guidProvider.GenerateGuidString());
                 game.InvitedPlayerId = string.IsNullOrWhiteSpace(invitedPlayerId) ? null : invitedPlayerId;
                 game.Player1.PlayerId = hostPlayerId;

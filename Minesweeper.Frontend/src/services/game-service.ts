@@ -129,14 +129,14 @@ export class GameService {
         }
     }
 
-    async createGame(tableRows: number, tableColumns: number, mineCount: number): Promise<void> {
+    async createGame(invitedPlayerId: string, tableRows: number, tableColumns: number, mineCount: number): Promise<void> {
         let client = new HttpClient();
         let defaultHeaders = {
             "Accept": "application/json",
             "X-Requested-With": "Fetch"
         };
 
-        let body = { tableRows, tableColumns, mineCount };
+        let body = { tableRows, tableColumns, mineCount, invitedPlayerId };
         let request = { method: "POST", credentials: "include", body: json(body) };
 
         client.configure(config => {

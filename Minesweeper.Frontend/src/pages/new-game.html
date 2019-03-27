@@ -2,6 +2,19 @@
     <page-header title="New game"></page-header>
 
     <form submit.delegate="create()">
+
+        <div class="form-group row ">
+            <label class="col-sm-2 col-form-label" for="invited-player-id">Invited player</label>
+
+            <div class="col-sm-10 mb-3">
+                <input type="text" class="form-control" id="invited-player-id" aria-describedby="invited-player-id-help"
+                    placeholder="Your friend's Id" value.bind="invitedPlayerId" />
+                <small id="invited-player-id-help" class="form-text text-muted">
+                    Optionally type a player's Id here to make this game only accessible to that player.
+                </small>
+            </div>
+        </div>
+
         <div class="form-row">
             <div class="form-group col-12">
                 <label for="difficulty">Difficulty</label>

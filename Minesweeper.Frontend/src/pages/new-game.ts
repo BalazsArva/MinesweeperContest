@@ -5,7 +5,7 @@ import { GameService } from "services/game-service";
 @autoinject
 export class NewGame {
 
-    @bindable displayName: string = null;
+    invitedPlayerId: string = null;
     @bindable selectedDifficulty: Difficulty = null;
     @bindable selectableDifficulties: Difficulty[] = [
         { width: 10, height: 10, mines: 10, title: "Small" },
@@ -13,15 +13,13 @@ export class NewGame {
         { width: 16, height: 32, mines: 50, title: "Large" }
     ];
 
-    // TODO: Use this value at creation as well.
-    isPrivate: boolean = true;
-
     constructor(private gameService: GameService) {
     }
 
     async create() {
         let diff = this.selectedDifficulty;
+        let invitedPlayerId = this.invitedPlayerId;
 
-        await this.gameService.createGame(diff.height, diff.width, diff.mines);
+        await this.gameService.createGame(invitedPlayerId, diff.height, diff.width, diff.mines);
     }
 }
