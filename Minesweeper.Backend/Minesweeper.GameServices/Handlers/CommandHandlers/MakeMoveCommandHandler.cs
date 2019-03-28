@@ -99,7 +99,7 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
         private int GetRemainingMineCount(Game game)
         {
-            var foundMineCount = game.VisibleTable.Sum(row => row.Count(field => field == GameModel.VisibleFieldType.Player1FoundMine || field == GameModel.VisibleFieldType.Player2FoundMine));
+            var foundMineCount = game.VisibleTable.Count(field => field == GameModel.VisibleFieldType.Player1FoundMine || field == GameModel.VisibleFieldType.Player2FoundMine);
             var totalMineCount = game.Mines;
 
             return totalMineCount - foundMineCount;
