@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -40,8 +41,11 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
                 var currentPlayer = game.NextPlayer;
                 var currentVisibleTable = EnumArrayCloner.Clone(game.VisibleTable);
+                var mineCountBeforeMove = GetRemainingMineCount(game);
 
                 var movementResult = _gameDriver.MakeMove(game, command.PlayerId, command.Row, command.Column);
+
+                var mineCountAfterMove = GetRemainingMineCount(game);
 
                 if (movementResult == MoveResultType.Success || movementResult == MoveResultType.GameOver)
                 {
@@ -56,6 +60,8 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
                     await PublishPlayersTurnAsync(command.GameId, nextPlayerId, cancellationToken).ConfigureAwait(false);
                 }
+
+                await PublishRemainingMinesIfChangedAsync(command.GameId, mineCountBeforeMove, mineCountAfterMove, cancellationToken).ConfigureAwait(false);
 
                 return new MoveResult { MoveResultType = movementResult };
             }
@@ -78,12 +84,28 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                 }
             }
 
-            await _mediator.Publish(new GameTableUpdatedNotification(gameId, fieldUpdates), cancellationToken);
+            await _mediator.Publish(new GameTableUpdatedNotification(gameId, fieldUpdates), cancellationToken).ConfigureAwait(false);
         }
 
         private async Task PublishPlayersTurnAsync(string gameId, string nextPlayerId, CancellationToken cancellationToken)
         {
-            await _mediator.Publish(new PlayersTurnNotification(gameId, nextPlayerId), cancellationToken);
+            await _mediator.Publish(new PlayersTurnNotification(gameId, nextPlayerId), cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task PublishRemainingMinesIfChangedAsync(string gameId, int mineCountBeforeMove, int mineCountAfterMove, CancellationToken cancellationToken)
+        {
+            if (mineCountBeforeMove != mineCountAfterMove)
+            {
+                await _mediator.Publish(new RemainingMinesChangedNotification(gameId, mineCountAfterMove)).ConfigureAwait(false);
+            }
+        }
+
+        private int GetRemainingMineCount(Game game)
+        {
+            var foundMineCount = game.VisibleTable.Sum(row => row.Count(field => field == GameModel.VisibleFieldType.Player1FoundMine || field == GameModel.VisibleFieldType.Player2FoundMine));
+            var totalMineCount = game.Mines;
+
+            return totalMineCount - foundMineCount;
         }
     }
 }

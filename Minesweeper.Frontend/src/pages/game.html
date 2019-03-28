@@ -12,7 +12,7 @@
             <game-stat stat="0" title="Opponent's points" color-class="danger"></game-stat>
         </div>
         <div class="col">
-            <game-stat stat="20" title="Mines left"></game-stat>
+            <game-stat stat="${ remainingMines >= 0 ? remainingMines : '?' }" title="Mines left"></game-stat>
         </div>
     </div>
 

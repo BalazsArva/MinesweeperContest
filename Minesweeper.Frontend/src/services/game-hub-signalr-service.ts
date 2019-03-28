@@ -33,6 +33,10 @@ export class GameHubSignalRService {
         connection.on("GameTableUpdated", notification => {
             this.eventAggregator.publish(`games:${gameId}:tableChanged`, notification);
         });
+
+        connection.on("RemainingMinesChanged", notification => {
+            this.eventAggregator.publish(`games:${gameId}:remainingMinesChanged`, notification);
+        });
     }
 }
 
@@ -44,4 +48,8 @@ export interface FieldUpdate {
     row: number;
     column: number;
     fieldType: FieldTypes;
+}
+
+export interface RemainingMinesChangedNotification {
+    remainingMineCount: number;
 }

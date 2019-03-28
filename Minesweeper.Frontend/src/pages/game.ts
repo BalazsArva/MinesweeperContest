@@ -3,7 +3,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 
 import { GameService, MarkTypes } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
-import { GameHubSignalRService, GameTableUpdatedNotification } from "services/game-hub-signalr-service";
+import { GameHubSignalRService, GameTableUpdatedNotification, RemainingMinesChangedNotification } from "services/game-hub-signalr-service";
 
 interface Field {
     fieldType: FieldTypes;
@@ -19,6 +19,7 @@ export class Game {
     timerHandle: number = null;
     elapsedSeconds = 0;
     gameId: string = null;
+    remainingMines: number = null;
 
     constructor(private eventAggregator: EventAggregator, private gameService: GameService, private gameHubService: GameHubSignalRService) {
     }
@@ -34,11 +35,16 @@ export class Game {
 
         // TODO: Consider interrupted games 
         this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
+
         this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, (notification: GameTableUpdatedNotification) => {
             for (let i = 0; i < notification.fieldUpdates.length; ++i) {
                 let fieldUpdate = notification.fieldUpdates[i];
                 this.gameTable[fieldUpdate.row][fieldUpdate.column].fieldType = fieldUpdate.fieldType;
             }
+        });
+
+        this.eventAggregator.subscribe(`games:${gameId}:remainingMinesChanged`, (notification: RemainingMinesChangedNotification) => {
+            this.remainingMines = notification.remainingMineCount;
         });
     }
 

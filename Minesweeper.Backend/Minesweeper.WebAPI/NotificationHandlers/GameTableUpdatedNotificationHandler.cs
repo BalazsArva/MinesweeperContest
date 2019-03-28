@@ -22,7 +22,25 @@ namespace Minesweeper.WebAPI.NotificationHandlers
         {
             var signalRNotification = new GameTableUpdatedSignalRNotification(notification.FieldUpdates);
 
-            await _hubContext.Clients.Group(notification.GameId).GameTableUpdated(signalRNotification);
+            await _hubContext.Clients.Group(notification.GameId).GameTableUpdated(signalRNotification).ConfigureAwait(false);
+        }
+    }
+
+    public class RemainingMinesChangedNotificationHandler : INotificationHandler<RemainingMinesChangedNotification>
+    {
+        private readonly IHubContext<GameHub, IGameClient> _hubContext;
+
+        public RemainingMinesChangedNotificationHandler(IHubContext<GameHub, IGameClient> hubContext)
+        {
+            _hubContext = hubContext;
+        }
+
+        public async Task Handle(RemainingMinesChangedNotification notification, CancellationToken cancellationToken)
+        {
+            var signalRNotification = new RemainingMinesChangedSignalRNotification(notification);
+
+            // TODO: Find out whether cancellation tokens can/should be passed to client calls
+            await _hubContext.Clients.Group(notification.GameId).RemainingMinesChanged(signalRNotification).ConfigureAwait(false);
         }
     }
 }
