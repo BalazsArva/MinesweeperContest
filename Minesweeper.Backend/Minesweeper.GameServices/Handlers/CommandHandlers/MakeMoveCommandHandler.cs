@@ -39,29 +39,23 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                 // TODO: Concurrency protection
                 var game = await session.LoadGameAsync(command.GameId, cancellationToken).ConfigureAwait(false);
 
-                var currentPlayer = game.NextPlayer;
+                var currentPlayerId = GetPlayerIdByPlayerOrder(game, game.NextPlayer);
                 var currentVisibleTable = EnumArrayCloner.Clone(game.VisibleTable);
                 var mineCountBeforeMove = GetRemainingMineCount(game);
 
                 var movementResult = _gameDriver.MakeMove(game, command.PlayerId, command.Row, command.Column);
 
-                var mineCountAfterMove = GetRemainingMineCount(game);
-
                 if (movementResult == MoveResultType.Success || movementResult == MoveResultType.GameOver)
                 {
                     await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
+                    var mineCountAfterMove = GetRemainingMineCount(game);
+                    var nextPlayerId = GetPlayerIdByPlayerOrder(game, game.NextPlayer);
+
                     await PublishTableUpdatedAsync(command.GameId, currentVisibleTable, game.VisibleTable, cancellationToken);
+                    await PublishPlayersTurnIfChangedAsync(command.GameId, currentPlayerId, nextPlayerId, cancellationToken).ConfigureAwait(false);
+                    await PublishRemainingMinesIfChangedAsync(command.GameId, mineCountBeforeMove, mineCountAfterMove, cancellationToken).ConfigureAwait(false);
                 }
-
-                if (movementResult == MoveResultType.Success && currentPlayer != game.NextPlayer)
-                {
-                    var nextPlayerId = game.NextPlayer == Players.Player1 ? game.Player1.PlayerId : game.Player2.PlayerId;
-
-                    await PublishPlayersTurnAsync(command.GameId, nextPlayerId, cancellationToken).ConfigureAwait(false);
-                }
-
-                await PublishRemainingMinesIfChangedAsync(command.GameId, mineCountBeforeMove, mineCountAfterMove, cancellationToken).ConfigureAwait(false);
 
                 return new MoveResult { MoveResultType = movementResult };
             }
@@ -87,9 +81,12 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             await _mediator.Publish(new GameTableUpdatedNotification(gameId, fieldUpdates), cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task PublishPlayersTurnAsync(string gameId, string nextPlayerId, CancellationToken cancellationToken)
+        private async Task PublishPlayersTurnIfChangedAsync(string gameId, string playerIdBeforeMove, string playerIdAfterMove, CancellationToken cancellationToken)
         {
-            await _mediator.Publish(new PlayersTurnNotification(gameId, nextPlayerId), cancellationToken).ConfigureAwait(false);
+            if (playerIdBeforeMove != playerIdAfterMove)
+            {
+                await _mediator.Publish(new PlayersTurnNotification(gameId, playerIdAfterMove), cancellationToken).ConfigureAwait(false);
+            }
         }
 
         private async Task PublishRemainingMinesIfChangedAsync(string gameId, int mineCountBeforeMove, int mineCountAfterMove, CancellationToken cancellationToken)
@@ -106,6 +103,13 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             var totalMineCount = game.Mines;
 
             return totalMineCount - foundMineCount;
+        }
+
+        private string GetPlayerIdByPlayerOrder(Game game, Players player)
+        {
+            return player == Players.Player1
+                ? game.Player1.PlayerId
+                : game.Player2.PlayerId;
         }
     }
 }
