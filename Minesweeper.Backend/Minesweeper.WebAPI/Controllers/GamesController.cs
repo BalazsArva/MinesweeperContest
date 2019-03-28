@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.WebAPI.Contracts.Requests;
 using Minesweeper.WebAPI.Extensions;
+using Minesweeper.WebAPI.Mappers;
 
 namespace Minesweeper.WebAPI.Controllers
 {
@@ -14,10 +15,12 @@ namespace Minesweeper.WebAPI.Controllers
     public class GamesController : ControllerBase
     {
         private readonly IGameService _gameService;
+        private readonly IMakeMoveCommandHandler _makeMoveCommandHandler;
 
-        public GamesController(IGameService gameService)
+        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler)
         {
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
+            this._makeMoveCommandHandler = makeMoveCommandHandler ?? throw new ArgumentNullException(nameof(makeMoveCommandHandler));
         }
 
         [HttpGet]
@@ -60,9 +63,9 @@ namespace Minesweeper.WebAPI.Controllers
         public async Task<IActionResult> MakeMove(string gameId, [FromBody]MakeMoveRequest request, CancellationToken cancellationToken)
         {
             var userId = User.GetUserId();
+            var command = MakeMoveMapper.ToCommand(gameId, userId, request);
 
-            // TODO: This is only temp
-            await _gameService.MakeMoveAsync(gameId, userId, request.Row, request.Column, cancellationToken).ConfigureAwait(false);
+            await _makeMoveCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
             // TODO: Error handling
             return Ok();

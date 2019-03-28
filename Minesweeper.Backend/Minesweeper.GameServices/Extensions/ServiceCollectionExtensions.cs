@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Generators;
+using Minesweeper.GameServices.Handlers.CommandHandlers;
 using Minesweeper.GameServices.Providers;
 
 namespace Minesweeper.GameServices.Extensions
@@ -9,6 +10,7 @@ namespace Minesweeper.GameServices.Extensions
     {
         public static IServiceCollection AddGameServices(this IServiceCollection services)
         {
+            // TODO: Review lifetime for each item
             return services
                 .AddScoped<IGuidProvider, GuidProvider>()
                 .AddScoped<IRandomNumberProvider, RandomNumberProvider>()
@@ -17,7 +19,8 @@ namespace Minesweeper.GameServices.Extensions
                 .AddScoped<IGameService, GameService>()
                 .AddScoped<ILobbyService, LobbyService>()
                 .AddScoped<IRandomPlayerSelector, RandomPlayerSelector>()
-                .AddScoped<IGameGenerator, GameGenerator>();
+                .AddScoped<IGameGenerator, GameGenerator>()
+                .AddScoped<IMakeMoveCommandHandler, MakeMoveCommandHandler>();
         }
     }
 }

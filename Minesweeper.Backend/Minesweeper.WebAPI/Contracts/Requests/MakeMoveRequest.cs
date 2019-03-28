@@ -1,9 +1,18 @@
-﻿namespace Minesweeper.WebAPI.Contracts.Requests
+﻿using Newtonsoft.Json;
+
+namespace Minesweeper.WebAPI.Contracts.Requests
 {
     public class MakeMoveRequest
     {
-        public int Row { get; set; }
+        [JsonConstructor]
+        public MakeMoveRequest(int row, int column)
+        {
+            Row = row;
+            Column = column;
+        }
 
-        public int Column { get; set; }
+        public int Row { get; }
+
+        public int Column { get; }
     }
 }

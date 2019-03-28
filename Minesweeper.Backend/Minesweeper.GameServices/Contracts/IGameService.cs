@@ -9,8 +9,6 @@ namespace Minesweeper.GameServices.Contracts
 
         Task JoinGameAsync(string gameId, string player2Id, string player2DisplayName, CancellationToken cancellationToken);
 
-        Task<MoveResult> MakeMoveAsync(string gameId, string playerId, int row, int column, CancellationToken cancellationToken);
-
         Task MarkFieldAsync(string gameId, string playerId, int row, int column, MarkTypes markType, CancellationToken cancellationToken);
 
         Task<MarkTypes[][]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken);
