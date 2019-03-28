@@ -1,21 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.GameModel;
-using Minesweeper.GameServices.Providers;
 
 namespace Minesweeper.GameServices
 {
     public class GameDriver : IGameDriver
     {
         private const int PointsForMineFound = 10;
-
-        private readonly IDateTimeProvider _dateTimeProvider;
-
-        public GameDriver(IDateTimeProvider dateTimeProvider)
-        {
-            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-        }
 
         public MoveResultType MakeMove(Game game, string playerId, int row, int column)
         {
@@ -72,12 +63,10 @@ namespace Minesweeper.GameServices
 
         private void PerformMove(Game game, Players player, int row, int column)
         {
-            var utcNow = _dateTimeProvider.GetUtcDateTime();
-
             if (game.BaseTable[row][column] == FieldTypes.Mined)
             {
                 AddPoints(game, player, PointsForMineFound);
-                RecordMove(game, player, row, column, utcNow);
+                RecordMove(game, player, row, column);
 
                 return;
             }
@@ -85,17 +74,17 @@ namespace Minesweeper.GameServices
             var neighboringMineCount = GetMinesAroundField(game, row, column);
             if (neighboringMineCount == 0)
             {
-                DoRecursiveMove(game, player, row, column, utcNow);
+                DoRecursiveMove(game, player, row, column);
             }
             else
             {
-                RecordMove(game, player, row, column, utcNow);
+                RecordMove(game, player, row, column);
             }
 
             game.NextPlayer = player == Players.Player1 ? Players.Player2 : Players.Player1;
         }
 
-        private void DoRecursiveMove(Game game, Players player, int row, int column, DateTime utcDateTimeRecorded)
+        private void DoRecursiveMove(Game game, Players player, int row, int column)
         {
             var rowOverflown = row < 0 || row >= game.Rows;
             var colOverflown = column < 0 || column >= game.Columns;
@@ -113,7 +102,7 @@ namespace Minesweeper.GameServices
                 return;
             }
 
-            RecordMove(game, player, row, column, utcDateTimeRecorded);
+            RecordMove(game, player, row, column);
 
             for (var rowOffset = -1; rowOffset <= 1; ++rowOffset)
             {
@@ -131,13 +120,13 @@ namespace Minesweeper.GameServices
                     var hasZeroMinesAround = GetMinesAroundField(game, row, column) == 0;
                     if (hasZeroMinesAround)
                     {
-                        DoRecursiveMove(game, player, recursionRow, recursionCol, utcDateTimeRecorded);
+                        DoRecursiveMove(game, player, recursionRow, recursionCol);
                     }
                 }
             }
         }
 
-        private void RecordMove(Game game, Players player, int row, int col, DateTime utcDateTimeRecorded)
+        private void RecordMove(Game game, Players player, int row, int col)
         {
             if (game.BaseTable[row][col] == FieldTypes.Mined)
             {
