@@ -1,13 +1,24 @@
-﻿namespace Minesweeper.WebAPI.Contracts.Requests
+﻿using Newtonsoft.Json;
+
+namespace Minesweeper.WebAPI.Contracts.Requests
 {
     public class NewGameRequest
     {
-        public int TableRows { get; set; }
+        [JsonConstructor]
+        public NewGameRequest(int tableRows, int tableColumns, int mineCount, string invitedPlayerId)
+        {
+            TableRows = tableRows;
+            TableColumns = tableColumns;
+            MineCount = mineCount;
+            InvitedPlayerId = invitedPlayerId;
+        }
 
-        public int TableColumns { get; set; }
+        public int TableRows { get; }
 
-        public int MineCount { get; set; }
+        public int TableColumns { get; }
 
-        public string InvitedPlayerId { get; set; }
+        public int MineCount { get; }
+
+        public string InvitedPlayerId { get; }
     }
 }

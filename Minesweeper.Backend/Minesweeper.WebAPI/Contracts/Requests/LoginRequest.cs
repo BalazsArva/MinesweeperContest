@@ -1,9 +1,18 @@
-﻿namespace Minesweeper.WebAPI.Contracts.Requests
+﻿using Newtonsoft.Json;
+
+namespace Minesweeper.WebAPI.Contracts.Requests
 {
     public class LoginRequest
     {
-        public string Email { get; set; }
+        [JsonConstructor]
+        public LoginRequest(string email, string password)
+        {
+            Email = email;
+            Password = password;
+        }
 
-        public string Password { get; set; }
+        public string Email { get; }
+
+        public string Password { get; }
     }
 }
