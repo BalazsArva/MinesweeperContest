@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.WebAPI.Contracts.Requests;
+using Minesweeper.WebAPI.Contracts.Responses;
 using Minesweeper.WebAPI.Extensions;
 using Minesweeper.WebAPI.Mappers;
 
@@ -54,7 +55,7 @@ namespace Minesweeper.WebAPI.Controllers
 
             var playerMarks = await _gameService.GetPlayerMarksAsync(gameId, userId, cancellationToken).ConfigureAwait(false);
 
-            return Ok(new GetPlayerMarksResponse { Marks = playerMarks });
+            return Ok(new GetPlayerMarksResponse(playerMarks));
         }
 
         [HttpPost]
