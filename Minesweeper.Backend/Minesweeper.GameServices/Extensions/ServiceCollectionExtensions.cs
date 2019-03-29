@@ -20,7 +20,8 @@ namespace Minesweeper.GameServices.Extensions
                 .AddScoped<ILobbyService, LobbyService>()
                 .AddScoped<IRandomPlayerSelector, RandomPlayerSelector>()
                 .AddScoped<IGameGenerator, GameGenerator>()
-                .AddScoped<IMakeMoveCommandHandler, MakeMoveCommandHandler>();
+                .AddScoped<IMakeMoveCommandHandler, MakeMoveCommandHandler>()
+                .AddScoped<INewGameCommandHandler, NewGameCommandHandler>();
         }
     }
 }

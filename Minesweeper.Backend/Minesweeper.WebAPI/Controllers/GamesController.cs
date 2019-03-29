@@ -17,11 +17,13 @@ namespace Minesweeper.WebAPI.Controllers
     {
         private readonly IGameService _gameService;
         private readonly IMakeMoveCommandHandler _makeMoveCommandHandler;
+        private readonly INewGameCommandHandler _newGameCommandHandler;
 
-        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler)
+        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler, INewGameCommandHandler newGameCommandHandler)
         {
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
-            this._makeMoveCommandHandler = makeMoveCommandHandler ?? throw new ArgumentNullException(nameof(makeMoveCommandHandler));
+            _makeMoveCommandHandler = makeMoveCommandHandler ?? throw new ArgumentNullException(nameof(makeMoveCommandHandler));
+            _newGameCommandHandler = newGameCommandHandler ?? throw new ArgumentNullException(nameof(newGameCommandHandler));
         }
 
         [HttpGet]
@@ -92,19 +94,13 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> CreateGame([FromBody] NewGameRequest request, CancellationToken cancellationToken)
         {
-            // TODO: Retrieve the real display name
             var userId = User.GetUserId();
-            var displayName = userId;
+            var command = NewGameMapper.ToCommand(userId, request);
 
-            var result = await _gameService.StartNewGameAsync(userId, displayName, request.InvitedPlayerId, request.TableRows, request.TableColumns, request.MineCount, cancellationToken).ConfigureAwait(false);
-
-            var routeValues = new
-            {
-                gameId = result
-            };
+            var gameId = await _newGameCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
             // TODO: Provide proper route once it is finalized
-            return CreatedAtRoute(RouteNames.Game, routeValues, null);
+            return CreatedAtRoute(RouteNames.Game, new { gameId }, null);
         }
 
         [HttpPost]

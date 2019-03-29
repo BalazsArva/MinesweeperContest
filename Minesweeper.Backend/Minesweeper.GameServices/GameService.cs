@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Minesweeper.DataAccess.RavenDb.Extensions;
 using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Converters;
@@ -32,25 +31,6 @@ namespace Minesweeper.GameServices
             _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
-        }
-
-        public async Task<string> StartNewGameAsync(string hostPlayerId, string hostPlayerDisplayName, string invitedPlayerId, int tableRows, int tableColumns, int mineCount, CancellationToken cancellationToken)
-        {
-            using (var session = _documentStore.OpenAsyncSession())
-            {
-                var game = _gameGenerator.GenerateGame(tableRows, tableColumns, mineCount);
-
-                // TODO: Validate that the invited player's Id is not the same as the host's Id.
-                game.Id = _documentStore.GetPrefixedDocumentId<Game>(_guidProvider.GenerateGuidString());
-                game.InvitedPlayerId = string.IsNullOrWhiteSpace(invitedPlayerId) ? null : invitedPlayerId;
-                game.Player1.PlayerId = hostPlayerId;
-                game.Player1.DisplayName = hostPlayerDisplayName;
-
-                await session.StoreAsync(game, cancellationToken).ConfigureAwait(false);
-                await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-                return game.Id;
-            }
         }
 
         public async Task JoinGameAsync(string gameId, string player2Id, string player2DisplayName, CancellationToken cancellationToken)
