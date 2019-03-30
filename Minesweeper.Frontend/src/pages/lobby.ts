@@ -20,7 +20,7 @@ export class Lobby {
     constructor(private lobbyService: LobbyService, private gameService: GameService, private router: Router) {
     }
 
-    async activate() {
+    async attached() {
         await this.refreshGames();
     }
 
