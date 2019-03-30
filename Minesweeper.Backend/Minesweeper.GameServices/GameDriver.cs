@@ -42,7 +42,7 @@ namespace Minesweeper.GameServices
 
         private bool CheckPlayerCanMove(Game game, Players player)
         {
-            if (game.Status == GameStatus.Finished)
+            if (game.Status == GameStatus.Finished || game.Status == GameStatus.NotStarted)
             {
                 return false;
             }
