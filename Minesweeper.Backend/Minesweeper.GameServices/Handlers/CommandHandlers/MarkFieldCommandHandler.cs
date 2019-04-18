@@ -37,15 +37,19 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
                 var isPlayer1 = game.Player1.PlayerId == command.PlayerId;
                 var newMark = MarkTypeConverter.FromContract(command.MarkType);
+                var row = command.Row;
+                var col = command.Column;
 
                 // TODO: Index overflow and underflow check here and everywhere else
+                // The 'row' and 'col' variables must exist as they are. For some reason, if command.Row / command.Column
+                // is used in the Patch expression's indexer (i.e. g.Player1Marks[command.Row][command.Column]) it fails to translate.
                 if (isPlayer1)
                 {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player1Marks[command.Row][command.Column], newMark);
+                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player1Marks[row][col], newMark);
                 }
                 else
                 {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player2Marks[command.Row][command.Column], newMark);
+                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player2Marks[row][col], newMark);
                 }
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
