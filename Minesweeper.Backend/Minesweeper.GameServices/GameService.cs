@@ -7,7 +7,6 @@ using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
-using Minesweeper.GameServices.GameModel;
 using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Providers;
 using Raven.Client.Documents;
@@ -56,35 +55,6 @@ namespace Minesweeper.GameServices
 
                 // TODO: Investigate what exception is thrown when a concurrent update occurs (because of the changevector) and rethrow an appropriate custom exception
                 await session.StoreAsync(game, changeVector, game.Id, cancellationToken).ConfigureAwait(false);
-                await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
-        }
-
-        public async Task MarkFieldAsync(string gameId, string playerId, int row, int column, Contracts.MarkTypes markType, CancellationToken cancellationToken)
-        {
-            using (var session = _documentStore.OpenAsyncSession())
-            {
-                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
-
-                if (game.Player1.PlayerId != playerId && game.Player2.PlayerId != playerId)
-                {
-                    throw new ActionNotAllowedException("You are not involved in that game.");
-                }
-
-                // TODO: Index overflow and underflow check here and everywhere else
-                var isPlayer1 = game.Player1.PlayerId == playerId;
-
-                var newMark = MarkTypeConverter.FromContract(markType);
-
-                if (isPlayer1)
-                {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player1Marks[row][column], newMark);
-                }
-                else
-                {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player2Marks[row][column], newMark);
-                }
-
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }

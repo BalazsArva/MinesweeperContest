@@ -17,12 +17,14 @@ namespace Minesweeper.WebAPI.Controllers
     {
         private readonly IGameService _gameService;
         private readonly IMakeMoveCommandHandler _makeMoveCommandHandler;
+        private readonly IMarkFieldCommandHandler _markFieldCommandHandler;
         private readonly INewGameCommandHandler _newGameCommandHandler;
 
-        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler, INewGameCommandHandler newGameCommandHandler)
+        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler, IMarkFieldCommandHandler markFieldCommandHandler, INewGameCommandHandler newGameCommandHandler)
         {
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
             _makeMoveCommandHandler = makeMoveCommandHandler ?? throw new ArgumentNullException(nameof(makeMoveCommandHandler));
+            _markFieldCommandHandler = markFieldCommandHandler ?? throw new ArgumentNullException(nameof(markFieldCommandHandler));
             _newGameCommandHandler = newGameCommandHandler ?? throw new ArgumentNullException(nameof(newGameCommandHandler));
         }
 
@@ -80,10 +82,9 @@ namespace Minesweeper.WebAPI.Controllers
         public async Task<IActionResult> MarkField(string gameId, [FromBody]MarkFieldRequest request, CancellationToken cancellationToken)
         {
             var userId = User.GetUserId();
+            var command = MarkFieldMapper.ToCommand(gameId, userId, request);
 
-            // TODO: This is only temp
-            // TODO: Expose a separate enum type for mark type
-            await _gameService.MarkFieldAsync(gameId, userId, request.Row, request.Column, request.MarkType, cancellationToken).ConfigureAwait(false);
+            await _markFieldCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
             // TODO: Error handling
             return Ok();
