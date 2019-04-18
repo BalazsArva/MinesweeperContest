@@ -52,6 +52,7 @@ namespace Minesweeper.GameServices
                 game.UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime();
                 game.Player2.PlayerId = player2Id;
                 game.Player2.DisplayName = player2DisplayName;
+                game.Status = GameModel.GameStatus.InProgress;
 
                 // TODO: Investigate what exception is thrown when a concurrent update occurs (because of the changevector) and rethrow an appropriate custom exception
                 await session.StoreAsync(game, changeVector, game.Id, cancellationToken).ConfigureAwait(false);
