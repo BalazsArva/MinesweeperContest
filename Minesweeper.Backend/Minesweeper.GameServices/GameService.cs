@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
-using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Providers;
 using Raven.Client.Documents;
 
@@ -15,21 +13,13 @@ namespace Minesweeper.GameServices
 {
     public class GameService : IGameService
     {
-        private readonly IMediator _mediator;
         private readonly IDocumentStore _documentStore;
-        private readonly IGameGenerator _gameGenerator;
-        private readonly IGameDriver _gameDriver;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly IGuidProvider _guidProvider;
 
-        public GameService(IMediator mediator, IDocumentStore documentStore, IGameGenerator gameGenerator, IGameDriver gameDriver, IDateTimeProvider dateTimeProvider, IGuidProvider guidProvider)
+        public GameService(IDocumentStore documentStore, IDateTimeProvider dateTimeProvider)
         {
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
-            _gameGenerator = gameGenerator ?? throw new ArgumentNullException(nameof(gameGenerator));
-            _gameDriver = gameDriver ?? throw new ArgumentNullException(nameof(gameDriver));
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
         }
 
         public async Task JoinGameAsync(string gameId, string player2Id, string player2DisplayName, CancellationToken cancellationToken)
