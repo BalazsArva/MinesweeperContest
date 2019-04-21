@@ -11,6 +11,8 @@ using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
 using Raven.Client.Documents;
+using Minesweeper.GameServices.Cloners;
+using Minesweeper.GameServices.Converters;
 
 namespace Minesweeper.GameServices.Handlers.CommandHandlers
 {

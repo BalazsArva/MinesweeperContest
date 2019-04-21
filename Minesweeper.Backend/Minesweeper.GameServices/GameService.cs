@@ -6,7 +6,6 @@ using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
-using Minesweeper.GameServices.Providers;
 using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices
@@ -14,40 +13,10 @@ namespace Minesweeper.GameServices
     public class GameService : IGameService
     {
         private readonly IDocumentStore _documentStore;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public GameService(IDocumentStore documentStore, IDateTimeProvider dateTimeProvider)
+        public GameService(IDocumentStore documentStore)
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
-            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-        }
-
-        public async Task JoinGameAsync(string gameId, string player2Id, string player2DisplayName, CancellationToken cancellationToken)
-        {
-            using (var session = _documentStore.OpenAsyncSession())
-            {
-                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
-                var changeVector = session.Advanced.GetChangeVectorFor(game);
-
-                if (game == null)
-                {
-                    throw new GameNotFoundException();
-                }
-
-                if ((game.InvitedPlayerId != null && game.InvitedPlayerId != player2Id) || game.Player2.PlayerId != null || game.Player1.PlayerId == player2Id)
-                {
-                    throw new ActionNotAllowedException("You are not allowed to join the requested game.");
-                }
-
-                game.UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime();
-                game.Player2.PlayerId = player2Id;
-                game.Player2.DisplayName = player2DisplayName;
-                game.Status = GameModel.GameStatus.InProgress;
-
-                // TODO: Investigate what exception is thrown when a concurrent update occurs (because of the changevector) and rethrow an appropriate custom exception
-                await session.StoreAsync(game, changeVector, game.Id, cancellationToken).ConfigureAwait(false);
-                await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
         }
 
         public async Task<Contracts.MarkTypes[][]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)

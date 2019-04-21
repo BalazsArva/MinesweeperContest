@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.WebAPI.Contracts.Requests;
 using Minesweeper.WebAPI.Contracts.Responses;
 using Minesweeper.WebAPI.Extensions;
@@ -17,13 +18,15 @@ namespace Minesweeper.WebAPI.Controllers
     {
         private readonly IGameService _gameService;
         private readonly IMakeMoveCommandHandler _makeMoveCommandHandler;
+        private readonly IJoinGameCommandHandler _joinGameCommandHandler;
         private readonly IMarkFieldCommandHandler _markFieldCommandHandler;
         private readonly INewGameCommandHandler _newGameCommandHandler;
 
-        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler, IMarkFieldCommandHandler markFieldCommandHandler, INewGameCommandHandler newGameCommandHandler)
+        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler, IJoinGameCommandHandler joinGameCommandHandler, IMarkFieldCommandHandler markFieldCommandHandler, INewGameCommandHandler newGameCommandHandler)
         {
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
             _makeMoveCommandHandler = makeMoveCommandHandler ?? throw new ArgumentNullException(nameof(makeMoveCommandHandler));
+            _joinGameCommandHandler = joinGameCommandHandler ?? throw new ArgumentNullException(nameof(joinGameCommandHandler));
             _markFieldCommandHandler = markFieldCommandHandler ?? throw new ArgumentNullException(nameof(markFieldCommandHandler));
             _newGameCommandHandler = newGameCommandHandler ?? throw new ArgumentNullException(nameof(newGameCommandHandler));
         }
@@ -113,7 +116,9 @@ namespace Minesweeper.WebAPI.Controllers
             var userId = User.GetUserId();
             var displayName = userId;
 
-            await _gameService.JoinGameAsync(gameId, userId, displayName, cancellationToken).ConfigureAwait(false);
+            var command = new JoinGameCommand(gameId, userId, displayName);
+
+            await _joinGameCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
             var routeValues = new { gameId };
 

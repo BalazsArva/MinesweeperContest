@@ -22,7 +22,8 @@ namespace Minesweeper.GameServices.Extensions
                 .AddScoped<IGameGenerator, GameGenerator>()
                 .AddScoped<IMakeMoveCommandHandler, MakeMoveCommandHandler>()
                 .AddScoped<INewGameCommandHandler, NewGameCommandHandler>()
-                .AddScoped<IMarkFieldCommandHandler, MarkFieldCommandHandler>();
+                .AddScoped<IMarkFieldCommandHandler, MarkFieldCommandHandler>()
+                .AddScoped<IJoinGameCommandHandler, JoinGameCommandHandler>();
         }
     }
 }
