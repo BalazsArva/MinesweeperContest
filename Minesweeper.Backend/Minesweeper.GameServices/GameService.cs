@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Contracts.Responses;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
@@ -19,7 +20,7 @@ namespace Minesweeper.GameServices
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        public async Task<Contracts.MarkTypes[][]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)
+        public async Task<MarkTypes[][]> GetPlayerMarksAsync(string gameId, string playerId, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
@@ -39,7 +40,7 @@ namespace Minesweeper.GameServices
             }
         }
 
-        public async Task<Contracts.VisibleFieldType[][]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
+        public async Task<VisibleFieldType[][]> GetVisibleGameTableAsync(string gameId, CancellationToken cancellationToken)
         {
             using (var session = _documentStore.OpenAsyncSession())
             {

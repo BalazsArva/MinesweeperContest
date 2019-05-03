@@ -1,4 +1,4 @@
-﻿using Minesweeper.GameServices.Contracts;
+﻿using Minesweeper.GameServices.Contracts.Responses;
 
 namespace Minesweeper.WebAPI.Contracts.Responses
 {

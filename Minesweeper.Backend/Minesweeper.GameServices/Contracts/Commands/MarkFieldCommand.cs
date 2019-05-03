@@ -1,4 +1,6 @@
-﻿namespace Minesweeper.GameServices.Contracts.Commands
+﻿using Minesweeper.GameServices.Contracts.Responses;
+
+namespace Minesweeper.GameServices.Contracts.Commands
 {
     public class MarkFieldCommand
     {

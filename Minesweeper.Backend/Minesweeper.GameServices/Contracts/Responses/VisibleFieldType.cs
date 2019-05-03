@@ -1,4 +1,4 @@
-﻿namespace Minesweeper.GameServices.Contracts
+﻿namespace Minesweeper.GameServices.Contracts.Responses
 {
     public enum VisibleFieldType
     {

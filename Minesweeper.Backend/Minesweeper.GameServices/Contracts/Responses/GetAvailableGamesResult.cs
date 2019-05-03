@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Minesweeper.GameServices.Contracts
+namespace Minesweeper.GameServices.Contracts.Responses
 {
     public class GetAvailableGamesResult
     {

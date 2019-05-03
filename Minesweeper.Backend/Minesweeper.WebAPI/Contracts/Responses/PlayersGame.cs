@@ -2,7 +2,7 @@
 {
     public class PlayersGame
     {
-        public PlayersGame(GameServices.Contracts.PlayersGame serviceContract)
+        public PlayersGame(GameServices.Contracts.Responses.PlayersGame serviceContract)
         {
             OtherPlayerId = serviceContract.OtherPlayerId;
             OtherPlayerDisplayName = serviceContract.OtherPlayerDisplayName;

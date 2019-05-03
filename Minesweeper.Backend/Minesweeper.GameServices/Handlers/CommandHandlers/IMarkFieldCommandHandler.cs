@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Minesweeper.GameServices.Contracts.Commands;
 
-namespace Minesweeper.GameServices.Contracts
+namespace Minesweeper.GameServices.Handlers.CommandHandlers
 {
     public interface IMarkFieldCommandHandler
     {

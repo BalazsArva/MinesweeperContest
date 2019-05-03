@@ -2,7 +2,7 @@
 {
     public class AvailableGame
     {
-        public AvailableGame(GameServices.Contracts.AvailableGame serviceContract)
+        public AvailableGame(GameServices.Contracts.Responses.AvailableGame serviceContract)
         {
             HostPlayerId = serviceContract.HostPlayerId;
             HostPlayerDisplayName = serviceContract.HostPlayerDisplayName;

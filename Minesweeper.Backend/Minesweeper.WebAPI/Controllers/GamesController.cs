@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Contracts.Commands;
+using Minesweeper.GameServices.Handlers.CommandHandlers;
 using Minesweeper.WebAPI.Contracts.Requests;
 using Minesweeper.WebAPI.Contracts.Responses;
 using Minesweeper.WebAPI.Extensions;

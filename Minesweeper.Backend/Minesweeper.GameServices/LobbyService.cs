@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Minesweeper.DataAccess.RavenDb.Extensions;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Contracts.Responses;
 using Minesweeper.GameServices.GameModel;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;

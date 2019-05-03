@@ -1,4 +1,4 @@
-﻿using Minesweeper.GameServices.Contracts;
+﻿using Minesweeper.GameServices.Contracts.Responses;
 using Newtonsoft.Json;
 
 namespace Minesweeper.WebAPI.Contracts.Requests

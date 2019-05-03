@@ -1,4 +1,6 @@
-﻿namespace Minesweeper.GameServices.Contracts.Notifications
+﻿using Minesweeper.GameServices.Contracts.Responses;
+
+namespace Minesweeper.GameServices.Contracts.Notifications
 {
     public class FieldUpdate
     {

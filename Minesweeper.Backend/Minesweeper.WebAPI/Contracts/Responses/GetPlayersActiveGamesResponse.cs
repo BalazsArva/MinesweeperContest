@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Contracts.Responses;
 
 namespace Minesweeper.WebAPI.Contracts.Responses
 {
@@ -14,7 +14,7 @@ namespace Minesweeper.WebAPI.Contracts.Responses
                 throw new ArgumentNullException(nameof(queryResult));
             }
 
-            PlayersGames = queryResult.PlayersGames.Select(ag => new PlayersGame(ag)).ToList();
+            PlayersGames = queryResult.PlayersGames.Select(x => new PlayersGame(x)).ToList();
             Total = queryResult.Total;
         }
 

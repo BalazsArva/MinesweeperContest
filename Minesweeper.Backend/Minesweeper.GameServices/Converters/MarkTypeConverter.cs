@@ -1,38 +1,39 @@
 ﻿using System;
+using Minesweeper.GameServices.Contracts.Responses;
 
 namespace Minesweeper.GameServices.Converters
 {
     public static class MarkTypeConverter
     {
-        public static Contracts.MarkTypes ToContract(GameModel.MarkTypes markType)
+        public static MarkTypes ToContract(GameModel.MarkTypes markType)
         {
             switch (markType)
             {
                 case GameModel.MarkTypes.Empty:
-                    return Contracts.MarkTypes.Empty;
+                    return MarkTypes.Empty;
 
                 case GameModel.MarkTypes.None:
-                    return Contracts.MarkTypes.None;
+                    return MarkTypes.None;
 
                 case GameModel.MarkTypes.Unknown:
-                    return Contracts.MarkTypes.Unknown;
+                    return MarkTypes.Unknown;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(markType), $"The value {(int)markType} is not valid for this parameter.");
             }
         }
 
-        public static GameModel.MarkTypes FromContract(Contracts.MarkTypes markType)
+        public static GameModel.MarkTypes FromContract(MarkTypes markType)
         {
             switch (markType)
             {
-                case Contracts.MarkTypes.Empty:
+                case MarkTypes.Empty:
                     return GameModel.MarkTypes.Empty;
 
-                case Contracts.MarkTypes.None:
+                case MarkTypes.None:
                     return GameModel.MarkTypes.None;
 
-                case Contracts.MarkTypes.Unknown:
+                case MarkTypes.Unknown:
                     return GameModel.MarkTypes.Unknown;
 
                 default:

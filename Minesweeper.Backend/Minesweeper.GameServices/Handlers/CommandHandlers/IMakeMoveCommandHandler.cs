@@ -1,8 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Minesweeper.GameServices.Contracts.Commands;
+using Minesweeper.GameServices.Contracts.Responses;
 
-namespace Minesweeper.GameServices.Contracts
+namespace Minesweeper.GameServices.Handlers.CommandHandlers
 {
     public interface IMakeMoveCommandHandler
     {
