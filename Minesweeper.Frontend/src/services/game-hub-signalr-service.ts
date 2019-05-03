@@ -37,6 +37,10 @@ export class GameHubSignalRService {
         connection.on("RemainingMinesChanged", notification => {
             this.eventAggregator.publish(`games:${gameId}:remainingMinesChanged`, notification);
         });
+
+        connection.on("GameOver", notification => {
+            this.eventAggregator.publish(`games:${gameId}:gameOver`, notification);
+        });
     }
 }
 
@@ -52,4 +56,8 @@ export interface FieldUpdate {
 
 export interface RemainingMinesChangedNotification {
     remainingMineCount: number;
+}
+
+export interface GameOverNotification {
+    winnerPlayerId: string;
 }

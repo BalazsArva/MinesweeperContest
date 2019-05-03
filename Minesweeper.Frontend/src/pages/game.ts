@@ -3,7 +3,12 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 
 import { GameService, MarkTypes } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
-import { GameHubSignalRService, GameTableUpdatedNotification, RemainingMinesChangedNotification } from "services/game-hub-signalr-service";
+import {
+    GameHubSignalRService,
+    GameTableUpdatedNotification,
+    RemainingMinesChangedNotification,
+    GameOverNotification
+} from "services/game-hub-signalr-service";
 
 interface Field {
     fieldType: FieldTypes;
@@ -45,6 +50,11 @@ export class Game {
 
         this.eventAggregator.subscribe(`games:${gameId}:remainingMinesChanged`, (notification: RemainingMinesChangedNotification) => {
             this.remainingMines = notification.remainingMineCount;
+        });
+
+        this.eventAggregator.subscribe(`games:${gameId}:gameOver`, (notification: GameOverNotification) => {
+            // TODO: Create better notification UX
+            alert("Game over. Winner: " + notification.winnerPlayerId);
         });
     }
 

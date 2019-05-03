@@ -8,5 +8,7 @@ namespace Minesweeper.WebAPI.Hubs.ClientContracts
         Task GameTableUpdated(GameTableUpdatedSignalRNotification notification);
 
         Task RemainingMinesChanged(RemainingMinesChangedSignalRNotification notification);
+
+        Task GameOver(GameOverSignalRNotification notification);
     }
 }

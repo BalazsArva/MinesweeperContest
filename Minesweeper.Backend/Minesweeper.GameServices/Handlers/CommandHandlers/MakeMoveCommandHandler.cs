@@ -7,12 +7,11 @@ using MediatR;
 using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Contracts.Commands;
+using Minesweeper.GameServices.Contracts.Notifications;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
 using Raven.Client.Documents;
-using Minesweeper.GameServices.Cloners;
-using Minesweeper.GameServices.Converters;
 
 namespace Minesweeper.GameServices.Handlers.CommandHandlers
 {
@@ -39,7 +38,8 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             using (var session = _documentStore.OpenAsyncSession())
             {
                 // TODO: Concurrency protection
-                var game = await session.LoadGameAsync(command.GameId, cancellationToken).ConfigureAwait(false);
+                var gameId = command.GameId;
+                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
 
                 var currentPlayerId = GetPlayerIdByPlayerOrder(game, game.NextPlayer);
                 var currentVisibleTable = EnumArrayCloner.Clone(game.VisibleTable);
@@ -54,9 +54,10 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                     var mineCountAfterMove = GetRemainingMineCount(game);
                     var nextPlayerId = GetPlayerIdByPlayerOrder(game, game.NextPlayer);
 
-                    await PublishTableUpdatedAsync(command.GameId, currentVisibleTable, game.VisibleTable, cancellationToken);
-                    await PublishPlayersTurnIfChangedAsync(command.GameId, currentPlayerId, nextPlayerId, cancellationToken).ConfigureAwait(false);
-                    await PublishRemainingMinesIfChangedAsync(command.GameId, mineCountBeforeMove, mineCountAfterMove, cancellationToken).ConfigureAwait(false);
+                    await PublishTableUpdatedAsync(gameId, currentVisibleTable, game.VisibleTable, cancellationToken);
+                    await PublishPlayersTurnIfChangedAsync(gameId, currentPlayerId, nextPlayerId, cancellationToken).ConfigureAwait(false);
+                    await PublishRemainingMinesIfChangedAsync(gameId, mineCountBeforeMove, mineCountAfterMove, cancellationToken).ConfigureAwait(false);
+                    await PublishWinnerIfGameIsOverAsync(gameId, game.Winner, game.Player1.PlayerId, game.Player2.PlayerId, cancellationToken).ConfigureAwait(false);
                 }
 
                 return new MoveResult { MoveResultType = movementResult };
@@ -96,6 +97,17 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             if (mineCountBeforeMove != mineCountAfterMove)
             {
                 await _mediator.Publish(new RemainingMinesChangedNotification(gameId, mineCountAfterMove)).ConfigureAwait(false);
+            }
+        }
+
+        private async Task PublishWinnerIfGameIsOverAsync(string gameId, Players? winnerPlayer, string player1Id, string player2Id, CancellationToken cancellationToken)
+        {
+            if (winnerPlayer.HasValue)
+            {
+                var winner = winnerPlayer.Value;
+                var winnerPlayerId = winner == Players.Player1 ? player1Id : player2Id;
+
+                await _mediator.Publish(new GameOverNotification(gameId, winnerPlayerId), cancellationToken).ConfigureAwait(false);
             }
         }
 
