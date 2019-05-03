@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MediatR;
 
-namespace Minesweeper.GameServices.Contracts
+namespace Minesweeper.GameServices.Contracts.Notifications
 {
     public class GameTableUpdatedNotification : INotification
     {
@@ -14,21 +14,5 @@ namespace Minesweeper.GameServices.Contracts
         public string GameId { get; }
 
         public IEnumerable<FieldUpdate> FieldUpdates { get; }
-    }
-
-    public class FieldUpdate
-    {
-        public FieldUpdate(int row, int column, VisibleFieldType fieldType)
-        {
-            Row = row;
-            Column = column;
-            FieldType = fieldType;
-        }
-
-        public int Row { get; }
-
-        public int Column { get; }
-
-        public VisibleFieldType FieldType { get; }
     }
 }

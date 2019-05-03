@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
-using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.Contracts.Notifications;
 using Minesweeper.WebAPI.Contracts.SignalRNotifications;
 using Minesweeper.WebAPI.Hubs;
 using Minesweeper.WebAPI.Hubs.ClientContracts;

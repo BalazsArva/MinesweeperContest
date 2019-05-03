@@ -4,7 +4,7 @@ namespace Minesweeper.WebAPI.Contracts.SignalRNotifications
 {
     public class FieldUpdate
     {
-        public FieldUpdate(GameServices.Contracts.FieldUpdate serviceContract)
+        public FieldUpdate(GameServices.Contracts.Notifications.FieldUpdate serviceContract)
         {
             Row = serviceContract.Row;
             Column = serviceContract.Column;

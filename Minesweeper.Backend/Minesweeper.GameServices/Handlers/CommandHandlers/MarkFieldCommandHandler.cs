@@ -7,8 +7,6 @@ using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
-using Minesweeper.GameServices.Generators;
-using Minesweeper.GameServices.Providers;
 using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices.Handlers.CommandHandlers
@@ -16,8 +14,6 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
     public class MarkFieldCommandHandler : IMarkFieldCommandHandler
     {
         private readonly IDocumentStore _documentStore;
-        private readonly IGameGenerator _gameGenerator;
-        private readonly IGuidProvider _guidProvider;
 
         public MarkFieldCommandHandler(IDocumentStore documentStore)
         {

@@ -1,4 +1,4 @@
-﻿using Minesweeper.GameServices.Contracts;
+﻿using Minesweeper.GameServices.Contracts.Notifications;
 
 namespace Minesweeper.WebAPI.Contracts.SignalRNotifications
 {

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Minesweeper.GameServices.Contracts
+namespace Minesweeper.GameServices.Contracts.Notifications
 {
     public class PlayersTurnNotification : INotification
     {
