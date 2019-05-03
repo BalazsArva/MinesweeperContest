@@ -21,6 +21,14 @@
     <hr />
 
     <!-- Available games -->
+    <div class="row">
+        <div class="col">
+            <h1 class="h5 py-3">
+                Available games
+            </h1>
+        </div>
+    </div>
+
     <template if.bind="availableGamesLoading">
         <p class="text-center" aria-hidden="true">
             <i class="fas fa-spinner fa-pulse"></i>
@@ -31,72 +39,74 @@
     </template>
 
     <template if.bind="!availableGamesLoading">
-        <div class="row">
-            <div class="col">
-                <h1 class="h5 py-3">
-                    Available games
-                </h1>
+
+        <template if.bind="!availableGames || !availableGames.length">
+            <div class="text-center m-2">
+                There are no available games right now. Go ahead and <a route-href="route.bind: 'newgame'">host
+                    one</a>.
             </div>
-        </div>
+        </template>
 
-        <template repeat.for="availableGame of availableGames">
+        <template if.bind="availableGames && availableGames.length">
+            <template repeat.for="availableGame of availableGames">
+                <div class="row py-1 align-items-center"
+                    style="background-color: #f8f8f8;border-top: 1px solid #eaeaea;">
+                    <div class="col-sm-6">
+                        <div class="media">
+                            <img class="mr-3 mt-1" src="http://placehold.it/32x32"
+                                alt="Avatar of ${ availableGame.hostPlayerDisplayName }" />
+                            <div class="media-body">
 
-            <div class="row py-1 align-items-center" style="background-color: #f8f8f8;border-top: 1px solid #eaeaea;">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <img class="mr-3 mt-1" src="http://placehold.it/32x32"
-                            alt="Avatar of ${ availableGame.hostPlayerDisplayName }" />
-                        <div class="media-body">
+                                <template if.one-time="availableGame.hostPlayerDisplayName">
+                                    <small class="text-muted">Playing against</small>
+                                    <p class="h6 m-0">
+                                        ${ availableGame.hostPlayerDisplayName }
+                                    </p>
+                                </template>
 
-                            <template if.one-time="availableGame.hostPlayerDisplayName">
-                                <small class="text-muted">Playing against</small>
-                                <p class="h6 m-0">
-                                    ${ availableGame.hostPlayerDisplayName }
-                                </p>
-                            </template>
+                                <template if.one-time="!availableGame.hostPlayerDisplayName">
+                                    <small class="text-muted">
+                                        No opponent yet
+                                    </small>
+                                </template>
 
-                            <template if.one-time="!availableGame.hostPlayerDisplayName">
-                                <small class="text-muted">
-                                    No opponent yet
-                                </small>
-                            </template>
-
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-6 col-sm-2">
-                    <p class="m-0 p-0 text-center text-info">
-                        <b>${ availableGame.rows }&times;${ availableGame.columns }</b>
-                    </p>
-                    <p class="m-0 p-0 text-center">
-                        <small>
-                            grid
-                        </small>
-                    </p>
-                </div>
-                <div class="col-6 col-sm-2">
-                    <p class="m-0 p-0 text-center text-info">
-                        <b>${ availableGame.mines }</b>
-                    </p>
-                    <p class="m-0 p-0 text-center">
-                        <small>
-                            mines
-                        </small>
-                    </p>
-                </div>
-                <div class="col-sm-2 text-right">
-                    <form submit.delegate="joinGame(availableGame.gameId)">
-                        <button type="submit" class="btn btn-info btn-sm">
-                            <i class="fas fa-plus"></i>
-                            <span class="ml-1">
-                                Join
-                            </span>
-                        </button>
-                    </form>
+                    <div class="col-6 col-sm-2">
+                        <p class="m-0 p-0 text-center text-info">
+                            <b>${ availableGame.rows }&times;${ availableGame.columns }</b>
+                        </p>
+                        <p class="m-0 p-0 text-center">
+                            <small>
+                                grid
+                            </small>
+                        </p>
+                    </div>
+                    <div class="col-6 col-sm-2">
+                        <p class="m-0 p-0 text-center text-info">
+                            <b>${ availableGame.mines }</b>
+                        </p>
+                        <p class="m-0 p-0 text-center">
+                            <small>
+                                mines
+                            </small>
+                        </p>
+                    </div>
+                    <div class="col-sm-2 text-right">
+                        <form submit.delegate="joinGame(availableGame.gameId)">
+                            <button type="submit" class="btn btn-info btn-sm">
+                                <i class="fas fa-plus"></i>
+                                <span class="ml-1">
+                                    Join
+                                </span>
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
 
-            </div>
-
+            </template>
         </template>
     </template>
     <!-- End of available games -->
@@ -104,6 +114,14 @@
     <div class="my-5"></div>
 
     <!-- Player's ongoing games -->
+    <div class="row">
+        <div class="col">
+            <h1 class="h5 py-3">
+                Your ongoing games
+            </h1>
+        </div>
+    </div>
+
     <template if.bind="playersGamesLoading">
         <p class="text-center" aria-hidden="true">
             <i class="fas fa-spinner fa-pulse"></i>
@@ -114,71 +132,72 @@
     </template>
 
     <template if.bind="!playersGamesLoading">
-        <div class="row">
-            <div class="col">
-                <h1 class="h5 py-3">
-                    Your ongoing games
-                </h1>
+        <template if.bind="!playersGames || !playersGames.length">
+            <div class="text-center m-2">
+                You don't have any ongoing games right now. Go ahead and <a route-href="route.bind: 'newgame'">host
+                    one</a>.
             </div>
-        </div>
+        </template>
 
-        <template repeat.for="playersGame of playersGames">
+        <template if.bind="playersGames && playersGames.length">
+            <template repeat.for="playersGame of playersGames">
+                <div class="row py-1 align-items-center"
+                    style="background-color: #f8f8f8;border-top: 1px solid #eaeaea;">
+                    <div class="col-sm-6">
+                        <div class="media">
+                            <img class="mr-3 mt-1" src="http://placehold.it/32x32"
+                                alt="Avatar of ${ playersGame.otherPlayerDisplayName }" />
+                            <div class="media-body">
 
-            <div class="row py-1 align-items-center" style="background-color: #f8f8f8;border-top: 1px solid #eaeaea;">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <img class="mr-3 mt-1" src="http://placehold.it/32x32"
-                            alt="Avatar of ${ playersGame.otherPlayerDisplayName }" />
-                        <div class="media-body">
+                                <template if.one-time="playersGame.otherPlayerDisplayName">
+                                    <small class="text-muted">Playing against</small>
+                                    <p class="h6 m-0">
+                                        ${ playersGame.otherPlayerDisplayName }
+                                    </p>
+                                </template>
 
-                            <template if.one-time="playersGame.otherPlayerDisplayName">
-                                <small class="text-muted">Playing against</small>
-                                <p class="h6 m-0">
-                                    ${ playersGame.otherPlayerDisplayName }
-                                </p>
-                            </template>
+                                <template if.one-time="!playersGame.otherPlayerDisplayName">
+                                    <small class="text-muted">
+                                        No opponent yet
+                                    </small>
+                                </template>
 
-                            <template if.one-time="!playersGame.otherPlayerDisplayName">
-                                <small class="text-muted">
-                                    No opponent yet
-                                </small>
-                            </template>
-
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-6 col-sm-2">
-                    <p class="m-0 p-0 text-center text-info">
-                        <b>${ playersGame.rows }&times;${ playersGame.columns }</b>
-                    </p>
-                    <p class="m-0 p-0 text-center">
-                        <small>
-                            grid
-                        </small>
-                    </p>
-                </div>
-                <div class="col-6 col-sm-2">
-                    <p class="m-0 p-0 text-center text-info">
-                        <b>${ playersGame.mines }</b>
-                    </p>
-                    <p class="m-0 p-0 text-center">
-                        <small>
-                            mines
-                        </small>
-                    </p>
-                </div>
-                <div class="col-sm-2 text-right">
-                    <a route-href="route: game; params.bind: { gameId: playersGame.gameId }"
-                        class="btn btn-info btn-sm">
-                        <i class="fas fa-play"></i>
-                        <span class="ml-1">
-                            Play
-                        </span>
-                    </a>
+                    <div class="col-6 col-sm-2">
+                        <p class="m-0 p-0 text-center text-info">
+                            <b>${ playersGame.rows }&times;${ playersGame.columns }</b>
+                        </p>
+                        <p class="m-0 p-0 text-center">
+                            <small>
+                                grid
+                            </small>
+                        </p>
+                    </div>
+                    <div class="col-6 col-sm-2">
+                        <p class="m-0 p-0 text-center text-info">
+                            <b>${ playersGame.mines }</b>
+                        </p>
+                        <p class="m-0 p-0 text-center">
+                            <small>
+                                mines
+                            </small>
+                        </p>
+                    </div>
+                    <div class="col-sm-2 text-right">
+                        <a route-href="route: game; params.bind: { gameId: playersGame.gameId }"
+                            class="btn btn-info btn-sm">
+                            <i class="fas fa-play"></i>
+                            <span class="ml-1">
+                                Play
+                            </span>
+                        </a>
+                    </div>
+
                 </div>
 
-            </div>
-
+            </template>
         </template>
     </template>
     <!-- End of player's ongoing games -->
