@@ -45,6 +45,9 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                 var currentVisibleTable = EnumArrayCloner.Clone(game.VisibleTable);
                 var mineCountBeforeMove = GetRemainingMineCount(game);
 
+                var player1PointsBeforeMove = game.Player1.Points;
+                var player2PointsBeforeMove = game.Player2.Points;
+
                 var movementResult = _gameDriver.MakeMove(game, command.PlayerId, command.Row, command.Column);
 
                 if (movementResult == MoveResultType.Success || movementResult == MoveResultType.GameOver)
@@ -54,10 +57,19 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                     var mineCountAfterMove = GetRemainingMineCount(game);
                     var nextPlayerId = GetPlayerIdByPlayerOrder(game, game.NextPlayer);
 
-                    await PublishTableUpdatedAsync(gameId, currentVisibleTable, game.VisibleTable, cancellationToken);
+                    await PublishTableUpdatedAsync(gameId, currentVisibleTable, game.VisibleTable, cancellationToken).ConfigureAwait(false); ;
                     await PublishPlayersTurnIfChangedAsync(gameId, currentPlayerId, nextPlayerId, cancellationToken).ConfigureAwait(false);
                     await PublishRemainingMinesIfChangedAsync(gameId, mineCountBeforeMove, mineCountAfterMove, cancellationToken).ConfigureAwait(false);
                     await PublishWinnerIfGameIsOverAsync(gameId, game.Winner, game.Player1.PlayerId, game.Player2.PlayerId, cancellationToken).ConfigureAwait(false);
+                    await PublishPointsIfChangedAsync(
+                        gameId,
+                        game.Player1.PlayerId,
+                        game.Player2.PlayerId,
+                        player1PointsBeforeMove,
+                        game.Player1.Points,
+                        player2PointsBeforeMove,
+                        game.Player2.Points,
+                        cancellationToken).ConfigureAwait(false);
                 }
 
                 return new MoveResult { MoveResultType = movementResult };
@@ -82,6 +94,27 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             }
 
             await _mediator.Publish(new GameTableUpdatedNotification(gameId, fieldUpdates), cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task PublishPointsIfChangedAsync(
+            string gameId,
+            string player1Id,
+            string player2Id,
+            int player1PointsBeforeMove,
+            int player1PointsAfterMove,
+            int player2PointsBeforeMove,
+            int player2PointsAfterMove,
+            CancellationToken cancellationToken)
+        {
+            if (player1PointsBeforeMove != player1PointsAfterMove)
+            {
+                await _mediator.Publish(new PlayerPointsChangedNotification(gameId, player1Id, player1PointsAfterMove)).ConfigureAwait(false);
+            }
+
+            if (player2PointsBeforeMove != player2PointsAfterMove)
+            {
+                await _mediator.Publish(new PlayerPointsChangedNotification(gameId, player2Id, player2PointsAfterMove)).ConfigureAwait(false);
+            }
         }
 
         private async Task PublishPlayersTurnIfChangedAsync(string gameId, string playerIdBeforeMove, string playerIdAfterMove, CancellationToken cancellationToken)

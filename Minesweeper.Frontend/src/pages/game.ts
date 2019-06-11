@@ -7,6 +7,7 @@ import {
     GameHubSignalRService,
     GameTableUpdatedNotification,
     RemainingMinesChangedNotification,
+    PlayerPointsChangedNotification,
     GameOverNotification
 } from "services/game-hub-signalr-service";
 
@@ -55,6 +56,11 @@ export class Game {
         this.eventAggregator.subscribe(`games:${gameId}:gameOver`, (notification: GameOverNotification) => {
             // TODO: Create better notification UX
             alert("Game over. Winner: " + notification.winnerPlayerId);
+        });
+
+        this.eventAggregator.subscribe(`games:${gameId}:pointsChanged`, (notification: PlayerPointsChangedNotification) => {
+            // TODO: Create better notification UX
+            alert("Points changed for player " + notification.playerId + ", points: " + notification.points);
         });
     }
 
