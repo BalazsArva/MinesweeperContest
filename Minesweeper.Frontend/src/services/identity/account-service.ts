@@ -20,8 +20,10 @@ export class AccountService {
             let httpResponse = await client.fetch("", request);
 
             if (httpResponse.status === loggedInStatus) {
-                // TODO: Populate user info
-                return { success: true, isLoggedIn: true };
+                let getUserInfoResponse = await httpResponse.json();
+                let userInfo = <UserInfo>getUserInfoResponse.userInfo;
+
+                return { success: true, isLoggedIn: true, userInfo: userInfo };
             }
 
             if (httpResponse.status === notLoggedInStatus) {
@@ -67,5 +69,5 @@ export interface GetUserInfoResult {
 }
 
 export interface UserInfo {
-    // TODO: Implement
+    id: string;
 }

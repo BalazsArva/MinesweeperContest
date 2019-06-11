@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.WebAPI.Contracts.Requests;
+using Minesweeper.WebAPI.Contracts.Responses.Account;
 using Minesweeper.WebAPI.Models;
 using Newtonsoft.Json;
 
@@ -31,8 +33,17 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> GetUserInfo()
         {
-            // TODO: Return user information
-            return Ok();
+            var nameClaim = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
+            var userId = nameClaim.Value;
+
+            // TODO: Return additional user information
+            return Ok(new GetUserInfoResponse
+            {
+                UserInfo =
+                {
+                    Id = userId
+                }
+            });
         }
 
         [HttpPost]

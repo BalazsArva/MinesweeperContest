@@ -6,10 +6,10 @@
             <game-stat stat.to-view="elapsedSeconds | secondsToTimespan" title="Time elapsed"></game-stat>
         </div>
         <div class="col">
-            <game-stat stat="0" title="Your points" color-class="success"></game-stat>
+            <game-stat stat.bind="myPoints" title="Your points" color-class="success"></game-stat>
         </div>
         <div class="col">
-            <game-stat stat="0" title="Opponent's points" color-class="danger"></game-stat>
+            <game-stat stat.bind="opponentsPoints" title="Opponent's points" color-class="danger"></game-stat>
         </div>
         <div class="col">
             <game-stat stat="${ remainingMines >= 0 ? remainingMines : '?' }" title="Mines left"></game-stat>
@@ -36,8 +36,10 @@
                         <td repeat.for="field of row">
 
                             <!-- Unopened field -->
-                            <button if.bind="field.fieldType === 0" class="btn btn-sm btn-light btn-game-table border-secondary"
-                                click.delegate="makeMove($event, field.row, field.column)" contextmenu.delegate="markField($event, field.row, field.column)">
+                            <button if.bind="field.fieldType === 0"
+                                class="btn btn-sm btn-light btn-game-table border-secondary"
+                                click.delegate="makeMove($event, field.row, field.column)"
+                                contextmenu.delegate="markField($event, field.row, field.column)">
                                 <span if.bind="field.markType === 1">
                                     <i class="fas fa-times"></i>
                                 </span>
@@ -47,7 +49,8 @@
                             </button>
 
                             <!-- Opened field -->
-                            <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light btn-game-table" disabled>
+                            <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light btn-game-table"
+                                disabled>
 
                                 <span class="align-top">
                                     <!-- Player 1 found mine -->

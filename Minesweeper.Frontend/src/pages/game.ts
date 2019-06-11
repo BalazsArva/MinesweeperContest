@@ -10,6 +10,7 @@ import {
     PlayerPointsChangedNotification,
     GameOverNotification
 } from "services/game-hub-signalr-service";
+import { AccountService } from "services/identity/account-service";
 
 interface Field {
     fieldType: FieldTypes;
@@ -24,10 +25,14 @@ export class Game {
     gameTable: Field[][] = null;
     timerHandle: number = null;
     elapsedSeconds = 0;
-    gameId: string = null;
     remainingMines: number = null;
+    gameId: string = null;
+    myPlayerId: string = null;
 
-    constructor(private eventAggregator: EventAggregator, private gameService: GameService, private gameHubService: GameHubSignalRService) {
+    myPoints: number = 0;
+    opponentsPoints: number = 0;
+
+    constructor(private eventAggregator: EventAggregator, private accountService: AccountService, private gameService: GameService, private gameHubService: GameHubSignalRService) {
     }
 
     async activate(params: any) {
@@ -35,6 +40,8 @@ export class Game {
 
         this.gameId = gameId;
 
+        // TODO: Retrieve the points at start (so that interrupted games, reloaded pages don't show 0-0 points until a change event is received).
+        await this.initializeUserInfo();
         await this.updateTable();
         await this.updateMarks();
         await this.gameHubService.connect(gameId);
@@ -55,13 +62,31 @@ export class Game {
 
         this.eventAggregator.subscribe(`games:${gameId}:gameOver`, (notification: GameOverNotification) => {
             // TODO: Create better notification UX
-            alert("Game over. Winner: " + notification.winnerPlayerId);
+            if (notification.winnerPlayerId === this.myPlayerId) {
+                alert("You won!");
+            } else {
+                alert("You lost!");
+            }
         });
 
         this.eventAggregator.subscribe(`games:${gameId}:pointsChanged`, (notification: PlayerPointsChangedNotification) => {
-            // TODO: Create better notification UX
-            alert("Points changed for player " + notification.playerId + ", points: " + notification.points);
+            if (notification.playerId === this.myPlayerId) {
+                this.myPoints = notification.points;
+            } else {
+                this.opponentsPoints = notification.points;
+            }
         });
+    }
+
+    async initializeUserInfo() {
+        let result = await this.accountService.getUserInfo();
+
+        // TODO: Show a message
+        if (!result.success) {
+            return;
+        }
+
+        this.myPlayerId = result.userInfo.id;
     }
 
     async updateTable() {
