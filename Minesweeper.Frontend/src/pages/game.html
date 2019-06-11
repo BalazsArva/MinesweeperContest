@@ -20,7 +20,19 @@
 
     <div class="row">
         <div class="col text-center">
-            Your turn
+
+            <span if.bind="isMyTurn === true">
+                Your turn
+            </span>
+
+            <span if.bind="isMyTurn === false">
+                Opponent's turn
+            </span>
+
+            <span if.bind="isMyTurn === null">
+                ??
+            </span>
+            
         </div>
     </div>
 

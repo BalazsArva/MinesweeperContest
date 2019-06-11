@@ -8,7 +8,8 @@ import {
     GameTableUpdatedNotification,
     RemainingMinesChangedNotification,
     PlayerPointsChangedNotification,
-    GameOverNotification
+    GameOverNotification,
+    TurnChangedNotification
 } from "services/game-hub-signalr-service";
 import { AccountService } from "services/identity/account-service";
 
@@ -28,6 +29,7 @@ export class Game {
     remainingMines: number = null;
     gameId: string = null;
     myPlayerId: string = null;
+    isMyTurn: boolean = null;
 
     myPoints: number = 0;
     opponentsPoints: number = 0;
@@ -40,6 +42,7 @@ export class Game {
 
         this.gameId = gameId;
 
+        // TODO: Retrieve which player's turn it is at start
         // TODO: Retrieve the points at start (so that interrupted games, reloaded pages don't show 0-0 points until a change event is received).
         await this.initializeUserInfo();
         await this.updateTable();
@@ -74,6 +77,14 @@ export class Game {
                 this.myPoints = notification.points;
             } else {
                 this.opponentsPoints = notification.points;
+            }
+        });
+
+        this.eventAggregator.subscribe(`games:${gameId}:turnChanged`, (notification: TurnChangedNotification) => {
+            if (notification.playerId === this.myPlayerId) {
+                this.isMyTurn = true;
+            } else {
+                this.isMyTurn = false;
             }
         });
     }

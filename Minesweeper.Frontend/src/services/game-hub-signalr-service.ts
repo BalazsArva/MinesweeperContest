@@ -45,6 +45,10 @@ export class GameHubSignalRService {
         connection.on("PointsChanged", notification => {
             this.eventAggregator.publish(`games:${gameId}:pointsChanged`, notification);
         });
+
+        connection.on("TurnChanged", notification => {
+            this.eventAggregator.publish(`games:${gameId}:turnChanged`, notification);
+        });
     }
 }
 
@@ -69,4 +73,8 @@ export interface GameOverNotification {
 export interface PlayerPointsChangedNotification {
     playerId: string;
     points: number;
+}
+
+export interface TurnChangedNotification {
+    playerId: string;
 }

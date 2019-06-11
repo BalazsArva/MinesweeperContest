@@ -4,7 +4,6 @@ namespace Minesweeper.GameServices.Contracts.Notifications
 {
     public class PlayersTurnNotification : INotification
     {
-        // TODO: Create handler
         public PlayersTurnNotification(string gameId, string playerId)
         {
             GameId = gameId;
