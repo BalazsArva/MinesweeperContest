@@ -6,6 +6,7 @@ namespace Minesweeper.GameServices
 {
     public class GameDriver : IGameDriver
     {
+        private const int MaxStreakBonus = 1024;
         private const int PointsForMineFound = 10;
 
         public MoveResultType MakeMove(Game game, string playerId, int row, int column)
@@ -65,11 +66,13 @@ namespace Minesweeper.GameServices
         {
             if (game.BaseTable[row][column] == FieldTypes.Mined)
             {
-                AddPoints(game, player, PointsForMineFound);
+                AddPoints(game, player);
                 RecordMove(game, player, row, column);
 
                 return;
             }
+
+            ResetStreakBonus(game, player);
 
             var neighboringMineCount = GetMinesAroundField(game, row, column);
             if (neighboringMineCount == 0)
@@ -177,15 +180,33 @@ namespace Minesweeper.GameServices
             }
         }
 
-        private void AddPoints(Game game, Players player, int points)
+        private void ResetStreakBonus(Game game, Players player)
         {
-            if (player == Players.Player1)
+            var targetPlayer = player == Players.Player1 ? game.Player1 : game.Player2;
+
+            targetPlayer.StreakBonus = 0;
+        }
+
+        private void AddPoints(Game game, Players player)
+        {
+            var targetPlayer = player == Players.Player1 ? game.Player1 : game.Player2;
+            var bonus = targetPlayer.StreakBonus;
+
+            targetPlayer.Points += PointsForMineFound;
+
+            if (bonus == 0)
             {
-                game.Player1.Points += points;
+                targetPlayer.StreakBonus = 1;
             }
             else
             {
-                game.Player2.Points += points;
+                targetPlayer.Points += bonus;
+                targetPlayer.StreakBonus *= 2;
+
+                if (targetPlayer.StreakBonus > MaxStreakBonus)
+                {
+                    targetPlayer.StreakBonus = MaxStreakBonus;
+                }
             }
         }
 

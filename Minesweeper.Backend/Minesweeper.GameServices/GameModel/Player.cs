@@ -7,5 +7,7 @@
         public string DisplayName { get; set; }
 
         public int Points { get; set; }
+
+        public int StreakBonus { get; set; }
     }
 }
