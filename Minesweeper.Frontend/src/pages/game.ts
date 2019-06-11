@@ -67,8 +67,10 @@ export class Game {
             // TODO: Create better notification UX
             if (notification.winnerPlayerId === this.myPlayerId) {
                 alert("You won!");
-            } else {
+            } else if (notification.winnerPlayerId) {
                 alert("You lost!");
+            } else {
+                alert("The game ended in a draw.");
             }
         });
 

@@ -60,7 +60,6 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                     await PublishTableUpdatedAsync(gameId, currentVisibleTable, game.VisibleTable, cancellationToken).ConfigureAwait(false); ;
                     await PublishPlayersTurnIfChangedAsync(gameId, currentPlayerId, nextPlayerId, cancellationToken).ConfigureAwait(false);
                     await PublishRemainingMinesIfChangedAsync(gameId, mineCountBeforeMove, mineCountAfterMove, cancellationToken).ConfigureAwait(false);
-                    await PublishWinnerIfGameIsOverAsync(gameId, game.Winner, game.Player1.PlayerId, game.Player2.PlayerId, cancellationToken).ConfigureAwait(false);
                     await PublishPointsIfChangedAsync(
                         gameId,
                         game.Player1.PlayerId,
@@ -70,6 +69,11 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                         player2PointsBeforeMove,
                         game.Player2.Points,
                         cancellationToken).ConfigureAwait(false);
+
+                    if (movementResult == MoveResultType.GameOver)
+                    {
+                        await PublishWinnerAsync(gameId, game.Winner, game.Player1.PlayerId, game.Player2.PlayerId, cancellationToken).ConfigureAwait(false);
+                    }
                 }
 
                 return new MoveResult { MoveResultType = movementResult };
@@ -133,7 +137,7 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             }
         }
 
-        private async Task PublishWinnerIfGameIsOverAsync(string gameId, Players? winnerPlayer, string player1Id, string player2Id, CancellationToken cancellationToken)
+        private async Task PublishWinnerAsync(string gameId, Players? winnerPlayer, string player1Id, string player2Id, CancellationToken cancellationToken)
         {
             if (winnerPlayer.HasValue)
             {
@@ -141,6 +145,10 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                 var winnerPlayerId = winner == Players.Player1 ? player1Id : player2Id;
 
                 await _mediator.Publish(new GameOverNotification(gameId, winnerPlayerId), cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                await _mediator.Publish(new GameOverNotification(gameId, null), cancellationToken).ConfigureAwait(false);
             }
         }
 
