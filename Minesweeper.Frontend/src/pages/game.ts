@@ -53,43 +53,11 @@ export class Game {
         // TODO: Consider interrupted games 
         this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
 
-        this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, (notification: GameTableUpdatedNotification) => {
-            for (let i = 0; i < notification.fieldUpdates.length; ++i) {
-                let fieldUpdate = notification.fieldUpdates[i];
-                this.gameTable[fieldUpdate.row][fieldUpdate.column].fieldType = fieldUpdate.fieldType;
-            }
-        });
-
-        this.eventAggregator.subscribe(`games:${gameId}:remainingMinesChanged`, (notification: RemainingMinesChangedNotification) => {
-            this.remainingMines = notification.remainingMineCount;
-        });
-
-        this.eventAggregator.subscribe(`games:${gameId}:gameOver`, (notification: GameOverNotification) => {
-            // TODO: Create better notification UX
-            if (notification.winnerPlayerId === this.myPlayerId) {
-                alert("You won!");
-            } else if (notification.winnerPlayerId) {
-                alert("You lost!");
-            } else {
-                alert("The game ended in a draw.");
-            }
-        });
-
-        this.eventAggregator.subscribe(`games:${gameId}:pointsChanged`, (notification: PlayerPointsChangedNotification) => {
-            if (notification.playerId === this.myPlayerId) {
-                this.myPoints = notification.points;
-            } else {
-                this.opponentsPoints = notification.points;
-            }
-        });
-
-        this.eventAggregator.subscribe(`games:${gameId}:turnChanged`, (notification: TurnChangedNotification) => {
-            if (notification.playerId === this.myPlayerId) {
-                this.isMyTurn = true;
-            } else {
-                this.isMyTurn = false;
-            }
-        });
+        this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, this.onTableChanged.bind(this));
+        this.eventAggregator.subscribe(`games:${gameId}:remainingMinesChanged`, this.onRemainingMinesChanged.bind(this));
+        this.eventAggregator.subscribe(`games:${gameId}:gameOver`, this.onGameOver.bind(this));
+        this.eventAggregator.subscribe(`games:${gameId}:pointsChanged`, this.onPointsChanged.bind(this));
+        this.eventAggregator.subscribe(`games:${gameId}:turnChanged`, this.onTurnChanged.bind(this));
     }
 
     async initializeGameState(gameId: string, playerId: string) {
@@ -200,5 +168,47 @@ export class Game {
 
         e.preventDefault();
         return false;
+    }
+
+    onTableChanged(notification: GameTableUpdatedNotification) {
+        for (let i = 0; i < notification.fieldUpdates.length; ++i) {
+            let fieldUpdate = notification.fieldUpdates[i];
+            this.gameTable[fieldUpdate.row][fieldUpdate.column].fieldType = fieldUpdate.fieldType;
+        }
+    }
+
+    onRemainingMinesChanged(notification: RemainingMinesChangedNotification) {
+        this.remainingMines = notification.remainingMineCount;
+    }
+
+    onGameOver(notification: GameOverNotification) {
+        // TODO: Create better notification UX
+        if (notification.winnerPlayerId === this.myPlayerId) {
+            alert("You won!");
+        }
+        else if (notification.winnerPlayerId) {
+            alert("You lost!");
+        }
+        else {
+            alert("The game ended in a draw.");
+        }
+    }
+
+    onPointsChanged(notification: PlayerPointsChangedNotification) {
+        if (notification.playerId === this.myPlayerId) {
+            this.myPoints = notification.points;
+        }
+        else {
+            this.opponentsPoints = notification.points;
+        }
+    }
+
+    onTurnChanged(notification: TurnChangedNotification) {
+        if (notification.playerId === this.myPlayerId) {
+            this.isMyTurn = true;
+        }
+        else {
+            this.isMyTurn = false;
+        }
     }
 }
