@@ -137,12 +137,12 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             }
         }
 
-        private async Task PublishWinnerAsync(string gameId, Players? winnerPlayer, string player1Id, string player2Id, CancellationToken cancellationToken)
+        private async Task PublishWinnerAsync(string gameId, GameModel.Players? winnerPlayer, string player1Id, string player2Id, CancellationToken cancellationToken)
         {
             if (winnerPlayer.HasValue)
             {
                 var winner = winnerPlayer.Value;
-                var winnerPlayerId = winner == Players.Player1 ? player1Id : player2Id;
+                var winnerPlayerId = winner == GameModel.Players.Player1 ? player1Id : player2Id;
 
                 await _mediator.Publish(new GameOverNotification(gameId, winnerPlayerId), cancellationToken).ConfigureAwait(false);
             }
@@ -160,9 +160,9 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             return totalMineCount - foundMineCount;
         }
 
-        private string GetPlayerIdByPlayerOrder(Game game, Players player)
+        private string GetPlayerIdByPlayerOrder(Game game, GameModel.Players player)
         {
-            return player == Players.Player1
+            return player == GameModel.Players.Player1
                 ? game.Player1.PlayerId
                 : game.Player2.PlayerId;
         }

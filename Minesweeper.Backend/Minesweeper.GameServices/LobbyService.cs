@@ -30,7 +30,7 @@ namespace Minesweeper.GameServices
                 var results = await session
                     .Query<Game>()
                     .Statistics(out var statistics)
-                    .Where(g => g.InvitedPlayerId == null && g.Status == GameStatus.NotStarted && g.Player2.PlayerId == null && g.Player1.PlayerId != userId)
+                    .Where(g => g.InvitedPlayerId == null && g.Status == GameModel.GameStatus.NotStarted && g.Player2.PlayerId == null && g.Player1.PlayerId != userId)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Select(g => new { g.Id, Player1Id = g.Player1.PlayerId, Player1DisplayName = g.Player1.DisplayName, g.Rows, g.Columns, g.Mines })
@@ -54,7 +54,7 @@ namespace Minesweeper.GameServices
                 var results = await session
                     .Query<Game>()
                     .Statistics(out var statistics)
-                    .Where(g => g.Status == GameStatus.NotStarted || g.Status == GameStatus.InProgress)
+                    .Where(g => g.Status == GameModel.GameStatus.NotStarted || g.Status == GameModel.GameStatus.InProgress)
                     .Where(g => g.Player1.PlayerId == userId || g.Player2.PlayerId == userId)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)

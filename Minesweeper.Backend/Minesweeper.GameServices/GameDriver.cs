@@ -11,7 +11,7 @@ namespace Minesweeper.GameServices
 
         public MoveResultType MakeMove(Game game, string playerId, int row, int column)
         {
-            var player = game.Player1.PlayerId == playerId ? Players.Player1 : Players.Player2;
+            var player = game.Player1.PlayerId == playerId ? GameModel.Players.Player1 : GameModel.Players.Player2;
 
             var playerAllowedToMove = CheckPlayerCanMove(game, player);
             if (!playerAllowedToMove)
@@ -25,14 +25,14 @@ namespace Minesweeper.GameServices
                 return MoveResultType.CannotMoveThere;
             }
 
-            game.Status = GameStatus.InProgress;
+            game.Status = GameModel.GameStatus.InProgress;
 
             PerformMove(game, player, row, column);
 
             var gameIsOver = IsGameOver(game);
             if (gameIsOver)
             {
-                game.Status = GameStatus.Finished;
+                game.Status = GameModel.GameStatus.Finished;
                 game.Winner = DetermineWinner(game);
 
                 return MoveResultType.GameOver;
@@ -41,9 +41,9 @@ namespace Minesweeper.GameServices
             return MoveResultType.Success;
         }
 
-        private bool CheckPlayerCanMove(Game game, Players player)
+        private bool CheckPlayerCanMove(Game game, GameModel.Players player)
         {
-            if (game.Status == GameStatus.Finished || game.Status == GameStatus.NotStarted)
+            if (game.Status == GameModel.GameStatus.Finished || game.Status == GameModel.GameStatus.NotStarted)
             {
                 return false;
             }
@@ -62,7 +62,7 @@ namespace Minesweeper.GameServices
                 game.VisibleTable[row][column] == GameModel.VisibleFieldType.Unknown;
         }
 
-        private void PerformMove(Game game, Players player, int row, int column)
+        private void PerformMove(Game game, GameModel.Players player, int row, int column)
         {
             if (game.BaseTable[row][column] == FieldTypes.Mined)
             {
@@ -84,10 +84,12 @@ namespace Minesweeper.GameServices
                 RecordMove(game, player, row, column);
             }
 
-            game.NextPlayer = player == Players.Player1 ? Players.Player2 : Players.Player1;
+            game.NextPlayer = player == GameModel.Players.Player1
+                ? GameModel.Players.Player2
+                : GameModel.Players.Player1;
         }
 
-        private void DoRecursiveMove(Game game, Players player, int row, int column)
+        private void DoRecursiveMove(Game game, GameModel.Players player, int row, int column)
         {
             var rowOverflown = row < 0 || row >= game.Rows;
             var colOverflown = column < 0 || column >= game.Columns;
@@ -129,11 +131,13 @@ namespace Minesweeper.GameServices
             }
         }
 
-        private void RecordMove(Game game, Players player, int row, int col)
+        private void RecordMove(Game game, GameModel.Players player, int row, int col)
         {
             if (game.BaseTable[row][col] == FieldTypes.Mined)
             {
-                game.VisibleTable[row][col] = player == Players.Player1 ? GameModel.VisibleFieldType.Player1FoundMine : GameModel.VisibleFieldType.Player2FoundMine;
+                game.VisibleTable[row][col] = player == GameModel.Players.Player1
+                    ? GameModel.VisibleFieldType.Player1FoundMine
+                    : GameModel.VisibleFieldType.Player2FoundMine;
             }
             else
             {
@@ -180,16 +184,16 @@ namespace Minesweeper.GameServices
             }
         }
 
-        private void ResetStreakBonus(Game game, Players player)
+        private void ResetStreakBonus(Game game, GameModel.Players player)
         {
-            var targetPlayer = player == Players.Player1 ? game.Player1 : game.Player2;
+            var targetPlayer = player == GameModel.Players.Player1 ? game.Player1 : game.Player2;
 
             targetPlayer.StreakBonus = 0;
         }
 
-        private void AddPoints(Game game, Players player)
+        private void AddPoints(Game game, GameModel.Players player)
         {
-            var targetPlayer = player == Players.Player1 ? game.Player1 : game.Player2;
+            var targetPlayer = player == GameModel.Players.Player1 ? game.Player1 : game.Player2;
             var bonus = targetPlayer.StreakBonus;
 
             targetPlayer.Points += PointsForMineFound;
@@ -250,7 +254,7 @@ namespace Minesweeper.GameServices
             return foundMines == game.Mines;
         }
 
-        private Players? DetermineWinner(Game game)
+        private GameModel.Players? DetermineWinner(Game game)
         {
             var player1Points = game.Player1.Points;
             var player2Points = game.Player2.Points;
@@ -261,10 +265,10 @@ namespace Minesweeper.GameServices
             }
             else if (player1Points > player2Points)
             {
-                return Players.Player1;
+                return GameModel.Players.Player1;
             }
 
-            return Players.Player2;
+            return GameModel.Players.Player2;
         }
     }
 }

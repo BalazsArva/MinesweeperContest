@@ -18,6 +18,7 @@ namespace Minesweeper.WebAPI.Controllers
     [ApiController]
     public class GamesController : ControllerBase
     {
+        private readonly IGetGameStateRequestHandler _getGameStateRequestHandler;
         private readonly IGetVisibleGameTableRequestHandler _getVisibleGameTableRequestHandler;
         private readonly IGetPlayerMarksRequestHandler _getPlayerMarksRequestHandler;
         private readonly IMakeMoveCommandHandler _makeMoveCommandHandler;
@@ -26,6 +27,7 @@ namespace Minesweeper.WebAPI.Controllers
         private readonly INewGameCommandHandler _newGameCommandHandler;
 
         public GamesController(
+            IGetGameStateRequestHandler getGameStateRequestHandler,
             IGetVisibleGameTableRequestHandler getVisibleGameTableRequestHandler,
             IGetPlayerMarksRequestHandler getPlayerMarksRequestHandler,
             IMakeMoveCommandHandler makeMoveCommandHandler,
@@ -33,6 +35,7 @@ namespace Minesweeper.WebAPI.Controllers
             IMarkFieldCommandHandler markFieldCommandHandler,
             INewGameCommandHandler newGameCommandHandler)
         {
+            _getGameStateRequestHandler = getGameStateRequestHandler ?? throw new ArgumentNullException(nameof(getGameStateRequestHandler));
             _getVisibleGameTableRequestHandler = getVisibleGameTableRequestHandler ?? throw new ArgumentNullException(nameof(getVisibleGameTableRequestHandler));
             _getPlayerMarksRequestHandler = getPlayerMarksRequestHandler ?? throw new ArgumentNullException(nameof(getPlayerMarksRequestHandler));
             _makeMoveCommandHandler = makeMoveCommandHandler ?? throw new ArgumentNullException(nameof(makeMoveCommandHandler));
@@ -43,9 +46,14 @@ namespace Minesweeper.WebAPI.Controllers
 
         [HttpGet]
         [Route("{gameId}", Name = RouteNames.Game)]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken)
+        [Authorize]
+        public async Task<IActionResult> Get(string gameId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var serviceResponse = await _getGameStateRequestHandler.HandleAsync(new GetGameStateRequest { GameId = gameId }, cancellationToken).ConfigureAwait(false);
+
+            var apiResponse = GetGameStateResponseMapper.ToApiResponse(serviceResponse);
+
+            return Ok(apiResponse);
         }
 
         [HttpGet]

@@ -11,7 +11,7 @@ namespace Minesweeper.GameServices.Extensions
     {
         public static IServiceCollection AddGameServices(this IServiceCollection services)
         {
-            return services
+            services
                 .AddSingleton<IGuidProvider, GuidProvider>()
                 .AddSingleton<IRandomNumberProvider, RandomNumberProvider>()
                 .AddSingleton<IDateTimeProvider, DateTimeProvider>()
@@ -19,13 +19,18 @@ namespace Minesweeper.GameServices.Extensions
                 .AddSingleton<ILobbyService, LobbyService>()
                 .AddSingleton<IRandomPlayerSelector, RandomPlayerSelector>()
                 .AddSingleton<IGameGenerator, GameGenerator>()
+                .AddSingleton<IGetGameStateRequestHandler, GetGameStateRequestHandler>()
                 .AddSingleton<IPlayerMarksGenerator, PlayerMarksGenerator>()
-                .AddSingleton<IMakeMoveCommandHandler, MakeMoveCommandHandler>()
                 .AddSingleton<INewGameCommandHandler, NewGameCommandHandler>()
                 .AddSingleton<IMarkFieldCommandHandler, MarkFieldCommandHandler>()
                 .AddSingleton<IJoinGameCommandHandler, JoinGameCommandHandler>()
                 .AddSingleton<IGetPlayerMarksRequestHandler, GetPlayerMarksRequestHandler>()
                 .AddSingleton<IGetVisibleGameTableRequestHandler, GetVisibleGameTableRequestHandler>();
+
+            services
+                .AddScoped<IMakeMoveCommandHandler, MakeMoveCommandHandler>();
+
+            return services;
         }
     }
 }
