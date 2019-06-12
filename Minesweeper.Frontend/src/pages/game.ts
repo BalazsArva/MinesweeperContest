@@ -43,6 +43,7 @@ export class Game {
         this.gameId = gameId;
 
         // TODO: Retrieve which player's turn it is at start
+        // TODO: Retrieve remaining mines at start
         // TODO: Retrieve the points at start (so that interrupted games, reloaded pages don't show 0-0 points until a change event is received).
         await this.initializeUserInfo();
         await this.updateTable();

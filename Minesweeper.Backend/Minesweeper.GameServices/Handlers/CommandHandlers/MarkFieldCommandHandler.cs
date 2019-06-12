@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
@@ -22,6 +21,9 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
         public async Task HandleAsync(MarkFieldCommand command, CancellationToken cancellationToken)
         {
+            // TODO: Should move the marks of each player to a separate document. This should:
+            // - improve document load performance (can avoid not-needed things)
+            // - enables each player to perform marking during the other player's turns as well while avoiding concurrency issues
             using (var session = _documentStore.OpenAsyncSession())
             {
                 var game = await session.LoadGameAsync(command.GameId, cancellationToken).ConfigureAwait(false);
