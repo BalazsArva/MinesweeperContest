@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Contracts.Commands;
+using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
-using Raven.Client.Documents;
-using Minesweeper.GameServices.Exceptions;
+using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Providers;
+using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices.Handlers.CommandHandlers
 {
@@ -15,11 +15,13 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
     {
         private readonly IDocumentStore _documentStore;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IPlayerMarksGenerator _playerMarksGenerator;
 
-        public JoinGameCommandHandler(IDocumentStore documentStore, IDateTimeProvider dateTimeProvider)
+        public JoinGameCommandHandler(IDocumentStore documentStore, IPlayerMarksGenerator playerMarksGenerator, IDateTimeProvider dateTimeProvider)
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            _playerMarksGenerator = playerMarksGenerator ?? throw new ArgumentNullException(nameof(playerMarksGenerator));
         }
 
         public async Task HandleAsync(JoinGameCommand command, CancellationToken cancellationToken)
@@ -41,6 +43,10 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                     throw new ActionNotAllowedException("You are not allowed to join the requested game.");
                 }
 
+                var player2MarkTable = _playerMarksGenerator.GenerateDefaultPlayerMarksTable(game.Rows, game.Columns);
+                var player2MarksDocumentId = session.GetPlayerMarksDocumentId(command.GameId, command.PlayerId);
+                var player2MarksDocument = new PlayerMarks { Marks = player2MarkTable, Id = player2MarksDocumentId };
+
                 game.UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime();
                 game.Player2.PlayerId = player2Id;
 
@@ -50,6 +56,8 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
                 // TODO: Investigate what exception is thrown when a concurrent update occurs (because of the changevector) and rethrow an appropriate custom exception
                 await session.StoreAsync(game, changeVector, game.Id, cancellationToken).ConfigureAwait(false);
+                await session.StoreAsync(player2MarksDocument, cancellationToken).ConfigureAwait(false);
+
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }

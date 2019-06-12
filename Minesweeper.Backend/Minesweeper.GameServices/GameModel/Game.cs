@@ -29,9 +29,5 @@ namespace Minesweeper.GameServices.GameModel
         public FieldTypes[][] BaseTable { get; set; }
 
         public VisibleFieldType[][] VisibleTable { get; set; }
-
-        public MarkTypes[][] Player1Marks { get; set; }
-
-        public MarkTypes[][] Player2Marks { get; set; }
     }
 }
