@@ -13,5 +13,9 @@ namespace Minesweeper.WebAPI.Contracts.Responses.Game
         public Players? Winner { get; set; }
 
         public GameStatus Status { get; set; }
+
+        public PlayerState Player1State { get; set; }
+
+        public PlayerState Player2State { get; set; }
     }
 }

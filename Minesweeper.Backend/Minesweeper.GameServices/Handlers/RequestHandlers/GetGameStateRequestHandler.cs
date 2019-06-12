@@ -42,6 +42,16 @@ namespace Minesweeper.GameServices.Handlers.RequestHandlers
                     RemainingMines = totalMines - foundMines,
                     UtcDateTimeStarted = gameDocument.UtcDateTimeStarted,
                     NextPlayer = gameDocument.NextPlayer == GameModel.Players.Player1 ? Players.Player1 : Players.Player2,
+                    Player1State = new PlayerState
+                    {
+                        PlayerId = gameDocument.Player1.PlayerId,
+                        Points = gameDocument.Player1.Points
+                    },
+                    Player2State = new PlayerState
+                    {
+                        PlayerId = gameDocument.Player2.PlayerId,
+                        Points = gameDocument.Player2.Points
+                    },
                     Winner = gameDocument.Winner == GameModel.Players.Player1 ? Players.Player1 : Players.Player2,
                     Status = gameDocument.Status == GameModel.GameStatus.Finished
                         ? GameStatus.Finished

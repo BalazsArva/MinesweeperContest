@@ -9,6 +9,8 @@
                 NextPlayer = PlayersEnumMapper.ToApiContract(serviceResponse.NextPlayer),
                 RemainingMines = serviceResponse.RemainingMines,
                 UtcDateTimeStarted = serviceResponse.UtcDateTimeStarted,
+                Player1State = PlayerStateMapper.ToApiContract(serviceResponse.Player1State),
+                Player2State = PlayerStateMapper.ToApiContract(serviceResponse.Player2State),
                 Status = GameStatusEnumMapper.ToApiContract(serviceResponse.Status),
                 Winner = serviceResponse.Winner != null
                     ? PlayersEnumMapper.ToApiContract(serviceResponse.Winner.Value)
