@@ -2,6 +2,7 @@
 using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
+using Minesweeper.GameServices.Handlers.RequestHandlers;
 using Minesweeper.GameServices.Providers;
 
 namespace Minesweeper.GameServices.Extensions
@@ -10,21 +11,21 @@ namespace Minesweeper.GameServices.Extensions
     {
         public static IServiceCollection AddGameServices(this IServiceCollection services)
         {
-            // TODO: Review lifetime for each item
             return services
-                .AddScoped<IGuidProvider, GuidProvider>()
-                .AddScoped<IRandomNumberProvider, RandomNumberProvider>()
-                .AddScoped<IDateTimeProvider, DateTimeProvider>()
-                .AddScoped<IGameDriver, GameDriver>()
-                .AddScoped<IGameService, GameService>()
-                .AddScoped<ILobbyService, LobbyService>()
-                .AddScoped<IRandomPlayerSelector, RandomPlayerSelector>()
-                .AddScoped<IGameGenerator, GameGenerator>()
-                .AddScoped<IPlayerMarksGenerator, PlayerMarksGenerator>()
-                .AddScoped<IMakeMoveCommandHandler, MakeMoveCommandHandler>()
-                .AddScoped<INewGameCommandHandler, NewGameCommandHandler>()
-                .AddScoped<IMarkFieldCommandHandler, MarkFieldCommandHandler>()
-                .AddScoped<IJoinGameCommandHandler, JoinGameCommandHandler>();
+                .AddSingleton<IGuidProvider, GuidProvider>()
+                .AddSingleton<IRandomNumberProvider, RandomNumberProvider>()
+                .AddSingleton<IDateTimeProvider, DateTimeProvider>()
+                .AddSingleton<IGameDriver, GameDriver>()
+                .AddSingleton<ILobbyService, LobbyService>()
+                .AddSingleton<IRandomPlayerSelector, RandomPlayerSelector>()
+                .AddSingleton<IGameGenerator, GameGenerator>()
+                .AddSingleton<IPlayerMarksGenerator, PlayerMarksGenerator>()
+                .AddSingleton<IMakeMoveCommandHandler, MakeMoveCommandHandler>()
+                .AddSingleton<INewGameCommandHandler, NewGameCommandHandler>()
+                .AddSingleton<IMarkFieldCommandHandler, MarkFieldCommandHandler>()
+                .AddSingleton<IJoinGameCommandHandler, JoinGameCommandHandler>()
+                .AddSingleton<IGetPlayerMarksRequestHandler, GetPlayerMarksRequestHandler>()
+                .AddSingleton<IGetVisibleGameTableRequestHandler, GetVisibleGameTableRequestHandler>();
         }
     }
 }

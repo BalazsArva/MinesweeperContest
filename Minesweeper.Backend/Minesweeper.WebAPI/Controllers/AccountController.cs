@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.WebAPI.Contracts.Requests;
 using Minesweeper.WebAPI.Contracts.Responses.Account;
+using Minesweeper.WebAPI.Extensions;
 using Minesweeper.WebAPI.Models;
 using Newtonsoft.Json;
 
@@ -33,15 +33,12 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> GetUserInfo()
         {
-            var nameClaim = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
-            var userId = nameClaim.Value;
-
             // TODO: Return additional user information
             return Ok(new GetUserInfoResponse
             {
                 UserInfo =
                 {
-                    Id = userId
+                    Id = User.GetUserId()
                 }
             });
         }
@@ -64,8 +61,8 @@ namespace Minesweeper.WebAPI.Controllers
                 };
 
                 var userIdentity = new ClaimsIdentity(claims, "login");
-
                 var principal = new ClaimsPrincipal(userIdentity);
+
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                 return Ok();
@@ -73,6 +70,7 @@ namespace Minesweeper.WebAPI.Controllers
 
             // TODO: Improve error feedback
             ModelState.AddModelError(string.Empty, "Login Failed");
+
             return BadRequest(loginModel);
         }
 
@@ -108,7 +106,6 @@ namespace Minesweeper.WebAPI.Controllers
                 var uri = $"{IdentityApiBaseUrl}/connect/token";
 
                 var res = await client.PostAsync(uri, formData);
-
                 var json = await res.Content.ReadAsStringAsync();
 
                 var tokenReponse = JsonConvert.DeserializeObject<OidcTokenResponse>(json);

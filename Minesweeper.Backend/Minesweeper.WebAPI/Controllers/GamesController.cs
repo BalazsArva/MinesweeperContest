@@ -3,9 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.Contracts.Commands;
+using Minesweeper.GameServices.Contracts.Requests;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
+using Minesweeper.GameServices.Handlers.RequestHandlers;
 using Minesweeper.WebAPI.Contracts.Requests;
 using Minesweeper.WebAPI.Contracts.Responses;
 using Minesweeper.WebAPI.Extensions;
@@ -17,15 +18,23 @@ namespace Minesweeper.WebAPI.Controllers
     [ApiController]
     public class GamesController : ControllerBase
     {
-        private readonly IGameService _gameService;
+        private readonly IGetVisibleGameTableRequestHandler _getVisibleGameTableRequestHandler;
+        private readonly IGetPlayerMarksRequestHandler _getPlayerMarksRequestHandler;
         private readonly IMakeMoveCommandHandler _makeMoveCommandHandler;
         private readonly IJoinGameCommandHandler _joinGameCommandHandler;
         private readonly IMarkFieldCommandHandler _markFieldCommandHandler;
         private readonly INewGameCommandHandler _newGameCommandHandler;
 
-        public GamesController(IGameService gameService, IMakeMoveCommandHandler makeMoveCommandHandler, IJoinGameCommandHandler joinGameCommandHandler, IMarkFieldCommandHandler markFieldCommandHandler, INewGameCommandHandler newGameCommandHandler)
+        public GamesController(
+            IGetVisibleGameTableRequestHandler getVisibleGameTableRequestHandler,
+            IGetPlayerMarksRequestHandler getPlayerMarksRequestHandler,
+            IMakeMoveCommandHandler makeMoveCommandHandler,
+            IJoinGameCommandHandler joinGameCommandHandler,
+            IMarkFieldCommandHandler markFieldCommandHandler,
+            INewGameCommandHandler newGameCommandHandler)
         {
-            _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
+            _getVisibleGameTableRequestHandler = getVisibleGameTableRequestHandler ?? throw new ArgumentNullException(nameof(getVisibleGameTableRequestHandler));
+            _getPlayerMarksRequestHandler = getPlayerMarksRequestHandler ?? throw new ArgumentNullException(nameof(getPlayerMarksRequestHandler));
             _makeMoveCommandHandler = makeMoveCommandHandler ?? throw new ArgumentNullException(nameof(makeMoveCommandHandler));
             _joinGameCommandHandler = joinGameCommandHandler ?? throw new ArgumentNullException(nameof(joinGameCommandHandler));
             _markFieldCommandHandler = markFieldCommandHandler ?? throw new ArgumentNullException(nameof(markFieldCommandHandler));
@@ -45,7 +54,9 @@ namespace Minesweeper.WebAPI.Controllers
         public async Task<IActionResult> GetGameTableTemp(string gameId, CancellationToken cancellationToken)
         {
             // TODO: This is only temp
-            var result = await _gameService.GetVisibleGameTableAsync(gameId, cancellationToken).ConfigureAwait(false);
+            var request = new GetVisibleGameTableRequest { GameId = gameId };
+
+            var result = await _getVisibleGameTableRequestHandler.HandleAsync(request, cancellationToken).ConfigureAwait(false);
 
             // TODO: Error handling
             return Ok(new
@@ -59,9 +70,13 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> GetPlayerMarks(string gameId, CancellationToken cancellationToken)
         {
-            var userId = User.GetUserId();
+            var request = new GetPlayerMarksRequest
+            {
+                GameId = gameId,
+                PlayerId = User.GetUserId()
+            };
 
-            var playerMarks = await _gameService.GetPlayerMarksAsync(gameId, userId, cancellationToken).ConfigureAwait(false);
+            var playerMarks = await _getPlayerMarksRequestHandler.HandleAsync(request, cancellationToken).ConfigureAwait(false);
 
             return Ok(new GetPlayerMarksResponse(playerMarks));
         }

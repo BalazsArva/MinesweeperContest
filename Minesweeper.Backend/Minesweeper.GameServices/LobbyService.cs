@@ -11,6 +11,7 @@ using Raven.Client.Documents.Linq;
 
 namespace Minesweeper.GameServices
 {
+    // TODO: Refactor into individual query handlers
     public class LobbyService : ILobbyService
     {
         private readonly IDocumentStore _documentStore;
