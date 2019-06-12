@@ -19,21 +19,14 @@ namespace Minesweeper.GameServices.Generators
         public Game GenerateGame(int tableRows, int tableColumns, int mineCount)
         {
             var starterPlayer = _randomPlayerSelector.SelectRandomPlayer();
-
-            var player1Marks = new MarkTypes[tableRows][];
-            var player2Marks = new MarkTypes[tableRows][];
             var visibleTable = new VisibleFieldType[tableRows][];
 
             for (var row = 0; row < tableRows; ++row)
             {
-                player1Marks[row] = new MarkTypes[tableColumns];
-                player2Marks[row] = new MarkTypes[tableColumns];
                 visibleTable[row] = new VisibleFieldType[tableColumns];
 
                 for (var col = 0; col < tableColumns; ++col)
                 {
-                    player1Marks[row][col] = MarkTypes.None;
-                    player2Marks[row][col] = MarkTypes.None;
                     visibleTable[row][col] = VisibleFieldType.Unknown;
                 }
             }
@@ -42,8 +35,6 @@ namespace Minesweeper.GameServices.Generators
             {
                 BaseTable = GenerateBaseTable(tableRows, tableColumns, mineCount),
                 VisibleTable = visibleTable,
-                Player1Marks = player1Marks,
-                Player2Marks = player2Marks,
                 NextPlayer = starterPlayer,
                 Status = GameStatus.NotStarted,
                 Rows = tableRows,

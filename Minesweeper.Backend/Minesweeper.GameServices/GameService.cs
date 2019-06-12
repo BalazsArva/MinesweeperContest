@@ -24,19 +24,14 @@ namespace Minesweeper.GameServices
         {
             using (var session = _documentStore.OpenAsyncSession())
             {
-                var game = await session.LoadGameAsync(gameId, cancellationToken).ConfigureAwait(false);
+                var playerMarksDocument = await session.LoadPlayerMarksAsync(gameId, playerId, cancellationToken).ConfigureAwait(false);
 
-                var isPlayer1 = game.Player1.PlayerId == playerId;
-                var isPlayer2 = game.Player2.PlayerId == playerId;
-
-                if (!isPlayer1 && !isPlayer2)
+                if (playerMarksDocument == null)
                 {
                     throw new ActionNotAllowedException("You are not involved in that game.");
                 }
 
-                var playerMarks = isPlayer1 ? game.Player1Marks : game.Player2Marks;
-
-                return EnumArrayCloner.CloneAndMap(playerMarks, MarkTypeConverter.ToContract);
+                return EnumArrayCloner.CloneAndMap(playerMarksDocument.Marks, MarkTypeConverter.ToContract);
             }
         }
 

@@ -21,19 +21,15 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
         public async Task HandleAsync(MarkFieldCommand command, CancellationToken cancellationToken)
         {
-            // TODO: Should move the marks of each player to a separate document. This should:
-            // - improve document load performance (can avoid not-needed things)
-            // - enables each player to perform marking during the other player's turns as well while avoiding concurrency issues
             using (var session = _documentStore.OpenAsyncSession())
             {
-                var game = await session.LoadGameAsync(command.GameId, cancellationToken).ConfigureAwait(false);
+                var marks = await session.LoadPlayerMarksAsync(command.GameId, command.PlayerId, cancellationToken).ConfigureAwait(false);
 
-                if (game.Player1.PlayerId != command.PlayerId && game.Player2.PlayerId != command.PlayerId)
+                if (marks == null)
                 {
                     throw new ActionNotAllowedException("You are not involved in that game.");
                 }
 
-                var isPlayer1 = game.Player1.PlayerId == command.PlayerId;
                 var newMark = MarkTypeConverter.FromContract(command.MarkType);
                 var row = command.Row;
                 var col = command.Column;
@@ -41,14 +37,7 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                 // TODO: Index overflow and underflow check here and everywhere else
                 // The 'row' and 'col' variables must exist as they are. For some reason, if command.Row / command.Column
                 // is used in the Patch expression's indexer (i.e. g.Player1Marks[command.Row][command.Column]) it fails to translate.
-                if (isPlayer1)
-                {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player1Marks[row][col], newMark);
-                }
-                else
-                {
-                    session.Advanced.Patch<Game, GameModel.MarkTypes>(game.Id, g => g.Player2Marks[row][col], newMark);
-                }
+                session.Advanced.Patch<PlayerMarks, MarkTypes>(marks.Id, g => g.Marks[row][col], newMark);
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
