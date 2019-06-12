@@ -1,7 +1,7 @@
 import { autoinject } from "aurelia-framework";
 import { EventAggregator } from 'aurelia-event-aggregator';
 
-import { GameService, MarkTypes } from "services/game-service";
+import { GameService, MarkTypes, Players } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
 import {
     GameHubSignalRService,
@@ -42,12 +42,12 @@ export class Game {
 
         this.gameId = gameId;
 
-        // TODO: Retrieve which player's turn it is at start
-        // TODO: Retrieve remaining mines at start
-        // TODO: Retrieve the points at start (so that interrupted games, reloaded pages don't show 0-0 points until a change event is received).
-        await this.initializeUserInfo();
-        await this.updateTable();
-        await this.updateMarks();
+        let playerId = await this.initializeUserInfo();
+
+        await this.initializeGameState(gameId, playerId);
+
+        await this.updateTable(gameId);
+        await this.updateMarks(gameId);
         await this.gameHubService.connect(gameId);
 
         // TODO: Consider interrupted games 
@@ -92,7 +92,19 @@ export class Game {
         });
     }
 
-    async initializeUserInfo() {
+    async initializeGameState(gameId: string, playerId: string) {
+        let result = await this.gameService.getGameState(gameId);
+
+        let isPlayer1 = playerId === result.player1State.playerId;
+        let player = isPlayer1 ? Players.Player1 : Players.Player2;
+
+        this.isMyTurn = result.nextPlayer === player;
+        this.remainingMines = result.remainingMines;
+        this.myPoints = isPlayer1 ? result.player1State.points : result.player2State.points;
+        this.opponentsPoints = isPlayer1 ? result.player2State.points : result.player1State.points;
+    }
+
+    async initializeUserInfo(): Promise<string> {
         let result = await this.accountService.getUserInfo();
 
         // TODO: Show a message
@@ -100,11 +112,15 @@ export class Game {
             return;
         }
 
-        this.myPlayerId = result.userInfo.id;
+        let userId = result.userInfo.id;
+
+        this.myPlayerId = userId;
+
+        return userId;
     }
 
-    async updateTable() {
-        let table = await this.gameService.getGameTable(this.gameId);
+    async updateTable(gameId: string) {
+        let table = await this.gameService.getGameTable(gameId);
 
         let newTableState: Field[][] = [];
         for (let row = 0; row < table.visibleTable.length; ++row) {
@@ -123,8 +139,8 @@ export class Game {
         this.gameTable = newTableState;
     }
 
-    async updateMarks() {
-        let marks = await this.gameService.getPlayerMarks(this.gameId);
+    async updateMarks(gameId: string) {
+        let marks = await this.gameService.getPlayerMarks(gameId);
 
         // TODO: Show a message
         if (!marks.success) {

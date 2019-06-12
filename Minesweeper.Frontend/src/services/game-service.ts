@@ -9,6 +9,22 @@ const apiUrl = "https://localhost:5001/api/games/"
 @autoinject()
 export class GameService {
 
+    async getGameState(gameId: string): Promise<GetGameStateResponse> {
+        let client = this.createHttpClient();
+
+        // TODO: Proper error handling
+        try {
+            let httpResponse = await client.fetch(`${gameId}`, { method: "GET", credentials: "include" });
+
+            let result = await httpResponse.json();
+
+            return <GetGameStateResponse>result;
+        }
+        catch (reason) {
+            console.log(reason);
+        }
+    }
+
     async getGameTable(gameId: string): Promise<GetGameTableResponse> {
         let client = this.createHttpClient();
 
@@ -177,6 +193,21 @@ export class GameService {
     }
 }
 
+export interface GetGameStateResponse {
+    remainingMines: number;
+    utcDateTimeStarted?: string;
+    player1State: PlayerState;
+    player2State: PlayerState;
+    nextPlayer: Players;
+    winner?: Players;
+    status: GameStatus;
+}
+
+export interface PlayerState {
+    points: number;
+    playerId: string;
+}
+
 export interface GetGameTableResponse {
     visibleTable: FieldTypes[][];
 }
@@ -185,6 +216,17 @@ export interface GetPlayerMarksResponse {
     success: boolean;
     errorMessage?: string;
     marks?: MarkTypes[][];
+}
+
+export enum Players {
+    Player1 = 0,
+    Player2 = 1
+}
+
+export enum GameStatus {
+    NotStarted = 0,
+    InProgress = 1,
+    Finished = 2
 }
 
 export enum MarkTypes {
