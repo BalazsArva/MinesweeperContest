@@ -60,4 +60,8 @@ body {
         color: $danger;
         border-bottom-color: $danger;
     }
+
+    &:focus {
+        outline: 0;
+    }
 }
