@@ -1,6 +1,7 @@
 import { autoinject } from "aurelia-framework";
 import { EventAggregator } from 'aurelia-event-aggregator';
 
+import BrowserConstants from '../constants/browser-constants';
 import { GameService, MarkTypes, Players } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
 import {
@@ -45,7 +46,6 @@ export class Game {
         let playerId = await this.initializeUserInfo();
 
         await this.initializeGameState(gameId, playerId);
-
         await this.updateTable(gameId);
         await this.updateMarks(gameId);
         await this.gameHubService.connect(gameId);
@@ -123,8 +123,7 @@ export class Game {
     }
 
     async makeMove(e: MouseEvent, row: number, col: number) {
-        // Left mouse button
-        if (e.button !== 0) {
+        if (e.button !== BrowserConstants.LeftMouseButtonId) {
             return;
         }
 
@@ -140,8 +139,7 @@ export class Game {
     }
 
     async markField(e: MouseEvent, row: number, col: number) {
-        // Right mouse button
-        if (e.button !== 2) {
+        if (e.button !== BrowserConstants.RightMouseButtonId) {
             return;
         }
 
