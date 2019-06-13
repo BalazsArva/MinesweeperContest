@@ -1,6 +1,7 @@
 import { autoinject } from "aurelia-framework";
-import { EventAggregator } from 'aurelia-event-aggregator';
+import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 
+import * as SignalR from '@aspnet/signalr';
 import BrowserConstants from '../constants/browser-constants';
 import { GameService, MarkTypes, Players } from "services/game-service";
 import { FieldTypes } from "../interfaces/field-types";
@@ -36,6 +37,9 @@ export class Game {
     myPoints: number = 0;
     opponentsPoints: number = 0;
 
+    subscriptions: Subscription[] = [];
+    signalRConnection: SignalR.HubConnection = null;
+
     constructor(private eventAggregator: EventAggregator, private accountService: AccountService, private gameService: GameService, private gameHubService: GameHubSignalRService) {
     }
 
@@ -49,16 +53,29 @@ export class Game {
         await this.initializeGameState(gameId, playerId);
         await this.updateTable(gameId);
         await this.updateMarks(gameId);
-        await this.gameHubService.connect(gameId);
 
         // TODO: Consider interrupted games 
         this.timerHandle = <number><any>setInterval(_ => ++this.elapsedSeconds, 1000);
+        this.signalRConnection = await this.gameHubService.connect(gameId);
 
-        this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, this.onTableChanged.bind(this));
-        this.eventAggregator.subscribe(`games:${gameId}:remainingMinesChanged`, this.onRemainingMinesChanged.bind(this));
-        this.eventAggregator.subscribe(`games:${gameId}:gameOver`, this.onGameOver.bind(this));
-        this.eventAggregator.subscribe(`games:${gameId}:pointsChanged`, this.onPointsChanged.bind(this));
-        this.eventAggregator.subscribe(`games:${gameId}:turnChanged`, this.onTurnChanged.bind(this));
+        this.subscriptions = [
+            this.eventAggregator.subscribe(`games:${gameId}:tableChanged`, this.onTableChanged.bind(this)),
+            this.eventAggregator.subscribe(`games:${gameId}:remainingMinesChanged`, this.onRemainingMinesChanged.bind(this)),
+            this.eventAggregator.subscribe(`games:${gameId}:gameOver`, this.onGameOver.bind(this)),
+            this.eventAggregator.subscribe(`games:${gameId}:pointsChanged`, this.onPointsChanged.bind(this)),
+            this.eventAggregator.subscribe(`games:${gameId}:turnChanged`, this.onTurnChanged.bind(this))
+        ];
+    };
+
+    async deactivate() {
+        // TODO: Refactor how connections are handled (shouldn't expose signalr, the hub service should return disposable objects which dispose the event subscriptions as well)
+        await this.signalRConnection.stop();
+
+        clearInterval(this.timerHandle);
+
+        for (let i = 0; i < this.subscriptions.length; ++i) {
+            this.subscriptions[i].dispose();
+        }
     }
 
     async initializeGameState(gameId: string, playerId: string) {

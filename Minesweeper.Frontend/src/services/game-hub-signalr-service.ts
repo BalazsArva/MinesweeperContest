@@ -13,7 +13,7 @@ export class GameHubSignalRService {
 
     }
 
-    async connect(gameId: string) {
+    async connect(gameId: string): Promise<SignalR.HubConnection> {
         // TODO: Error handling
         let connection = new SignalR.HubConnectionBuilder()
             .withUrl(gameHubUrl)
@@ -49,6 +49,8 @@ export class GameHubSignalRService {
         connection.on("TurnChanged", notification => {
             this.eventAggregator.publish(`games:${gameId}:turnChanged`, notification);
         });
+
+        return connection;
     }
 }
 
