@@ -31,6 +31,7 @@ export class Game {
     gameId: string = null;
     myPlayerId: string = null;
     isMyTurn: boolean = null;
+    isPlayer1: boolean = null;
 
     myPoints: number = 0;
     opponentsPoints: number = 0;
@@ -66,6 +67,7 @@ export class Game {
         let isPlayer1 = playerId === result.player1State.playerId;
         let player = isPlayer1 ? Players.Player1 : Players.Player2;
 
+        this.isPlayer1 = isPlayer1;
         this.isMyTurn = result.nextPlayer === player;
         this.remainingMines = result.remainingMines;
         this.myPoints = isPlayer1 ? result.player1State.points : result.player2State.points;

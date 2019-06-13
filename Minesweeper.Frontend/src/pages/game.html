@@ -20,19 +20,12 @@
 
     <div class="row">
         <div class="col text-center">
-
-            <span if.bind="isMyTurn === true">
-                Your turn
+            <b class="vertical-middle display-inline-block mx-2 ${ isPlayer1 && (isMyTurn === true) ? 'text-primary' : 'text-danger' }">
+                <i class="fas fa-2x fa-flag"></i>
+            </b>
+            <span class="vertical-middle display-inline-block">
+                ${ isMyTurn === true ? "Your " : "Opponent's "} turn
             </span>
-
-            <span if.bind="isMyTurn === false">
-                Opponent's turn
-            </span>
-
-            <span if.bind="isMyTurn === null">
-                Unknown turn
-            </span>
-
         </div>
     </div>
 
