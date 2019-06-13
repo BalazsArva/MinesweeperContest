@@ -7,6 +7,7 @@ export class NewGame {
 
     invitedPlayerId: string = null;
     @bindable selectedDifficulty: Difficulty = null;
+    @bindable customDifficulty: Difficulty = { width: 10, height: 10, mines: 10, title: "Custom" };
     @bindable selectableDifficulties: Difficulty[] = [
         { width: 10, height: 10, mines: 10, title: "Small" },
         { width: 15, height: 25, mines: 40, title: "Medium" },

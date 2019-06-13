@@ -1,0 +1,67 @@
+<template>
+    <label class="card btn btn-light ${ isSelected ? 'border-info' : '' } cursor-hand"
+        for="difficulty-${ difficulty.title }">
+
+        <div class="text-left m-0 p-0">
+            <div class="text-info">
+                <i if.bind="isSelected" class="fas fa-2x fa-check-square"></i>
+                <i if.bind="!isSelected" class="far fa-2x fa-square"></i>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <h1 class="h3 card-title">
+                ${ difficulty.title }
+            </h1>
+
+            <div class="row">
+
+                <!-- Grid size -->
+                <div class="col">
+                    <div class="mb-0">
+                        <div class="display-table">
+                            <div class="display-table-row">
+                                <div class="display-table-cell">
+                                    <input type="text" class="difficulty-selector-input info"
+                                        value.bind="difficulty.width" />
+                                </div>
+                                <div class="display-table-cell">
+                                    <b class="text-info h5">&times;</b>
+                                </div>
+                                <div class="display-table-cell">
+                                    <input type="text" class="difficulty-selector-input info"
+                                        value.bind="difficulty.height" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small>
+                        grid
+                    </small>
+                </div>
+
+                <!-- Mines -->
+                <div class="col text-danger">
+                    <div class="mb-0">
+                        <div class="display-table">
+                            <div class="display-table-row">
+                                <div class="display-table-cell">
+                                    <input type="text" class="difficulty-selector-input danger"
+                                        value.bind="difficulty.mines" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small>
+                        mines
+                    </small>
+                </div>
+            </div>
+
+            <p class="sr-only">
+                <input type="radio" name.bind="inputGroup" checked.bind="selectedDifficulty"
+                    id="difficulty-${ difficulty.title }" model.bind="difficulty" />
+            </p>
+        </div>
+    </label>
+</template>
