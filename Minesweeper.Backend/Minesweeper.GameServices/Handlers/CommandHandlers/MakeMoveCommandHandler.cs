@@ -10,6 +10,7 @@ using Minesweeper.GameServices.Contracts.Notifications;
 using Minesweeper.GameServices.Contracts.Responses;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Extensions;
+using Minesweeper.GameServices.GameEngine;
 using Minesweeper.GameServices.GameModel;
 using Raven.Client.Documents;
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Minesweeper.GameServices.Contracts;
+using Minesweeper.GameServices.GameEngine;
 using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
 using Minesweeper.GameServices.Handlers.RequestHandlers;

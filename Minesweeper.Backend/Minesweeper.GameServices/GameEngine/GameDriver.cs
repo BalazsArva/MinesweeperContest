@@ -2,7 +2,7 @@
 using Minesweeper.GameServices.Contracts.Responses;
 using Minesweeper.GameServices.GameModel;
 
-namespace Minesweeper.GameServices
+namespace Minesweeper.GameServices.GameEngine
 {
     public class GameDriver : IGameDriver
     {
