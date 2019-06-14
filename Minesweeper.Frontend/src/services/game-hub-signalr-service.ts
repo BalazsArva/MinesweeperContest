@@ -1,19 +1,11 @@
-import { autoinject } from 'aurelia-framework';
-import { EventAggregator } from 'aurelia-event-aggregator';
-
 import * as SignalR from '@aspnet/signalr';
-
 import { FieldTypes } from '../interfaces/field-types';
 
 const gameHubUrl = 'https://localhost:5001/hubs/game';
 
-@autoinject()
 export class GameHubSignalRService {
-    constructor(private eventAggregator: EventAggregator) {
 
-    }
-
-    async connect(gameId: string): Promise<SignalR.HubConnection> {
+    async connect(gameId: string): Promise<GameSession> {
         // TODO: Error handling
         let connection = new SignalR.HubConnectionBuilder()
             .withUrl(gameHubUrl)
@@ -25,32 +17,52 @@ export class GameHubSignalRService {
         catch (error) {
             console.error(error);
 
-            return;
+            return null;
         }
 
         await connection.send("SubscribeToGameNotifications", { gameId });
 
-        connection.on("GameTableUpdated", notification => {
-            this.eventAggregator.publish(`games:${gameId}:tableChanged`, notification);
-        });
+        return new GameSession(connection);
+    }
+}
 
-        connection.on("RemainingMinesChanged", notification => {
-            this.eventAggregator.publish(`games:${gameId}:remainingMinesChanged`, notification);
-        });
+export class GameSession {
 
-        connection.on("GameOver", notification => {
-            this.eventAggregator.publish(`games:${gameId}:gameOver`, notification);
-        });
+    constructor(private connection: SignalR.HubConnection) {
+    }
 
-        connection.on("PointsChanged", notification => {
-            this.eventAggregator.publish(`games:${gameId}:pointsChanged`, notification);
-        });
+    async dispose() {
+        await this.connection.stop();
+    }
 
-        connection.on("TurnChanged", notification => {
-            this.eventAggregator.publish(`games:${gameId}:turnChanged`, notification);
+    onTurnChanged(callback: (notification: TurnChangedNotification) => void) {
+        this.connection.on("TurnChanged", notification => {
+            callback(notification);
         });
+    }
 
-        return connection;
+    onPointsChanged(callback: (notification: PlayerPointsChangedNotification) => void) {
+        this.connection.on("PointsChanged", notification => {
+            callback(notification);
+        });
+    }
+
+    onGameOver(callback: (notification: GameOverNotification) => void) {
+        this.connection.on("GameOver", notification => {
+            callback(notification);
+        });
+    }
+
+    onRemainingMinesChanged(callback: (notification: RemainingMinesChangedNotification) => void) {
+        this.connection.on("RemainingMinesChanged", notification => {
+            callback(notification);
+        });
+    }
+
+    onGameTableUpdated(callback: (notification: GameTableUpdatedNotification) => void) {
+        this.connection.on("GameTableUpdated", notification => {
+            callback(notification);
+        });
     }
 }
 
