@@ -13,14 +13,12 @@ namespace Minesweeper.GameServices
         {
             var player = game.Player1.PlayerId == playerId ? GameModel.Players.Player1 : GameModel.Players.Player2;
 
-            var playerAllowedToMove = CheckPlayerCanMove(game, player);
-            if (!playerAllowedToMove)
+            if (!CheckPlayerCanMove(game, player))
             {
                 return MoveResultType.NotYourTurn;
             }
 
-            var canPerformMove = CheckCanPerformMove(game, row, column);
-            if (!canPerformMove)
+            if (!CheckCanPerformMove(game, row, column))
             {
                 return MoveResultType.CannotMoveThere;
             }
@@ -29,8 +27,7 @@ namespace Minesweeper.GameServices
 
             PerformMove(game, player, row, column);
 
-            var gameIsOver = IsGameOver(game);
-            if (gameIsOver)
+            if (IsGameOver(game))
             {
                 game.Status = GameModel.GameStatus.Finished;
                 game.Winner = DetermineWinner(game);
@@ -141,7 +138,6 @@ namespace Minesweeper.GameServices
             }
             else
             {
-                // TODO: Should cache this value somewhere
                 var minesAround = GetMinesAroundField(game, row, col);
                 switch (minesAround)
                 {
