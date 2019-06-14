@@ -20,7 +20,8 @@
 
     <div class="row">
         <div class="col text-center">
-            <b class="vertical-middle display-inline-block mx-2 ${ isPlayer1 && (isMyTurn === true) ? 'text-primary' : 'text-danger' }">
+            <b
+                class="vertical-middle display-inline-block mx-2 ${ isPlayer1 && (isMyTurn === true) ? 'text-primary' : 'text-danger' }">
                 <i class="fas fa-2x fa-flag"></i>
             </b>
             <span class="vertical-middle display-inline-block">
@@ -31,89 +32,91 @@
 
     <hr />
 
-    <div class="row justify-content-md-center" if.bind="gameTable">
-        <div class="col align-self-center" style="overflow-x:scroll;">
+    <div if.bind="gameTable" style="overflow-x: auto;">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center">
+                    <table class="display-inline-block">
+                        <tbody>
+                            <tr repeat.for="row of gameTable">
+                                <td repeat.for="field of row">
 
-            <table class="col" style="width: auto;">
-                <tbody>
-                    <tr repeat.for="row of gameTable">
-                        <td repeat.for="field of row">
+                                    <!-- Unopened field -->
+                                    <button if.bind="field.fieldType === 0"
+                                        class="btn btn-sm btn-light btn-game-table border-secondary"
+                                        click.delegate="makeMove($event, field.row, field.column)"
+                                        contextmenu.delegate="markField($event, field.row, field.column)">
+                                        <span if.bind="field.markType === 1">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                        <span if.bind="field.markType === 2">
+                                            <i class="fas fa-question"></i>
+                                        </span>
+                                    </button>
 
-                            <!-- Unopened field -->
-                            <button if.bind="field.fieldType === 0"
-                                class="btn btn-sm btn-light btn-game-table border-secondary"
-                                click.delegate="makeMove($event, field.row, field.column)"
-                                contextmenu.delegate="markField($event, field.row, field.column)">
-                                <span if.bind="field.markType === 1">
-                                    <i class="fas fa-times"></i>
-                                </span>
-                                <span if.bind="field.markType === 2">
-                                    <i class="fas fa-question"></i>
-                                </span>
-                            </button>
+                                    <!-- Opened field -->
+                                    <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light btn-game-table"
+                                        disabled>
 
-                            <!-- Opened field -->
-                            <button if.bind="field.fieldType !== 0" class="btn btn-sm btn-light btn-game-table"
-                                disabled>
+                                        <span class="align-top">
+                                            <!-- Player 1 found mine -->
+                                            <b if.bind="field.fieldType === 1" class="text-primary">
+                                                <i class="fas fa-flag"></i>
+                                            </b>
 
-                                <span class="align-top">
-                                    <!-- Player 1 found mine -->
-                                    <b if.bind="field.fieldType === 1" class="text-primary">
-                                        <i class="fas fa-flag"></i>
-                                    </b>
+                                            <!-- Player 2 found mine -->
+                                            <b if.bind="field.fieldType === 2" class="text-danger">
+                                                <i class="fas fa-flag"></i>
+                                            </b>
 
-                                    <!-- Player 2 found mine -->
-                                    <b if.bind="field.fieldType === 2" class="text-danger">
-                                        <i class="fas fa-flag"></i>
-                                    </b>
+                                            <!-- 1 mines around -->
+                                            <b if.bind="field.fieldType === 4" class="text-success">
+                                                1
+                                            </b>
 
-                                    <!-- 1 mines around -->
-                                    <b if.bind="field.fieldType === 4" class="text-success">
-                                        1
-                                    </b>
+                                            <!-- 2 mines around -->
+                                            <b if.bind="field.fieldType === 5" class="text-info">
+                                                2
+                                            </b>
 
-                                    <!-- 2 mines around -->
-                                    <b if.bind="field.fieldType === 5" class="text-info">
-                                        2
-                                    </b>
+                                            <!-- 3 mines around -->
+                                            <b if.bind="field.fieldType === 6" class="text-primary">
+                                                3
+                                            </b>
 
-                                    <!-- 3 mines around -->
-                                    <b if.bind="field.fieldType === 6" class="text-primary">
-                                        3
-                                    </b>
+                                            <!-- 4 mines around -->
+                                            <b if.bind="field.fieldType === 7" class="text-warning">
+                                                4
+                                            </b>
 
-                                    <!-- 4 mines around -->
-                                    <b if.bind="field.fieldType === 7" class="text-warning">
-                                        4
-                                    </b>
+                                            <!-- 5 mines around -->
+                                            <b if.bind="field.fieldType === 8" class="text-danger">
+                                                5
+                                            </b>
 
-                                    <!-- 5 mines around -->
-                                    <b if.bind="field.fieldType === 8" class="text-danger">
-                                        5
-                                    </b>
+                                            <!-- 6 mines around -->
+                                            <b if.bind="field.fieldType === 9" class="text-secondary">
+                                                6
+                                            </b>
 
-                                    <!-- 6 mines around -->
-                                    <b if.bind="field.fieldType === 9" class="text-secondary">
-                                        6
-                                    </b>
+                                            <!-- 7 mines around -->
+                                            <b if.bind="field.fieldType === 10" class="text-dark">
+                                                7
+                                            </b>
 
-                                    <!-- 7 mines around -->
-                                    <b if.bind="field.fieldType === 10" class="text-dark">
-                                        7
-                                    </b>
+                                            <!-- 8 mines around -->
+                                            <b if.bind="field.fieldType === 11" class="text-dark">
+                                                8
+                                            </b>
+                                        </span>
 
-                                    <!-- 8 mines around -->
-                                    <b if.bind="field.fieldType === 11" class="text-dark">
-                                        8
-                                    </b>
-                                </span>
-
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </template>

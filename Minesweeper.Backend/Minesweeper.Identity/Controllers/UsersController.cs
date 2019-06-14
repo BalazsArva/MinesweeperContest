@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.Identity.Contracts.Requests;
@@ -24,12 +23,10 @@ namespace Minesweeper.Identity.Controllers
         public async Task<IActionResult> RegisterUser(RegisterUserRequest request, CancellationToken cancellationToken)
         {
             // TODO: Validation
-
             var user = new AppUser
             {
                 DisplayName = request.DisplayName,
                 Email = request.Email,
-                // TODO: Maybe implement actual confirmation process
                 EmailConfirmed = true,
                 LockoutEnabled = true,
                 UserName = request.Email,

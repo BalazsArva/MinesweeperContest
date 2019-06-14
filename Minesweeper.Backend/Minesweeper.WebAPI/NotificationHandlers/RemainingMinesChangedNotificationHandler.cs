@@ -22,7 +22,6 @@ namespace Minesweeper.WebAPI.NotificationHandlers
         {
             var signalRNotification = new RemainingMinesChangedSignalRNotification(notification);
 
-            // TODO: Find out whether cancellation tokens can/should be passed to client calls
             await _hubContext.Clients.Group(notification.GameId).RemainingMinesChanged(signalRNotification).ConfigureAwait(false);
         }
     }
