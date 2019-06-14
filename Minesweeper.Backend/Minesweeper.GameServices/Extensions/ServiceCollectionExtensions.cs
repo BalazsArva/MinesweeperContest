@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Minesweeper.GameServices.Contracts;
 using Minesweeper.GameServices.GameEngine;
 using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
 using Minesweeper.GameServices.Handlers.RequestHandlers;
+using Minesweeper.GameServices.Handlers.RequestHandlers.Lobby;
 using Minesweeper.GameServices.Providers;
 
 namespace Minesweeper.GameServices.Extensions
@@ -17,7 +17,8 @@ namespace Minesweeper.GameServices.Extensions
                 .AddSingleton<IRandomNumberProvider, RandomNumberProvider>()
                 .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                 .AddSingleton<IGameDriver, GameDriver>()
-                .AddSingleton<ILobbyService, LobbyService>()
+                .AddSingleton<IGetAvailableGamesRequestHandler, GetAvailableGamesRequestHandler>()
+                .AddSingleton<IGetPlayersActiveGamesRequestHandler, GetPlayersActiveGamesRequestHandler>()
                 .AddSingleton<IRandomPlayerSelector, RandomPlayerSelector>()
                 .AddSingleton<IGameGenerator, GameGenerator>()
                 .AddSingleton<IGetGameStateRequestHandler, GetGameStateRequestHandler>()

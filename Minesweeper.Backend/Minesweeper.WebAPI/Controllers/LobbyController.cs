@@ -3,9 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Minesweeper.GameServices.Contracts;
-using Minesweeper.WebAPI.Contracts.Responses;
+using Minesweeper.GameServices.Contracts.Requests.Lobby;
+using Minesweeper.GameServices.Handlers.RequestHandlers.Lobby;
 using Minesweeper.WebAPI.Extensions;
+using Minesweeper.WebAPI.Mappers.Lobby;
 
 namespace Minesweeper.WebAPI.Controllers
 {
@@ -13,11 +14,13 @@ namespace Minesweeper.WebAPI.Controllers
     [ApiController]
     public class LobbyController : ControllerBase
     {
-        private readonly ILobbyService _lobbyService;
+        private readonly IGetAvailableGamesRequestHandler getAvailableGamesRequestHandler;
+        private readonly IGetPlayersActiveGamesRequestHandler getPlayersActiveGamesRequestHandler;
 
-        public LobbyController(ILobbyService lobbyService)
+        public LobbyController(IGetAvailableGamesRequestHandler getAvailableGamesRequestHandler, IGetPlayersActiveGamesRequestHandler getPlayersActiveGamesRequestHandler)
         {
-            _lobbyService = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
+            this.getAvailableGamesRequestHandler = getAvailableGamesRequestHandler ?? throw new ArgumentNullException(nameof(getAvailableGamesRequestHandler));
+            this.getPlayersActiveGamesRequestHandler = getPlayersActiveGamesRequestHandler ?? throw new ArgumentNullException(nameof(getPlayersActiveGamesRequestHandler));
         }
 
         [HttpGet]
@@ -25,11 +28,17 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> GetAvailableGames([FromQuery]int page = 1, [FromQuery]int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var userId = User.GetUserId();
+            var request = new GetAvailableGamesRequest
+            {
+                Page = page,
+                PageSize = pageSize,
+                UserId = User.GetUserId()
+            };
 
-            var results = await _lobbyService.GetAvailableGamesAsync(userId, page, pageSize, cancellationToken).ConfigureAwait(false);
+            var serviceResult = await getAvailableGamesRequestHandler.HandleAsync(request, cancellationToken).ConfigureAwait(false);
+            var apiResponse = GetAvailableGamesMapper.ToApiResponse(serviceResult);
 
-            return Ok(new GetAvailableGamesResponse(results));
+            return Ok(apiResponse);
         }
 
         [HttpGet]
@@ -37,11 +46,17 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> GetPlayersActiveGames([FromQuery]int page = 1, [FromQuery]int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var userId = User.GetUserId();
+            var request = new GetPlayersActiveGamesRequest
+            {
+                Page = page,
+                PageSize = pageSize,
+                UserId = User.GetUserId()
+            };
 
-            var results = await _lobbyService.GetPlayersActiveGamesAsync(userId, page, pageSize, cancellationToken).ConfigureAwait(false);
+            var serviceResult = await getPlayersActiveGamesRequestHandler.HandleAsync(request, cancellationToken).ConfigureAwait(false);
+            var apiResponse = GetPlayersActiveGamesMapper.ToApiResponse(serviceResult);
 
-            return Ok(new GetPlayersActiveGamesResponse(results));
+            return Ok(apiResponse);
         }
     }
 }
