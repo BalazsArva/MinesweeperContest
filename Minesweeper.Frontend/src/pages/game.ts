@@ -134,6 +134,37 @@ export class Game {
         }
     }
 
+    async markSurroundingFields(e: MouseEvent, clickedRow: number, clickedCol: number) {
+        if (!e.ctrlKey || e.button !== BrowserConstants.RightMouseButtonId) {
+            return;
+        }
+
+        for (let row = clickedRow - 1; row <= clickedRow + 1; ++row) {
+            for (let col = clickedCol - 1; col <= clickedCol + 1; ++col) {
+
+                if (col < 0 || row < 0 || row >= this.gameTable.length || col >= this.gameTable[0].length) {
+                    continue;
+                }
+
+                if (row === clickedRow && col === clickedCol) {
+                    continue;
+                }
+
+                let targetMarkType = MarkTypes.Empty;
+                let targetField = this.gameTable[row][col];
+
+                if (targetField.markType === targetMarkType) {
+                    continue;
+                }
+
+                let result = await this.gameService.markField(this.gameId, row, col, targetMarkType);
+                if (result.success) {
+                    targetField.markType = targetMarkType;
+                }
+            }
+        }
+    }
+
     async makeMove(e: MouseEvent, row: number, col: number) {
         if (e.button !== BrowserConstants.LeftMouseButtonId) {
             return;
