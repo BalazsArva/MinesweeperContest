@@ -1,4 +1,4 @@
-﻿namespace Minesweeper.GameServices.Contracts.Requests
+﻿namespace Minesweeper.GameServices.Contracts.Requests.Game
 {
     public class GetVisibleGameTableRequest
     {

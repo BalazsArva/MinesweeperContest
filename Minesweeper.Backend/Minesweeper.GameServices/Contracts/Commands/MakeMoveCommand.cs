@@ -2,20 +2,12 @@
 {
     public class MakeMoveCommand
     {
-        public MakeMoveCommand(string gameId, string playerId, int row, int column)
-        {
-            GameId = gameId;
-            PlayerId = playerId;
-            Row = row;
-            Column = column;
-        }
+        public string GameId { get; set; }
 
-        public string GameId { get; }
+        public string PlayerId { get; set; }
 
-        public string PlayerId { get; }
+        public int Row { get; set; }
 
-        public int Row { get; }
-
-        public int Column { get; }
+        public int Column { get; set; }
     }
 }

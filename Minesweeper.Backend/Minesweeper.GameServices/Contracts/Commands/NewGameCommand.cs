@@ -2,23 +2,14 @@
 {
     public class NewGameCommand
     {
-        public NewGameCommand(string hostPlayerId, string invitedPlayerId, int tableRows, int tableColumns, int mineCount)
-        {
-            HostPlayerId = hostPlayerId;
-            InvitedPlayerId = invitedPlayerId;
-            TableRows = tableRows;
-            TableColumns = tableColumns;
-            MineCount = mineCount;
-        }
+        public string HostPlayerId { get; set; }
 
-        public string HostPlayerId { get; }
+        public string InvitedPlayerId { get; set; }
 
-        public string InvitedPlayerId { get; }
+        public int TableRows { get; set; }
 
-        public int TableRows { get; }
+        public int TableColumns { get; set; }
 
-        public int TableColumns { get; }
-
-        public int MineCount { get; }
+        public int MineCount { get; set; }
     }
 }

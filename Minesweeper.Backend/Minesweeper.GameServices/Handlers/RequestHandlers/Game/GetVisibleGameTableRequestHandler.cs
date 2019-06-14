@@ -2,13 +2,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Minesweeper.GameServices.Cloners;
-using Minesweeper.GameServices.Contracts.Requests;
-using Minesweeper.GameServices.Contracts.Responses;
+using Minesweeper.GameServices.Contracts.Requests.Game;
+using Minesweeper.GameServices.Contracts.Responses.Game;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Extensions;
 using Raven.Client.Documents;
 
-namespace Minesweeper.GameServices.Handlers.RequestHandlers
+namespace Minesweeper.GameServices.Handlers.RequestHandlers.Game
 {
     public class GetVisibleGameTableRequestHandler : IGetVisibleGameTableRequestHandler
     {

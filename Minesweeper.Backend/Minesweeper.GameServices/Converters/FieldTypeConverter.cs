@@ -1,5 +1,5 @@
 ﻿using System;
-using Minesweeper.GameServices.Contracts.Responses;
+using Minesweeper.GameServices.Contracts.Responses.Game;
 
 namespace Minesweeper.GameServices.Converters
 {

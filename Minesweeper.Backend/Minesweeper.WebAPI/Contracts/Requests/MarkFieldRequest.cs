@@ -1,23 +1,13 @@
-﻿using Minesweeper.GameServices.Contracts.Responses;
-using Newtonsoft.Json;
+﻿using Minesweeper.GameServices.Contracts;
 
 namespace Minesweeper.WebAPI.Contracts.Requests
 {
     public class MarkFieldRequest
     {
-        [JsonConstructor]
-        public MarkFieldRequest(int row, int column, MarkTypes markType)
+        public int Row { get; set; }
 
-        {
-            Row = row;
-            Column = column;
-            MarkType = markType;
-        }
+        public int Column { get; set; }
 
-        public int Row { get; }
-
-        public int Column { get; }
-
-        public MarkTypes MarkType { get; }
+        public MarkTypes MarkType { get; set; }
     }
 }

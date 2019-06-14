@@ -2,17 +2,10 @@
 {
     public class JoinGameCommand
     {
-        public JoinGameCommand(string gameId, string playerId, string playerDisplayName)
-        {
-            GameId = gameId;
-            PlayerId = playerId;
-            PlayerDisplayName = playerDisplayName;
-        }
+        public string GameId { get; set; }
 
-        public string GameId { get; }
+        public string PlayerId { get; set; }
 
-        public string PlayerId { get; }
-
-        public string PlayerDisplayName { get; }
+        public string PlayerDisplayName { get; set; }
     }
 }

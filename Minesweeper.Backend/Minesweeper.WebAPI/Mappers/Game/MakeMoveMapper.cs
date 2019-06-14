@@ -2,7 +2,7 @@
 using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.WebAPI.Contracts.Requests;
 
-namespace Minesweeper.WebAPI.Mappers
+namespace Minesweeper.WebAPI.Mappers.Game
 {
     public static class MakeMoveMapper
     {
@@ -13,7 +13,13 @@ namespace Minesweeper.WebAPI.Mappers
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return new MakeMoveCommand(gameId, playerId, request.Row, request.Column);
+            return new MakeMoveCommand
+            {
+                GameId = gameId,
+                PlayerId = playerId,
+                Row = request.Row,
+                Column = request.Column,
+            };
         }
     }
 }

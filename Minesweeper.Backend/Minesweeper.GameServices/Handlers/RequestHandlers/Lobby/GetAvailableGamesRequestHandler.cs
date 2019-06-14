@@ -27,7 +27,7 @@ namespace Minesweeper.GameServices.Handlers.RequestHandlers.Lobby
             using (var session = _documentStore.OpenAsyncSession())
             {
                 var results = await session
-                    .Query<Game>()
+                    .Query<GameModel.Game>()
                     .Statistics(out var statistics)
                     .Where(g => g.InvitedPlayerId == null && g.Status == GameStatus.NotStarted && g.Player2.PlayerId == null && g.Player1.PlayerId != request.UserId)
                     .Paginate(request.Page, request.PageSize)
@@ -46,7 +46,7 @@ namespace Minesweeper.GameServices.Handlers.RequestHandlers.Lobby
                 var transformedResults = results
                     .Select(r => new AvailableGame
                     {
-                        GameId = _documentStore.TrimCollectionPrefixFromDocumentId<Game>(r.Id),
+                        GameId = _documentStore.TrimCollectionPrefixFromDocumentId<GameModel.Game>(r.Id),
                         HostPlayerId = r.Player1Id,
                         HostPlayerDisplayName = r.Player1DisplayName,
                         Rows = r.Rows,

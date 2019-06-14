@@ -1,4 +1,4 @@
-﻿namespace Minesweeper.GameServices.Contracts.Responses
+﻿namespace Minesweeper.GameServices.Contracts.Responses.Game
 {
     public class MoveResult
     {

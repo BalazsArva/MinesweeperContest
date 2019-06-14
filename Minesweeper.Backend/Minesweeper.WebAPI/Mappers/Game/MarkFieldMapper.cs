@@ -2,7 +2,7 @@
 using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.WebAPI.Contracts.Requests;
 
-namespace Minesweeper.WebAPI.Mappers
+namespace Minesweeper.WebAPI.Mappers.Game
 {
     public static class MarkFieldMapper
     {
@@ -13,7 +13,14 @@ namespace Minesweeper.WebAPI.Mappers
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return new MarkFieldCommand(gameId, playerId, request.Row, request.Column, request.MarkType);
+            return new MarkFieldCommand
+            {
+                GameId = gameId,
+                PlayerId = playerId,
+                Row = request.Row,
+                Column = request.Column,
+                MarkType = request.MarkType
+            };
         }
     }
 }

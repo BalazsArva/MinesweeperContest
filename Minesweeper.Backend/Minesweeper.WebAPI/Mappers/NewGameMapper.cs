@@ -13,7 +13,14 @@ namespace Minesweeper.WebAPI.Mappers
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return new NewGameCommand(playerId, request.InvitedPlayerId, request.TableRows, request.TableColumns, request.MineCount);
+            return new NewGameCommand
+            {
+                HostPlayerId = playerId,
+                InvitedPlayerId = request.InvitedPlayerId,
+                TableRows = request.TableRows,
+                TableColumns = request.TableColumns,
+                MineCount = request.MineCount
+            };
         }
     }
 }

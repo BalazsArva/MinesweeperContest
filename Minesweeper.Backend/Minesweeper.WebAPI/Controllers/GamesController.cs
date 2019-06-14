@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.GameServices.Contracts.Commands;
-using Minesweeper.GameServices.Contracts.Requests;
+using Minesweeper.GameServices.Contracts.Requests.Game;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
-using Minesweeper.GameServices.Handlers.RequestHandlers;
+using Minesweeper.GameServices.Handlers.RequestHandlers.Game;
 using Minesweeper.WebAPI.Contracts.Requests;
 using Minesweeper.WebAPI.Contracts.Responses;
 using Minesweeper.WebAPI.Extensions;
 using Minesweeper.WebAPI.Mappers;
+using Minesweeper.WebAPI.Mappers.Game;
 
 namespace Minesweeper.WebAPI.Controllers
 {
@@ -86,7 +87,10 @@ namespace Minesweeper.WebAPI.Controllers
 
             var playerMarks = await _getPlayerMarksRequestHandler.HandleAsync(request, cancellationToken).ConfigureAwait(false);
 
-            return Ok(new GetPlayerMarksResponse(playerMarks));
+            return Ok(new GetPlayerMarksResponse
+            {
+                Marks = playerMarks
+            });
         }
 
         [HttpPost]
@@ -137,10 +141,12 @@ namespace Minesweeper.WebAPI.Controllers
         public async Task<IActionResult> JoinGame(string gameId, CancellationToken cancellationToken)
         {
             // TODO: Retrieve the real display name
-            var userId = User.GetUserId();
-            var displayName = userId;
-
-            var command = new JoinGameCommand(gameId, userId, displayName);
+            var command = new JoinGameCommand
+            {
+                GameId = gameId,
+                PlayerId = User.GetUserId(),
+                PlayerDisplayName = User.GetUserId()
+            };
 
             await _joinGameCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 

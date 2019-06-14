@@ -1,20 +1,13 @@
-﻿using Minesweeper.GameServices.Contracts.Responses;
+﻿using Minesweeper.GameServices.Contracts.Responses.Game;
 
 namespace Minesweeper.GameServices.Contracts.Notifications
 {
     public class FieldUpdate
     {
-        public FieldUpdate(int row, int column, VisibleFieldType fieldType)
-        {
-            Row = row;
-            Column = column;
-            FieldType = fieldType;
-        }
+        public int Row { get; set; }
 
-        public int Row { get; }
+        public int Column { get; set; }
 
-        public int Column { get; }
-
-        public VisibleFieldType FieldType { get; }
+        public VisibleFieldType FieldType { get; set; }
     }
 }

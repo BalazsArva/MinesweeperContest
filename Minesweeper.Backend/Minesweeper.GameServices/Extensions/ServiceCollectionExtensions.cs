@@ -2,7 +2,7 @@
 using Minesweeper.GameServices.GameEngine;
 using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
-using Minesweeper.GameServices.Handlers.RequestHandlers;
+using Minesweeper.GameServices.Handlers.RequestHandlers.Game;
 using Minesweeper.GameServices.Handlers.RequestHandlers.Lobby;
 using Minesweeper.GameServices.Providers;
 

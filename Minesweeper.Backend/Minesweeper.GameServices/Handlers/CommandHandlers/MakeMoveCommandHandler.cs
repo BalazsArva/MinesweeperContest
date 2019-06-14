@@ -7,7 +7,7 @@ using MediatR;
 using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.GameServices.Contracts.Notifications;
-using Minesweeper.GameServices.Contracts.Responses;
+using Minesweeper.GameServices.Contracts.Responses.Game;
 using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameEngine;
@@ -81,7 +81,11 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
             }
         }
 
-        private async Task PublishTableUpdatedAsync(string gameId, GameModel.VisibleFieldType[][] previousTableState, GameModel.VisibleFieldType[][] newTableState, CancellationToken cancellationToken)
+        private async Task PublishTableUpdatedAsync(
+            string gameId,
+            GameModel.VisibleFieldType[][] previousTableState,
+            GameModel.VisibleFieldType[][] newTableState,
+            CancellationToken cancellationToken)
         {
             var fieldUpdates = new List<FieldUpdate>(previousTableState.Length * previousTableState[0].Length);
 
@@ -93,12 +97,12 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                     {
                         var fieldType = FieldTypeConverter.ToContract(newTableState[row][col]);
 
-                        fieldUpdates.Add(new FieldUpdate(row, col, fieldType));
+                        fieldUpdates.Add(new FieldUpdate { Row = row, Column = col, FieldType = fieldType });
                     }
                 }
             }
 
-            await _mediator.Publish(new GameTableUpdatedNotification(gameId, fieldUpdates), cancellationToken).ConfigureAwait(false);
+            await _mediator.Publish(new GameTableUpdatedNotification { GameId = gameId, FieldUpdates = fieldUpdates }, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task PublishPointsIfChangedAsync(
@@ -113,12 +117,26 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
         {
             if (player1PointsBeforeMove != player1PointsAfterMove)
             {
-                await _mediator.Publish(new PlayerPointsChangedNotification(gameId, player1Id, player1PointsAfterMove)).ConfigureAwait(false);
+                var notification = new PlayerPointsChangedNotification
+                {
+                    GameId = gameId,
+                    PlayerId = player1Id,
+                    Points = player1PointsAfterMove
+                };
+
+                await _mediator.Publish(notification).ConfigureAwait(false);
             }
 
             if (player2PointsBeforeMove != player2PointsAfterMove)
             {
-                await _mediator.Publish(new PlayerPointsChangedNotification(gameId, player2Id, player2PointsAfterMove)).ConfigureAwait(false);
+                var notification = new PlayerPointsChangedNotification
+                {
+                    GameId = gameId,
+                    PlayerId = player2Id,
+                    Points = player2PointsAfterMove
+                };
+
+                await _mediator.Publish(notification).ConfigureAwait(false);
             }
         }
 
@@ -126,7 +144,7 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
         {
             if (playerIdBeforeMove != playerIdAfterMove)
             {
-                await _mediator.Publish(new PlayersTurnNotification(gameId, playerIdAfterMove), cancellationToken).ConfigureAwait(false);
+                await _mediator.Publish(new PlayersTurnNotification { GameId = gameId, PlayerId = playerIdAfterMove }, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -134,23 +152,20 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
         {
             if (mineCountBeforeMove != mineCountAfterMove)
             {
-                await _mediator.Publish(new RemainingMinesChangedNotification(gameId, mineCountAfterMove)).ConfigureAwait(false);
+                await _mediator.Publish(new RemainingMinesChangedNotification { GameId = gameId, RemainingMineCount = mineCountAfterMove }).ConfigureAwait(false);
             }
         }
 
         private async Task PublishWinnerAsync(string gameId, GameModel.Players? winnerPlayer, string player1Id, string player2Id, CancellationToken cancellationToken)
         {
+            string winnerPlayerId = null;
+
             if (winnerPlayer.HasValue)
             {
-                var winner = winnerPlayer.Value;
-                var winnerPlayerId = winner == GameModel.Players.Player1 ? player1Id : player2Id;
+                winnerPlayerId = winnerPlayer.Value == GameModel.Players.Player1 ? player1Id : player2Id;
+            }
 
-                await _mediator.Publish(new GameOverNotification(gameId, winnerPlayerId), cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                await _mediator.Publish(new GameOverNotification(gameId, null), cancellationToken).ConfigureAwait(false);
-            }
+            await _mediator.Publish(new GameOverNotification { GameId = gameId, WinnerPlayerId = winnerPlayerId }, cancellationToken).ConfigureAwait(false);
         }
 
         private int GetRemainingMineCount(Game game)

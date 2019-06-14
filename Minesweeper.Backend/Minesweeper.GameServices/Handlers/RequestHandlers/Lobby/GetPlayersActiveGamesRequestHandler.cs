@@ -27,7 +27,7 @@ namespace Minesweeper.GameServices.Handlers.RequestHandlers.Lobby
             using (var session = _documentStore.OpenAsyncSession())
             {
                 var results = await session
-                    .Query<Game>()
+                    .Query<GameModel.Game>()
                     .Statistics(out var statistics)
                     .Where(g => g.Status == GameStatus.NotStarted || g.Status == GameStatus.InProgress)
                     .Where(g => g.Player1.PlayerId == request.UserId || g.Player2.PlayerId == request.UserId)
@@ -56,7 +56,7 @@ namespace Minesweeper.GameServices.Handlers.RequestHandlers.Lobby
 
                         return new PlayersGame
                         {
-                            GameId = _documentStore.TrimCollectionPrefixFromDocumentId<Game>(r.Id),
+                            GameId = _documentStore.TrimCollectionPrefixFromDocumentId<GameModel.Game>(r.Id),
                             OtherPlayerId = otherPlayerId,
                             OtherPlayerDisplayName = otherPlayerDisplayName,
                             Rows = r.Rows,

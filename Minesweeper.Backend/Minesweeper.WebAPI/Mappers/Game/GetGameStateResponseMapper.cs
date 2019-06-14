@@ -1,8 +1,8 @@
-﻿namespace Minesweeper.WebAPI.Mappers
+﻿namespace Minesweeper.WebAPI.Mappers.Game
 {
     public static class GetGameStateResponseMapper
     {
-        public static Contracts.Responses.Game.GetGameStateResponse ToApiResponse(GameServices.Contracts.Responses.GetGameStateResponse serviceResponse)
+        public static Contracts.Responses.Game.GetGameStateResponse ToApiResponse(GameServices.Contracts.Responses.Game.GetGameStateResponse serviceResponse)
         {
             return new Contracts.Responses.Game.GetGameStateResponse
             {
