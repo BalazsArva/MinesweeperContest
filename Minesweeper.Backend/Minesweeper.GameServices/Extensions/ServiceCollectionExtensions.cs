@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Minesweeper.GameServices.GameEngine;
-using Minesweeper.GameServices.Generators;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
 using Minesweeper.GameServices.Handlers.RequestHandlers.Game;
 using Minesweeper.GameServices.Handlers.RequestHandlers.Lobby;
-using Minesweeper.GameServices.Providers;
+using Minesweeper.GameServices.Utilities.Generators;
+using Minesweeper.GameServices.Utilities.Providers;
 
 namespace Minesweeper.GameServices.Extensions
 {

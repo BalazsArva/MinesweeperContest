@@ -1,4 +1,4 @@
-﻿namespace Minesweeper.GameServices.Providers
+﻿namespace Minesweeper.GameServices.Utilities.Providers
 {
     public interface IRandomNumberProvider
     {

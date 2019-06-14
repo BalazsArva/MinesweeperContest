@@ -2,10 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Minesweeper.GameServices.Contracts.Commands;
-using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
+using Minesweeper.GameServices.Utilities.Converters;
 using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices.Handlers.CommandHandlers

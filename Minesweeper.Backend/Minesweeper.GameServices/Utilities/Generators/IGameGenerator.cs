@@ -1,6 +1,6 @@
 ﻿using Minesweeper.GameServices.GameModel;
 
-namespace Minesweeper.GameServices.Generators
+namespace Minesweeper.GameServices.Utilities.Generators
 {
     public interface IGameGenerator
     {

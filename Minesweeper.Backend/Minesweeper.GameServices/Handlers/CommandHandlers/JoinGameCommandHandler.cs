@@ -5,8 +5,8 @@ using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.GameServices.Exceptions;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameModel;
-using Minesweeper.GameServices.Generators;
-using Minesweeper.GameServices.Providers;
+using Minesweeper.GameServices.Utilities.Generators;
+using Minesweeper.GameServices.Utilities.Providers;
 using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices.Handlers.CommandHandlers

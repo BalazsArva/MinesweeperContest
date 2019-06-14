@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts.Requests.Game;
 using Minesweeper.GameServices.Contracts.Responses.Game;
-using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Extensions;
+using Minesweeper.GameServices.Utilities.Cloners;
+using Minesweeper.GameServices.Utilities.Converters;
 using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices.Handlers.RequestHandlers.Game

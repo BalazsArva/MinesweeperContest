@@ -1,7 +1,7 @@
 ﻿using System;
 using Minesweeper.GameServices.Contracts.Responses.Game;
 
-namespace Minesweeper.GameServices.Converters
+namespace Minesweeper.GameServices.Utilities.Converters
 {
     public static class FieldTypeConverter
     {

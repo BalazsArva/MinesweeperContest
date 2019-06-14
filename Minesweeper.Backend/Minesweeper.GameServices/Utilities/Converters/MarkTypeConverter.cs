@@ -1,7 +1,7 @@
 ﻿using System;
 using Minesweeper.GameServices.Contracts;
 
-namespace Minesweeper.GameServices.Converters
+namespace Minesweeper.GameServices.Utilities.Converters
 {
     public static class MarkTypeConverter
     {

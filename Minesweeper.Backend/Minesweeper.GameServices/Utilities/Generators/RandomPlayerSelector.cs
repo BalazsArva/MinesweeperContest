@@ -1,17 +1,17 @@
 ﻿using System;
 using Minesweeper.GameServices.GameModel;
-using Minesweeper.GameServices.Providers;
+using Minesweeper.GameServices.Utilities.Providers;
 
-namespace Minesweeper.GameServices.Generators
+namespace Minesweeper.GameServices.Utilities.Generators
 {
     public class RandomPlayerSelector : IRandomPlayerSelector
     {
+        private readonly IRandomNumberProvider _randomNumberProvider;
+
         public RandomPlayerSelector(IRandomNumberProvider randomNumberProvider)
         {
             _randomNumberProvider = randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
         }
-
-        private readonly IRandomNumberProvider _randomNumberProvider;
 
         public Players SelectRandomPlayer()
         {

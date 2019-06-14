@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minesweeper.GameServices.Providers
+namespace Minesweeper.GameServices.Utilities.Providers
 {
     public interface IGuidProvider
     {

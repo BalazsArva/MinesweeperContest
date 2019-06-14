@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minesweeper.GameServices.Cloners
+namespace Minesweeper.GameServices.Utilities.Cloners
 {
     public static class EnumArrayCloner
     {

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Minesweeper.GameServices.Cloners;
 using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.GameServices.Contracts.Notifications;
 using Minesweeper.GameServices.Contracts.Responses.Game;
-using Minesweeper.GameServices.Converters;
 using Minesweeper.GameServices.Extensions;
 using Minesweeper.GameServices.GameEngine;
 using Minesweeper.GameServices.GameModel;
+using Minesweeper.GameServices.Utilities.Cloners;
+using Minesweeper.GameServices.Utilities.Converters;
 using Raven.Client.Documents;
 
 namespace Minesweeper.GameServices.Handlers.CommandHandlers
