@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -46,13 +48,13 @@ namespace Minesweeper.WebAPI.Controllers
         [HttpPost]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginRequest loginModel)
+        public async Task<IActionResult> Login(LoginRequest loginModel, CancellationToken cancellationToken)
         {
-            var token = await LoginUser(loginModel.Email, loginModel.Password);
+            var token = await LoginUserAsync(loginModel.Email, loginModel.Password, cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(token.AccessToken))
             {
-                var user = await GetUserInfo(token.AccessToken);
+                var user = await GetUserInfoAsync(token.AccessToken, cancellationToken).ConfigureAwait(false);
 
                 var claims = new List<Claim>
                 {
@@ -75,85 +77,80 @@ namespace Minesweeper.WebAPI.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
-            await LogoutUser(User.FindFirstValue(AccessTokenClaimKey));
+            await LogoutUserAsync(User.FindFirstValue(AccessTokenClaimKey), cancellationToken);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return Ok();
         }
 
-        private async Task<OidcTokenResponse> LoginUser(string username, string password)
+        private async Task<OidcTokenResponse> LoginUserAsync(string username, string password, CancellationToken cancellationToken)
         {
+            // TODO: Reuse a client
             using (var client = new HttpClient())
             {
-                // The Token Endpoint Authentication Method must be set to POST if you
-                // want to send the client_secret in the POST body.
-                // If Token Endpoint Authentication Method then client_secret must be
-                // combined with client_id and provided as a base64 encoded string
-                // in a basic authorization header.
-                // e.g. Authorization: basic <base64 encoded ("client_id:client_secret")>
-                var formData = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("username", username),
-                    new KeyValuePair<string, string>("password", password),
-                    new KeyValuePair<string, string>("client_id", ClientId),
-                    new KeyValuePair<string, string>("client_secret", ClientSecret),
-                    new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("scope", "Minesweeper.Apis.Game Minesweeper.Identity openid")
-                });
-
                 var uri = $"{IdentityApiBaseUrl}/connect/token";
 
-                var res = await client.PostAsync(uri, formData);
-                var json = await res.Content.ReadAsStringAsync();
+                var request = new PasswordTokenRequest
+                {
+                    Address = uri,
+                    Password = password,
+                    UserName = username,
+                    ClientId = ClientId,
+                    ClientSecret = ClientSecret,
+                    Scope = "Minesweeper.Apis.Game Minesweeper.Identity openid email profile"
+                };
 
-                var tokenReponse = JsonConvert.DeserializeObject<OidcTokenResponse>(json);
+                var response = await client.RequestPasswordTokenAsync(request, cancellationToken).ConfigureAwait(false);
 
-                return tokenReponse;
+                return new OidcTokenResponse
+                {
+                    AccessToken = response.AccessToken,
+                    ExpiresIn = response.ExpiresIn.ToString(CultureInfo.InvariantCulture),
+                    RefeshToken = response.RefreshToken,
+                    TokenType = response.TokenType
+                };
             }
         }
 
-        private async Task<bool> LogoutUser(string accessToken)
+        private async Task<bool> LogoutUserAsync(string accessToken, CancellationToken cancellationToken)
         {
-            // TODO: Should not create a http client all the time. A global singleton one will do.
+            // TODO: Should not create a http client all the time.
             using (var client = new HttpClient())
             {
-                // The Token Endpoint Authentication Method must be set to POST if you
-                // want to send the client_secret in the POST body.
-                // If Token Endpoint Authentication Method then client_secret must be
-                // combined with client_id and provided as a base64 encoded string
-                // in a basic authorization header.
-                // e.g. Authorization: basic <base64 encoded ("client_id:client_secret")>
-                var formData = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("token", accessToken),
-                    new KeyValuePair<string, string>("token_type_hint", "access_token"),
-                    new KeyValuePair<string, string>("client_id", ClientId),
-                    new KeyValuePair<string, string>("client_secret", ClientSecret)
-                });
-
                 var uri = $"{IdentityApiBaseUrl}/connect/revocation";
 
-                var res = await client.PostAsync(uri, formData);
+                var request = new TokenRevocationRequest
+                {
+                    Address = uri,
+                    ClientId = ClientId,
+                    ClientSecret = ClientSecret,
+                    Token = accessToken,
+                    TokenTypeHint = "access_token"
+                };
 
-                return res.IsSuccessStatusCode;
+                var response = await client.RevokeTokenAsync(request, cancellationToken).ConfigureAwait(false);
+
+                // TODO: Improve this
+                return !response.IsError;
             }
         }
 
-        private async Task<User> GetUserInfo(string accessToken)
+        private async Task<User> GetUserInfoAsync(string accessToken, CancellationToken cancellationToken)
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
                 var uri = $"{IdentityApiBaseUrl}/connect/userinfo";
+                var request = new UserInfoRequest
+                {
+                    Address = uri,
+                    Token = accessToken
+                };
 
-                var res = await client.GetAsync(uri);
+                var userInfo = await client.GetUserInfoAsync(request, cancellationToken).ConfigureAwait(false);
 
-                var json = await res.Content.ReadAsStringAsync();
-
-                return JsonConvert.DeserializeObject<User>(json);
+                return JsonConvert.DeserializeObject<User>(userInfo.Raw);
             }
         }
     }
