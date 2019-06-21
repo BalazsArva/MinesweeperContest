@@ -34,7 +34,6 @@ namespace Minesweeper.Identity.Controllers
             };
 
             var creationResult = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
-
             if (creationResult.Succeeded)
             {
                 return Ok();
