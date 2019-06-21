@@ -10,6 +10,11 @@ namespace Minesweeper.WebAPI.Mappers
     {
         public static NewGameCommand ToCommand(ClaimsPrincipal user, NewGameRequest request)
         {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
             if (request == null)
             {
                 throw new ArgumentNullException(nameof(request));
