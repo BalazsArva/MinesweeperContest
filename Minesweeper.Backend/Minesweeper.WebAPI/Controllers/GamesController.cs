@@ -126,8 +126,7 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> CreateGame([FromBody] NewGameRequest request, CancellationToken cancellationToken)
         {
-            var userId = User.GetUserId();
-            var command = NewGameMapper.ToCommand(userId, request);
+            var command = NewGameMapper.ToCommand(User, request);
 
             var gameId = await _newGameCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 

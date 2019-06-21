@@ -4,6 +4,8 @@
     {
         public string HostPlayerId { get; set; }
 
+        public string HostPlayerDisplayName { get; set; }
+
         public string InvitedPlayerId { get; set; }
 
         public int TableRows { get; set; }

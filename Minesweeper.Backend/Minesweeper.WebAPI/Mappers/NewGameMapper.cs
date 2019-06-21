@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Security.Claims;
 using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.WebAPI.Contracts.Requests;
+using Minesweeper.WebAPI.Extensions;
 
 namespace Minesweeper.WebAPI.Mappers
 {
     public static class NewGameMapper
     {
-        public static NewGameCommand ToCommand(string playerId, NewGameRequest request)
+        public static NewGameCommand ToCommand(ClaimsPrincipal user, NewGameRequest request)
         {
             if (request == null)
             {
@@ -15,7 +17,9 @@ namespace Minesweeper.WebAPI.Mappers
 
             return new NewGameCommand
             {
-                HostPlayerId = playerId,
+                // TODO: Use display name instead of email once it is retrieved from IDP
+                HostPlayerDisplayName = user.GetEmail(),
+                HostPlayerId = user.GetUserId(),
                 InvitedPlayerId = request.InvitedPlayerId,
                 TableRows = request.TableRows,
                 TableColumns = request.TableColumns,
