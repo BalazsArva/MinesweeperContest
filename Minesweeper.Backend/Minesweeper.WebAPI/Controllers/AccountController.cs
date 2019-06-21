@@ -33,15 +33,11 @@ namespace Minesweeper.WebAPI.Controllers
         // TODO: This returns 500 because of challenge failure instead of 401 when the user is not authenticated. Fix it here and everywhere else as unauthenticated requests will be 500 instead of 401.
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetUserInfo()
+        public IActionResult GetUserInfo()
         {
-            // TODO: Return additional user information
             return Ok(new GetUserInfoResponse
             {
-                UserInfo =
-                {
-                    Id = User.GetUserId()
-                }
+                UserInfo = User.ToUserInfo()
             });
         }
 
