@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Minesweeper.Common;
 using Minesweeper.WebAPI.Contracts.Requests;
 using Minesweeper.WebAPI.Contracts.Responses.Account;
 using Minesweeper.WebAPI.Extensions;
@@ -54,8 +55,9 @@ namespace Minesweeper.WebAPI.Controllers
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(CustomClaimTypes.DisplayName, user.DisplayName),
                     new Claim(AccessTokenClaimKey, token.AccessToken)
                 };
 
@@ -96,7 +98,7 @@ namespace Minesweeper.WebAPI.Controllers
                     UserName = username,
                     ClientId = ClientId,
                     ClientSecret = ClientSecret,
-                    Scope = "Minesweeper.Apis.Game openid email profile"
+                    Scope = $"Minesweeper.Apis.Game openid email profile {CustomScopes.CustomProfile}"
                 };
 
                 var response = await client.RequestPasswordTokenAsync(request, cancellationToken).ConfigureAwait(false);

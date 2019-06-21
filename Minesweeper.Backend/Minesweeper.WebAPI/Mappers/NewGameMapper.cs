@@ -22,8 +22,7 @@ namespace Minesweeper.WebAPI.Mappers
 
             return new NewGameCommand
             {
-                // TODO: Use display name instead of email once it is retrieved from IDP
-                HostPlayerDisplayName = user.GetEmail(),
+                HostPlayerDisplayName = user.GetDisplayName(),
                 HostPlayerId = user.GetUserId(),
                 InvitedPlayerId = request.InvitedPlayerId,
                 TableRows = request.TableRows,

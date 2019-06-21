@@ -18,7 +18,7 @@ namespace Minesweeper.WebAPI.Mappers
             {
                 GameId = gameId,
                 PlayerId = user.GetUserId(),
-                PlayerDisplayName = user.GetEmail(),
+                PlayerDisplayName = user.GetDisplayName(),
             };
         }
     }
