@@ -3,6 +3,7 @@ using System.Linq;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Models;
+using Minesweeper.Common;
 
 namespace Minesweeper.Identity.Data.Setup
 {
@@ -12,7 +13,17 @@ namespace Minesweeper.Identity.Data.Setup
         {
             new IdentityResources.Email(),
             new IdentityResources.Profile(),
-            new IdentityResources.OpenId()
+            new IdentityResources.OpenId(),
+            new IdentityResource
+            {
+                DisplayName = "Custom profile",
+                Description = "Contains profile information beyond what is provided by the OpenID spec.",
+                Name = "CustomProfile",
+                UserClaims = new List<string>
+                {
+                    CustomClaimTypes.DisplayName
+                }
+            }
         };
 
         public static void EnsureClientsRegistered(ConfigurationDbContext configurationDbContext)

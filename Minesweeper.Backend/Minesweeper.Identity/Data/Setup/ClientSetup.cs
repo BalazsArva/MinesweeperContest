@@ -3,6 +3,7 @@ using System.Linq;
 using IdentityServer4;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Models;
+using Minesweeper.Common;
 using Client = IdentityServer4.EntityFramework.Entities.Client;
 using ClientCorsOrigin = IdentityServer4.EntityFramework.Entities.ClientCorsOrigin;
 using ClientGrantType = IdentityServer4.EntityFramework.Entities.ClientGrantType;
@@ -44,6 +45,7 @@ namespace Minesweeper.Identity.Data.Setup
                 {
                     // TODO: Move custom constants to a central location
                     new ClientScope { Scope = "Minesweeper.Apis.Game" },
+                    new ClientScope { Scope = CustomScopes.CustomProfile },
                     new ClientScope { Scope = IdentityServerConstants.StandardScopes.OpenId },
                     new ClientScope { Scope = IdentityServerConstants.StandardScopes.Profile },
                     new ClientScope { Scope = IdentityServerConstants.StandardScopes.Email }

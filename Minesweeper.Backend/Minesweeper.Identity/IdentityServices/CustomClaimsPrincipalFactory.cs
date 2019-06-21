@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Minesweeper.Common;
 using Minesweeper.Identity.Data.Entities;
 
 namespace Minesweeper.Identity.IdentityServices
@@ -22,9 +23,11 @@ namespace Minesweeper.Identity.IdentityServices
 
         protected override async Task<ClaimsIdentity> GenerateClaimsAsync(AppUser user)
         {
-            var result = await base.GenerateClaimsAsync(user).ConfigureAwait(false);
+            var defaultClaims = await base.GenerateClaimsAsync(user).ConfigureAwait(false);
 
-            return result;
+            defaultClaims.AddClaim(new Claim(CustomClaimTypes.DisplayName, user.DisplayName, ClaimValueTypes.String));
+
+            return defaultClaims;
         }
     }
 }
