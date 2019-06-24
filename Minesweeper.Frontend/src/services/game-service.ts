@@ -77,7 +77,7 @@ export class GameService {
         let request = { method: "post", body: json(body), credentials: "include" };
 
         try {
-            let httpResponse = await client.fetch(`${gameId}/make-move`, request);
+            let httpResponse = await client.fetch(`${gameId}/moves`, request);
 
             // TODO: Do proper error handling
             if (!httpResponse.ok) {
@@ -96,7 +96,7 @@ export class GameService {
         let request = { method: "post", body: json(body), credentials: "include" };
 
         try {
-            let httpResponse = await client.fetch(`${gameId}/mark-field`, request);
+            let httpResponse = await client.fetch(`${gameId}/player-marks`, request);
 
             if (httpResponse.ok) {
                 return { success: true };

@@ -88,7 +88,7 @@ namespace Minesweeper.WebAPI.Controllers
         }
 
         [Authorize]
-        [HttpPost("{gameId}/make-move")]
+        [HttpPost("{gameId}/moves")]
         public async Task<IActionResult> MakeMove(string gameId, [FromBody]MakeMoveRequest request, CancellationToken cancellationToken)
         {
             var userId = User.GetUserId();
@@ -100,7 +100,7 @@ namespace Minesweeper.WebAPI.Controllers
         }
 
         [Authorize]
-        [HttpPost("{gameId}/mark-field")]
+        [HttpPost("{gameId}/player-marks")]
         public async Task<IActionResult> MarkField(string gameId, [FromBody]MarkFieldRequest request, CancellationToken cancellationToken)
         {
             var userId = User.GetUserId();
