@@ -1,13 +1,20 @@
 ﻿using System;
+using System.Security.Claims;
 using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.WebAPI.Contracts.Requests;
+using Minesweeper.WebAPI.Extensions;
 
 namespace Minesweeper.WebAPI.Mappers
 {
     public static class NewGameMapper
     {
-        public static NewGameCommand ToCommand(string playerId, NewGameRequest request)
+        public static NewGameCommand ToCommand(ClaimsPrincipal user, NewGameRequest request)
         {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
             if (request == null)
             {
                 throw new ArgumentNullException(nameof(request));
@@ -15,7 +22,8 @@ namespace Minesweeper.WebAPI.Mappers
 
             return new NewGameCommand
             {
-                HostPlayerId = playerId,
+                HostPlayerDisplayName = user.GetDisplayName(),
+                HostPlayerId = user.GetUserId(),
                 InvitedPlayerId = request.InvitedPlayerId,
                 TableRows = request.TableRows,
                 TableColumns = request.TableColumns,

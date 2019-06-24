@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Minesweeper.GameServices.Contracts.Commands;
 using Minesweeper.GameServices.Contracts.Requests.Game;
 using Minesweeper.GameServices.Handlers.CommandHandlers;
 using Minesweeper.GameServices.Handlers.RequestHandlers.Game;
@@ -126,8 +125,7 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> CreateGame([FromBody] NewGameRequest request, CancellationToken cancellationToken)
         {
-            var userId = User.GetUserId();
-            var command = NewGameMapper.ToCommand(userId, request);
+            var command = NewGameMapper.ToCommand(User, request);
 
             var gameId = await _newGameCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
@@ -140,13 +138,7 @@ namespace Minesweeper.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> JoinGame(string gameId, CancellationToken cancellationToken)
         {
-            // TODO: Retrieve the real display name
-            var command = new JoinGameCommand
-            {
-                GameId = gameId,
-                PlayerId = User.GetUserId(),
-                PlayerDisplayName = User.GetUserId()
-            };
+            var command = JoinGameMapper.ToCommand(User, gameId);
 
             await _joinGameCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 

@@ -1,22 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using IdentityServer4.EntityFramework.DbContexts;
-using IdentityResource = IdentityServer4.EntityFramework.Entities.IdentityResource;
+using IdentityServer4.EntityFramework.Mappers;
+using IdentityServer4.Models;
+using Minesweeper.Common;
 
 namespace Minesweeper.Identity.Data.Setup
 {
     public static class IdentityResourceSetup
     {
-        // TODO: Delete if no longer needed
-        private static List<IdentityResource> _knownIdentityResources = new List<IdentityResource>
+        private static readonly List<IdentityResource> _knownIdentityResources = new List<IdentityResource>
         {
+            new IdentityResources.Email(),
+            new IdentityResources.Profile(),
+            new IdentityResources.OpenId(),
             new IdentityResource
             {
-                Description = "Represents identity resources used by the minesweeper game.",
-                DisplayName = "Minesweeper Identity Data",
-                Name = "Minesweeper.Identity",
-                Enabled = true,
-                ShowInDiscoveryDocument = true
+                DisplayName = "Custom profile",
+                Description = "Contains profile information beyond what is provided by the OpenID spec.",
+                Name = "CustomProfile",
+                UserClaims = new List<string>
+                {
+                    CustomClaimTypes.DisplayName
+                }
             }
         };
 
@@ -33,12 +39,10 @@ namespace Minesweeper.Identity.Data.Setup
                     identityResourcesInDb.Remove(identityResourceInDb);
                 }
 
-                identityResourcesInDb.Add(identityResource);
+                identityResourcesInDb.Add(identityResource.ToEntity());
             }
 
             configurationDbContext.SaveChanges();
-
-            _knownIdentityResources = null;
         }
     }
 }

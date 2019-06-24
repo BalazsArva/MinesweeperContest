@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minesweeper.Identity.Data;
 using Minesweeper.Identity.Data.Entities;
-using Minesweeper.Identity.Data.Setup;
+using Minesweeper.Identity.IdentityServices;
 
 namespace Minesweeper.Identity
 {
@@ -26,37 +25,41 @@ namespace Minesweeper.Identity
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MinesweeperIdentityDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("Minesweeper.IdentityDb")));
-
-            services.AddIdentity<AppUser, IdentityRole>()
-                .AddEntityFrameworkStores<MinesweeperIdentityDbContext>()
-                .AddUserManager<AspNetUserManager<AppUser>>()
-                .AddDefaultTokenProviders();
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
             services.AddCors(cors => cors.AddPolicy("Frontend", configure => configure.SetIsOriginAllowed(url => url == "http://localhost:9000").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 
-            services.AddIdentityServer()
+            services
+                .AddDbContext<MinesweeperIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Minesweeper.IdentityDb")));
+
+            services
+                .AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<MinesweeperIdentityDbContext>()
+                .AddUserManager<AspNetUserManager<AppUser>>()
+                .AddRoleManager<AspNetRoleManager<IdentityRole>>()
+                .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
+                .AddDefaultTokenProviders();
+
+            services
+                .AddIdentityServer()
                 // TODO: Replace with a proper signing credential later
                 .AddDeveloperSigningCredential()
                 .AddConfigurationStore(options =>
                 {
-                    // this adds the config data from DB (clients, resources)
+                    // This adds the config data from DB (clients, resources)
                     options.ConfigureDbContext = b =>
                         b.UseSqlServer(Configuration.GetConnectionString("Minesweeper.ConfigDb"), sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddOperationalStore(options =>
                 {
-                    // this adds the operational data from DB (codes, tokens, consents)
+                    // This adds the operational data from DB (codes, tokens, consents)
                     options.ConfigureDbContext = b =>
                         b.UseSqlServer(Configuration.GetConnectionString("Minesweeper.OperationalDb"), sql => sql.MigrationsAssembly(migrationsAssembly));
 
-                    // this enables automatic token cleanup. this is optional.
+                    // This enables automatic token cleanup. This is optional.
                     options.EnableTokenCleanup = true;
                 })
-                .AddAspNetIdentity<AppUser>();
+                .AddAspNetIdentity<AppUser>()
+                .AddProfileService<CustomProfileService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -78,20 +81,7 @@ namespace Minesweeper.Identity
             app.UseHttpsRedirection();
             app.UseMvc();
 
-            SeedDatabase(app);
-        }
-
-        private void SeedDatabase(IApplicationBuilder app)
-        {
-            // TODO: Only migrate if needed
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var identityServerConfigurationDbContext = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-
-                ClientSetup.EnsureClientsRegistered(identityServerConfigurationDbContext);
-                ApiResourceSetup.EnsureApiResourcesRegistered(identityServerConfigurationDbContext);
-                IdentityResourceSetup.EnsureClientsRegistered(identityServerConfigurationDbContext);
-            }
+            DatabaseSeeder.SeedDatabase(app);
         }
     }
 }

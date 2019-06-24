@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using IdentityServer4;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Models;
+using Minesweeper.Common;
 using Client = IdentityServer4.EntityFramework.Entities.Client;
 using ClientCorsOrigin = IdentityServer4.EntityFramework.Entities.ClientCorsOrigin;
 using ClientGrantType = IdentityServer4.EntityFramework.Entities.ClientGrantType;
@@ -13,7 +15,7 @@ namespace Minesweeper.Identity.Data.Setup
 {
     public static class ClientSetup
     {
-        private static List<Client> _knownClients = new List<Client>
+        private static readonly List<Client> _knownClients = new List<Client>
         {
             new Client
             {
@@ -41,9 +43,12 @@ namespace Minesweeper.Identity.Data.Setup
                 }).ToList(),
                 AllowedScopes = new List<ClientScope>
                 {
+                    // TODO: Move custom constants to a central location
                     new ClientScope { Scope = "Minesweeper.Apis.Game" },
-                    new ClientScope { Scope = "Minesweeper.Identity" },
-                    new ClientScope { Scope = "openid" },
+                    new ClientScope { Scope = CustomScopes.CustomProfile },
+                    new ClientScope { Scope = IdentityServerConstants.StandardScopes.OpenId },
+                    new ClientScope { Scope = IdentityServerConstants.StandardScopes.Profile },
+                    new ClientScope { Scope = IdentityServerConstants.StandardScopes.Email }
                 },
                 AllowAccessTokensViaBrowser = true,
 
@@ -73,8 +78,6 @@ namespace Minesweeper.Identity.Data.Setup
             }
 
             configurationDbContext.SaveChanges();
-
-            _knownClients = null;
         }
     }
 }

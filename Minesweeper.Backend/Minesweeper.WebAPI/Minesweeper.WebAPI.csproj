@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Minesweeper.Common\Minesweeper.Common.csproj" />
     <ProjectReference Include="..\Minesweeper.DataAccess.RavenDb\Minesweeper.DataAccess.RavenDb.csproj" />
     <ProjectReference Include="..\Minesweeper.GameServices\Minesweeper.GameServices.csproj" />
   </ItemGroup>

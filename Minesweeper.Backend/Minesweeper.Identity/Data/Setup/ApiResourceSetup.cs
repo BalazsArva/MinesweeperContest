@@ -8,7 +8,8 @@ namespace Minesweeper.Identity.Data.Setup
 {
     public static class ApiResourceSetup
     {
-        private static List<ApiResource> _knownApiResources = new List<ApiResource>
+        // TODO: Ensure this scope is actually used for gaming
+        private static readonly List<ApiResource> _knownApiResources = new List<ApiResource>
         {
             new ApiResource
             {
@@ -16,8 +17,7 @@ namespace Minesweeper.Identity.Data.Setup
                 DisplayName = "Minesweeper Game API",
                 Scopes = new List<ApiScope>
                 {
-                    new ApiScope { DisplayName = "Game API default scope", Name = "Minesweeper.Apis.Game", Required = true, ShowInDiscoveryDocument = true },
-                    new ApiScope { DisplayName = "Game API openid scope", Name = "openid", Required = true, ShowInDiscoveryDocument = true },
+                    new ApiScope { Name = "Minesweeper.Apis.Game", Required = true, ShowInDiscoveryDocument = true }
                 },
                 Name = "Minesweeper",
                 Enabled = true
@@ -41,8 +41,6 @@ namespace Minesweeper.Identity.Data.Setup
             }
 
             configurationDbContext.SaveChanges();
-
-            _knownApiResources = null;
         }
     }
 }

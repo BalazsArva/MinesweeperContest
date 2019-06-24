@@ -46,9 +46,7 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                 game.Id = _documentStore.GetPrefixedDocumentId<Game>(gameId);
                 game.InvitedPlayerId = string.IsNullOrWhiteSpace(command.InvitedPlayerId) ? null : command.InvitedPlayerId;
                 game.Player1.PlayerId = command.HostPlayerId;
-
-                // TODO: Look up the real display name using some user API
-                game.Player1.DisplayName = command.HostPlayerId;
+                game.Player1.DisplayName = command.HostPlayerDisplayName;
 
                 await session.StoreAsync(game, cancellationToken).ConfigureAwait(false);
                 await session.StoreAsync(player1MarksDocument, cancellationToken).ConfigureAwait(false);

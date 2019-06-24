@@ -48,11 +48,9 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
                 var player2MarksDocument = new PlayerMarks { Marks = player2MarkTable, Id = player2MarksDocumentId };
 
                 game.UtcDateTimeStarted = _dateTimeProvider.GetUtcDateTime();
-                game.Player2.PlayerId = player2Id;
-
-                // TODO: Remove the display name from the command and retrieve from the identity data.
-                game.Player2.DisplayName = command.PlayerDisplayName;
                 game.Status = GameStatus.InProgress;
+                game.Player2.PlayerId = player2Id;
+                game.Player2.DisplayName = command.PlayerDisplayName;
 
                 // TODO: Investigate what exception is thrown when a concurrent update occurs (because of the changevector) and rethrow an appropriate custom exception
                 await session.StoreAsync(game, changeVector, game.Id, cancellationToken).ConfigureAwait(false);
