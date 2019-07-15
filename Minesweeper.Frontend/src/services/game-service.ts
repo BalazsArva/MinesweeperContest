@@ -74,19 +74,19 @@ export class GameService {
     async makeMove(gameId: string, row: number, column: number): Promise<void> {
         let client = this.createHttpClient();
 
+        let httpResponse: Response;
         let body = { column, row };
         let request = { method: "post", body: json(body), credentials: "include" };
 
         try {
-            let httpResponse = await client.fetch(`${gameId}/moves`, request);
-
-            // TODO: Do proper error handling
-            if (!httpResponse.ok) {
-                throw Error("Unexpected status code: " + httpResponse.status);
-            }
+            httpResponse = await client.fetch(`${gameId}/moves`, request);
         }
-        catch (reason) {
-            console.log(reason);
+        catch{
+            throw Error("Failed to make move due to a connection error. Please try again later.");
+        }
+
+        if (!httpResponse.ok) {
+            throw Error("Failed to make move. Unexpected status code: " + httpResponse.status);
         }
     }
 
@@ -124,6 +124,7 @@ export class GameService {
             "X-Requested-With": "Fetch"
         };
 
+        let httpResponse: Response;
         let request = { method: "POST", credentials: "include" };
 
         client.configure(config => {
@@ -134,15 +135,14 @@ export class GameService {
         });
 
         try {
-            let httpResponse = await client.fetch(`${gameId}/player2`, request);
-
-            // TODO: Do proper error handling
-            if (!httpResponse.ok) {
-                throw Error("Unexpected status code: " + httpResponse.status);
-            }
+            httpResponse = await client.fetch(`${gameId}/player2`, request);
         }
         catch (reason) {
-            console.log(reason);
+            throw Error("Failed to join the game due to a connection error. Please try again later.");
+        }
+
+        if (!httpResponse.ok) {
+            throw Error("Failed to join the game. Unexpected status code: " + httpResponse.status);
         }
     }
 
