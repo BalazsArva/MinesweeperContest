@@ -26,7 +26,7 @@ namespace Minesweeper.WebAPI
             services.AddRavenDb(Configuration);
             services.AddGameServices();
             services.AddSignalR();
-            services.AddCors(cors => cors.AddPolicy("Frontend", configure => configure.SetIsOriginAllowed(url => url == "http://localhost:9000").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+            services.AddCors(cors => cors.AddPolicy("Frontend", configure => configure.SetIsOriginAllowed(url => url == "http://localhost:9000").AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithExposedHeaders("Location")));
             services.AddMediatR();
 
             services

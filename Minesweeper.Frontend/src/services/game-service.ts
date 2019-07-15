@@ -2,6 +2,7 @@ import { HttpClient, json } from "aurelia-fetch-client";
 import { autoinject } from "aurelia-framework";
 
 import { FieldTypes } from "../interfaces/field-types";
+import { HttpResponse } from "@aspnet/signalr";
 
 const apiUrl = "https://localhost:5001/api/games/"
 
@@ -145,13 +146,14 @@ export class GameService {
         }
     }
 
-    async createGame(invitedPlayerId: string, tableRows: number, tableColumns: number, mineCount: number): Promise<void> {
+    async createGame(invitedPlayerId: string, tableRows: number, tableColumns: number, mineCount: number): Promise<string> {
         let client = new HttpClient();
         let defaultHeaders = {
             "Accept": "application/json",
             "X-Requested-With": "Fetch"
         };
 
+        let httpResponse: Response;
         let body = { tableRows, tableColumns, mineCount, invitedPlayerId };
         let request = { method: "POST", credentials: "include", body: json(body) };
 
@@ -163,16 +165,24 @@ export class GameService {
         });
 
         try {
-            let httpResponse = await client.fetch("", request);
+            httpResponse = await client.fetch("", request);
+        }
+        catch (e) {
+            throw Error("Failed to create game due to a connection error. Please try again later.");
+        }
 
-            // TODO: Do proper error handling
-            if (!httpResponse.ok) {
-                throw Error("Unexpected status code: " + httpResponse.status);
-            }
+        if (!httpResponse.ok) {
+            throw Error("Failed to create the game. Unexpected status code: " + httpResponse.status);
         }
-        catch (reason) {
-            console.log(reason);
-        }
+
+        const gamesUriSegment = "/games/";
+        const guidStringLength = 36;
+
+        let gameApiUri = httpResponse.headers.get("Location");
+        let indexOfGamesUriSegment = gameApiUri.toLowerCase().indexOf(gamesUriSegment);
+        let gameIdIndex = indexOfGamesUriSegment + gamesUriSegment.length;
+
+        return gameApiUri.substr(gameIdIndex, guidStringLength);
     }
 
     private createHttpClient(): HttpClient {

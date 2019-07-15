@@ -5,6 +5,8 @@ import { GameService } from "services/game-service";
 @autoinject
 export class NewGame {
 
+    busy: boolean = false;
+    createdGameId: string = null;
     invitedPlayerId: string = null;
     @bindable selectedDifficulty: Difficulty = null;
     @bindable customDifficulty: Difficulty = { width: 10, height: 10, mines: 10, title: "Custom" };
@@ -18,9 +20,23 @@ export class NewGame {
     }
 
     async create() {
-        let diff = this.selectedDifficulty;
-        let invitedPlayerId = this.invitedPlayerId;
+        if (this.busy) {
+            return;
+        }
 
-        await this.gameService.createGame(invitedPlayerId, diff.height, diff.width, diff.mines);
+        try {
+            this.busy = true;
+            this.createdGameId = null;
+
+            let diff = this.selectedDifficulty;
+            let invitedPlayerId = this.invitedPlayerId;
+
+            let gameId = await this.gameService.createGame(invitedPlayerId, diff.height, diff.width, diff.mines);
+
+            this.createdGameId = gameId;
+        }
+        finally {
+            this.busy = false;
+        }
     }
 }

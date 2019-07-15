@@ -27,7 +27,8 @@
                         </difficulty-selector>
                     </div>
                     <div class="form-group col-12 col-lg">
-                        <difficulty-selector-custom difficulty.bind="customDifficulty" selected-difficulty.bind="selectedDifficulty">
+                        <difficulty-selector-custom difficulty.bind="customDifficulty"
+                            selected-difficulty.bind="selectedDifficulty">
                         </difficulty-selector-custom>
                     </div>
                 </div>
@@ -37,6 +38,25 @@
 
         <hr />
 
-        <button type="submit" class="btn btn-primary">Start</button>
+        <div class="row">
+            <div class="col">
+                <span if.bind="createdGameId" class="alert alert-success mr-5">
+                    Your game has just been created!
+                    <a class="btn btn-sm btn-success ml-3"
+                        route-href="route: game; params.bind: { gameId: createdGameId }">
+                        Go to game
+                    </a>
+                </span>
+            </div>
+
+            <div class="col text-right">
+                <span class="alert">
+                    <a class="btn btn-link" route-href="route: lobby">Back to lobby</a>
+
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </span>
+            </div>
+        </div>
+
     </form>
 </template>

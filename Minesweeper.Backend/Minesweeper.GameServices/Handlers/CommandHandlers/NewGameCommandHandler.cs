@@ -53,7 +53,7 @@ namespace Minesweeper.GameServices.Handlers.CommandHandlers
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-                return game.Id;
+                return gameId;
             }
         }
     }
